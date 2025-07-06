@@ -9,7 +9,10 @@
 	"id": "cheeseworks.favorite_mods",
 	"name": "Favorite Mods",
 	"version": "v1.0.0",
-	"developer": "Cheeseworks",
+	"developers": [
+		"Cheeseworks",
+		"ArcticWoof"
+	],
 	"description": "Add installed Geode mods as your favorites!",
 	"dependencies": {
 		"alphalaneous.alphas_geode_utils": {
@@ -19,5 +22,10 @@
 	},
 	"links": {
 		"source": "https://github.com/BlueWitherer/FavoriteMods"
-	}
+	},
+	"issues": {
+		"info": "Report any issues to our repository!",
+		"url": "https://www.github.com/BlueWitherer/FavoriteMods/issues/"
+	},
+	"early-load": false
 }
