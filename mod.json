@@ -33,5 +33,9 @@
 		"info": "Report any issues to our repository!",
 		"url": "https://www.github.com/BlueWitherer/FavoriteMods/issues/"
 	},
+	"tags": [
+		"offline",
+		"enhancement"
+	],
 	"early-load": false
 }
