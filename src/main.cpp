@@ -20,9 +20,9 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             log::debug("Actions menu found, creating favorites button...");
 
             // favorites button sprite
-            auto favBtnSprite = CircleButtonSprite::createWithSprite(
+            auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
                 "GJ_starsIcon_001.png",
-                0.75f,
+                0.875f,
                 (isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green)
             );
             favBtnSprite->setScale(0.8f);
@@ -46,7 +46,6 @@ class $nodeModify(MyModsLayer, ModsLayer) {
 
     void onFavoritesBtn(CCObject*) {
         log::debug("clicky click");
-        return;
     };
 };
 
