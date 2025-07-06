@@ -1,0 +1,20 @@
+{
+	"geode": "4.6.3",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "cheeseworks.favorite_mods",
+	"name": "Favorite Mods",
+	"version": "v1.0.0",
+	"developer": "Cheeseworks",
+	"description": "Add installed Geode mods as your favorites!",
+	"dependencies": {
+		"alphalaneous.alphas_geode_utils": {
+			"importance": "required",
+			"version": ">=1.1.0"
+		}
+	}
+}
