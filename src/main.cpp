@@ -22,7 +22,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             // favorites button sprite
             auto favBtnSprite = CircleButtonSprite::createWithSprite(
                 "GJ_starsIcon_001.png",
-                0.85f,
+                0.75f,
                 (isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green)
             );
             favBtnSprite->setScale(0.8f);
