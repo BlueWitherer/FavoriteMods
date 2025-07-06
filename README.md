@@ -5,7 +5,7 @@ Add installed Geode mods as your favorites!
 
 > [<img alt="Latest Version" src="https://img.shields.io/github/v/release/BlueWitherer/FavoriteMods?include_prereleases&sort=semver&display_name=release&style=for-the-badge&logo=github&logoColor=ffffff&label=Version">](../../releases/) [<img alt="Code License" src="https://img.shields.io/github/license/BlueWitherer/FavoriteMods?style=for-the-badge&logo=gnu&logoColor=ffffff&label=License">](LICENSE.md)
 >  
-> [<img alt="Mod Downloads" src="https://img.shields.io/github/downloads/BlueWitherer/FavoriteMods/total?style=for-the-badge&logo=geode&logoColor=ffffff&label=Downloads">](https://www.geode-sdk.org/mods/cheeseworks.advancedautoretry)
+> [<img alt="Mod Downloads" src="https://img.shields.io/github/downloads/BlueWitherer/FavoriteMods/total?style=for-the-badge&logo=geode&logoColor=ffffff&label=Downloads">](https://www.geode-sdk.org/mods/cheeseworks.favoritemods)
 
 Find your absolute favorite mods quicker than ever.
 

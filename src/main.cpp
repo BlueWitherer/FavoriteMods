@@ -2,6 +2,8 @@
 
 #include <Geode/ui/GeodeUI.hpp>
 
+#include <Geode/utils/terminate.hpp>
+
 #include <alphalaneous.alphas_geode_utils/include/NodeModding.h>
 
 using namespace geode::prelude;
@@ -46,6 +48,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
 
     void onFavoritesBtn(CCObject*) {
         log::debug("clicky click");
+        openInfoPopup(getMod());
     };
 };
 
