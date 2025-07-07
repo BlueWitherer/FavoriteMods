@@ -37,5 +37,24 @@
 		"offline",
 		"enhancement"
 	],
+	"settings": {
+		"enabled-required": {
+			"type": "bool",
+			"name": "Only Show Enabled Mods",
+			"description": "Only list mods that you have enabled on your client.",
+			"default": false
+		},
+		"other": {
+			"type": "title",
+			"name": "Other",
+			"description": "Miscellaneous mod functions."
+		},
+		"alerts": {
+			"type": "bool",
+			"name": "Error Alerts",
+			"description": "Show alerts when errors occur.",
+			"default": false
+		}
+	},
 	"early-load": false
 }

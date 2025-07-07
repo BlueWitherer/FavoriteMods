@@ -10,6 +10,7 @@
 
 using namespace geode::prelude;
 
+auto getThisMod = getMod();
 
 // use alpha's geode utils to modify layer
 class $nodeModify(MyModsLayer, ModsLayer) {
@@ -34,6 +35,13 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             };
         } else {
             log::error("Failed to get Geode loader");
+        };
+
+        if (getThisMod->hasSavedValue(getThisMod->getID())) {
+            log::debug("User has loaded the mod before");
+        } else {
+            log::info("User has loaded this mod for the first time!");
+            getThisMod->setSavedValue(getThisMod->getID(), true);
         };
 
         // get the actions menu
@@ -103,23 +111,24 @@ class $nodeModify(MyModsLayer, ModsLayer) {
 
     void onFavoritesBtn(CCObject*) {
         log::debug("Favorites button clicked!");
+        bool alerts = getThisMod->getSettingValue<bool>("alerts");
 
         try {
             auto popup = FavoritesPopup::create();
+
             if (popup) {
                 popup->show();
                 log::debug("Favorites popup shown successfully");
             } else {
                 log::error("Failed to create favorites popup!");
-                FLAlertLayer::create("Error", "Failed to create favorites popup!", "OK")->show();
-            }
-            // lets try catch something shall we :p
-        } catch (const std::exception& e) {
+                if (alerts) FLAlertLayer::create("Error", "Failed to create favorites popup!", "OK")->show();
+            };
+        } catch (const std::exception& e) { // lets try catch something shall we :p
             log::error("Exception while showing favorites popup: {}", e.what());
-            FLAlertLayer::create("Error", "An error occurred while showing the favorites popup!", "OK")->show();
+            if (alerts) FLAlertLayer::create("Error", "An error occurred while showing the favorites popup!", "OK")->show();
         } catch (...) {
             log::error("Unknown error occurred while showing favorites popup");
-            FLAlertLayer::create("Error", "An unknown error occurred while showing the favorites popup!", "OK")->show();
-        }
+            if (alerts) FLAlertLayer::create("Error", "An unknown error occurred while showing the favorites popup!", "OK")->show();
+        };
     };
 };

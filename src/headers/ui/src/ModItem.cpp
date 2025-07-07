@@ -10,7 +10,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
     m_parentPopup = parentPopup;
 
     // Check if this mod is already favorited
-    isFavorite = getMod()->getSavedValue<bool>(m_mod->getID(), false);
+    isFavorite = m_thisMod->getSavedValue<bool>(m_mod->getID(), false);
 
     if (CCNode::init()) {
         this->setID(m_mod->getID());
@@ -25,7 +25,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
         m_backgroundSprite->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
         m_backgroundSprite->setColor({ 125, 125, 125 });
         m_backgroundSprite->setOpacity(50);
-        
+
         this->addChild(m_backgroundSprite);
 
         // Mod icon sprite
@@ -33,7 +33,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
         modIcon->setScale(0.5f);
         modIcon->setPosition({ 20.f, this->getScaledContentHeight() / 2.f });
         modIcon->ignoreAnchorPointForPosition(false);
-        modIcon->setAnchorPoint({ 0.5, 0.5 }); 
+        modIcon->setAnchorPoint({ 0.5, 0.5 });
 
         this->addChild(modIcon);
 
@@ -123,22 +123,16 @@ void ModItem::onViewMod(CCObject*) {
 void ModItem::onFavorite(CCObject*) {
     // Toggle favorite status
     isFavorite = !isFavorite;
-    
+
     // Save the favorite status
-    getMod()->setSavedValue<bool>(m_mod->getID(), isFavorite);
-    
+    m_thisMod->setSavedValue<bool>(m_mod->getID(), isFavorite);
+
     // Update the icon
     updateFavoriteIcon();
-    
+
     // Notify parent popup to refresh
-    if (m_parentPopup) {
-        m_parentPopup->onModFavoriteChanged();
-    }
-    
-    // Show notification (very annoying)
-    //std::string message = isFavorite ? "Added to favorites!" : "Removed from favorites!";
-    //Notification::create(message, NotificationIcon::Success, 1.5f)->show();
-}
+    if (m_parentPopup) m_parentPopup->onModFavoriteChanged();
+};
 
 void ModItem::updateFavoriteIcon() {
     if (m_favButton) {
@@ -146,9 +140,12 @@ void ModItem::updateFavoriteIcon() {
             isFavorite ? "GJ_starsIcon_001.png" : "GJ_starsIcon_gray_001.png"
         );
         newSprite->setScale(0.875f);
+
         m_favButton->setNormalImage(newSprite);
-    }
-}
+    } else {
+        log::error("Favorite button not found");
+    };
+};
 
 ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
     auto ret = new ModItem();

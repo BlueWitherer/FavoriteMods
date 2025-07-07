@@ -6,18 +6,16 @@
 
 #include <Geode/ui/GeodeUI.hpp>
 
-#include <Geode/utils/terminate.hpp>
-
 using namespace geode::prelude;
 
-std::string toLowercase(std::string str) {
-    std::string newStr = str;
+std::string toLowercase(std::string s) {
+    std::string str = s;
 
-    for (auto& c : newStr) {
+    for (auto& c : str) {
         c = tolower(c);
     };
 
-    return newStr;
+    return str;
 };
 
 bool FavoritesPopup::setup() {
@@ -27,9 +25,21 @@ bool FavoritesPopup::setup() {
     // geode loader
     auto loader = Loader::get();
 
+    auto [widthCS, heightCS] = m_mainLayer->getContentSize();
+
     // Create main content area
     auto contentSize = CCSize{ 400.f, 290.f };
     auto scrollSize = CCSize{ 380.f, 200.5f };
+
+    // for buttons to work
+    m_overlayMenu = CCMenu::create();
+    m_overlayMenu->setID("overlay-menu");
+    m_overlayMenu->ignoreAnchorPointForPosition(false);
+    m_overlayMenu->setPosition({ widthCS / 2.f, heightCS / 2.f });
+    m_overlayMenu->setScaledContentSize(m_mainLayer->getScaledContentSize());
+    m_overlayMenu->setZOrder(10);
+
+    m_mainLayer->addChild(m_overlayMenu);
 
     // Background for scroll area
     auto scrollBG = CCScale9Sprite::create("square02b_001.png");
@@ -54,7 +64,7 @@ bool FavoritesPopup::setup() {
     auto favOnlyOnSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
     favOnlyOffSprite->setScale(0.8f);
     favOnlyOnSprite->setScale(0.8f);
-    
+
     m_favoritesOnlyToggle = CCMenuItemToggler::create(
         favOnlyOffSprite,
         favOnlyOnSprite,
@@ -68,7 +78,7 @@ bool FavoritesPopup::setup() {
     auto hideFavOnSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
     hideFavOffSprite->setScale(0.8f);
     hideFavOnSprite->setScale(0.8f);
-    
+
     m_hideFavoritesToggle = CCMenuItemToggler::create(
         hideFavOffSprite,
         hideFavOnSprite,
@@ -98,17 +108,18 @@ bool FavoritesPopup::setup() {
     // Create info button
     auto infoBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     infoBtnSprite->setScale(0.7f);
-    
+
     auto infoBtn = CCMenuItemSpriteExtra::create(
         infoBtnSprite,
         this,
         menu_selector(FavoritesPopup::onInfoButton)
     );
     infoBtn->setPosition({ contentSize.width - 15.f, contentSize.height - 25.f });
-    
+
     auto infoMenu = CCMenu::create();
-    infoMenu->addChild(infoBtn);
     infoMenu->setPosition(CCPointZero);
+
+    infoMenu->addChild(infoBtn);
     m_mainLayer->addChild(infoMenu);
 
     // Create "No mods found" label (initially hidden)
@@ -137,9 +148,9 @@ bool FavoritesPopup::setup() {
     auto allMods = loader->getAllMods();
 
     // Sort if favorited or otherwise in alphabetical order
-    std::sort(allMods.begin(), allMods.end(), [](const Mod* a, const Mod* b) -> bool {
-        auto aFav = getMod()->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
-        auto bFav = getMod()->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
+    std::sort(allMods.begin(), allMods.end(), [this](const Mod* a, const Mod* b) -> bool {
+        auto aFav = m_thisMod->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
+        auto bFav = m_thisMod->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
@@ -154,6 +165,31 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->m_contentLayer->updateLayout();
     m_scrollLayer->scrollToTop();
 
+    // geode mod settings popup button
+    auto modSettingsBtnSprite = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
+    modSettingsBtnSprite->setScale(0.875f);
+
+    auto modSettingsBtn = CCMenuItemSpriteExtra::create(
+        modSettingsBtnSprite,
+        this,
+        menu_selector(FavoritesPopup::onModSettings));
+    modSettingsBtn->setID("mod-settings-button");
+    modSettingsBtn->setPosition({ 25.f, 25.f });
+
+    m_overlayMenu->addChild(modSettingsBtn);
+
+    // button to clear favorites
+    auto clearAllBtnSprite = ButtonSprite::create("Clear");
+    auto clearAllBtn = CCMenuItemSpriteExtra::create(
+        clearAllBtnSprite,
+        this,
+        menu_selector(FavoritesPopup::onPromptClearAll));
+    clearAllBtn->setPosition({ widthCS / 2.f, 5.f });
+    clearAllBtn->setVisible(true);
+    clearAllBtn->setZOrder(3);
+
+    m_overlayMenu->addChild(clearAllBtn);
+
     return true;
 };
 
@@ -166,40 +202,40 @@ void FavoritesPopup::refreshModList() {
 
     // Filter mods based on search text and toggle settings
     std::vector<Mod*> filteredMods;
+
     for (Mod* mod : allMods) {
-        bool isFavorited = getMod()->getSavedValue<bool>(mod->getID(), false);
-        bool matchesSearch = m_searchText.empty() || 
-            toLowercase(mod->getName()).find(toLowercase(m_searchText)) != std::string::npos;
-        
-        // If favorites-only is enabled, only show favorited mods
-        if (m_showFavoritesOnly) {
-            if (isFavorited && matchesSearch) {
-                filteredMods.push_back(mod);
-            }
-        }
-        // If hide favorites is enabled, only show non-favorited mods
-        else if (m_hideFavorites) {
-            if (!isFavorited && matchesSearch) {
-                filteredMods.push_back(mod);
-            }
-        }
-        // Normal mode: show all matching mods, with favorites prioritized
-        else {
-            if (isFavorited || matchesSearch) {
-                filteredMods.push_back(mod);
-            }
-        }
-    }
+        bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
+
+        bool matchesSearch = m_searchText.empty() && mod->getID() != "geode.loader" // Skip geode by default
+            || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != std::string::npos
+            || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != std::string::npos;
+
+        bool filterEnabled = m_thisMod->getSettingValue<bool>("enabled-required"); // Filter to only show enabled mods
+        bool enabledFilter = !filterEnabled || mod->isEnabled() && filterEnabled; // Show all mods, or filter through only enabled mods
+
+        if (enabledFilter) {
+            // If favorites-only is enabled, only show favorited mods
+            if (m_showFavoritesOnly) {
+                if (isFavorited && matchesSearch) filteredMods.push_back(mod);
+            } else if (m_hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
+                if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
+            } else { // Normal mode: show all matching mods, with favorites prioritized
+                if (isFavorited || matchesSearch) filteredMods.push_back(mod);
+            };
+        } else {
+            log::error("Mod {} must be enabled to show", mod->getID());
+        };
+    };
 
     // Sort if favorited or otherwise in alphabetical order
-    std::sort(filteredMods.begin(), filteredMods.end(), [](const Mod* a, const Mod* b) -> bool {
-        auto aFav = getMod()->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
-        auto bFav = getMod()->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
+    std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
+        auto aFav = m_thisMod->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
+        auto bFav = m_thisMod->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
         return toLowercase(a->getName()) < toLowercase(b->getName()); // Alphabetical order
-    });
+              });
 
     for (Mod* mod : filteredMods) { // Add filtered mod items to scrolllayer
         m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
@@ -216,69 +252,90 @@ void FavoritesPopup::refreshModList() {
     } else {
         m_noModsLabel->setVisible(false);
         m_scrollLayer->setVisible(true);
-    }
+    };
 };
 
 void FavoritesPopup::textChanged(CCTextInputNode* input) {
     m_searchText = input->getString();
     this->refreshModList();
-}
+};
+
+void FavoritesPopup::onModSettings(CCObject*) {
+    openSettingsPopup(m_thisMod);
+};
 
 void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
     m_showFavoritesOnly = !m_showFavoritesOnly;
-    
+
     // If favorites only is turned on, turn off hide favorites
     if (m_showFavoritesOnly && m_hideFavorites) {
         m_hideFavorites = false;
         m_hideFavoritesToggle->toggle(false);
-    }
-    
+    };
+
     this->refreshModList();
-}
+};
 
 void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
     m_hideFavorites = !m_hideFavorites;
-    
+
     // If hide favorites is turned on, turn off favorites only
     if (m_hideFavorites && m_showFavoritesOnly) {
         m_showFavoritesOnly = false;
         m_favoritesOnlyToggle->toggle(false);
-    }
-    
+    };
+
     this->refreshModList();
-}
+};
 
 void FavoritesPopup::onInfoButton(CCObject*) {
-    std::string helpText = 
-        "Welcome to the Favorite Mods! Here's how to use it:\n\n"
-        "to do: change text\n";
-    
-    auto popup = geode::MDPopup::create(
-        "Favorite Mods Help",
-        helpText,
-        "OK",
-        nullptr,
-        [](bool) {}
+    auto popup = FLAlertLayer::create(
+        "Help",
+        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>star icon</c> located to the right-hand side of the interface. You can also press it again to <cr>remove</c> it from your favorites.",
+        "OK"
     );
     popup->show();
-}
+};
+
+void FavoritesPopup::onPromptClearAll(CCObject*) {
+    createQuickPopup(
+        "Clear All Favorites",
+        "Are you sure you want to <cr>clear all your favorite mods</c>?",
+        "Cancel", "Yes",
+        [this](auto, bool btn2) {
+            if (btn2) this->onClearAll();
+        },
+        true);
+};
+
+void FavoritesPopup::onClearAll() {
+    auto loader = Loader::get();
+    auto allMods = loader->getAllMods();
+
+    for (Mod* mod : allMods) {
+        auto modId = mod->getID();
+        if (m_thisMod->getSavedValue<bool>(modId)) m_thisMod->setSavedValue(modId, false);
+    };
+
+    this->refreshModList();
+
+    Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
+    log::info("Cleared all favorite mods");
+};
 
 void FavoritesPopup::onModFavoriteChanged() {
     // Refresh the mod list to re-sort based on new favorite status
     this->refreshModList();
-}
+};
 
 FavoritesPopup* FavoritesPopup::create() {
-    log::debug("FavoritesPopup::create() called");
-
     auto ret = new FavoritesPopup();
+
     if (ret && ret->initAnchored(400.f, 280.f)) {
         ret->autorelease();
-        log::debug("FavoritesPopup created successfully");
         return ret;
     };
 
-    log::error("Failed to create FavoritesPopup!");
     CC_SAFE_DELETE(ret);
     return nullptr;
 };
