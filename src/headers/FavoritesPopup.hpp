@@ -33,6 +33,7 @@ protected:
     void refreshModList(bool clearSearch = false);
     void onClearAll(); // Clear all favorites
 
+    void onClearSearch(CCObject*);
     void onPromptClearAll(CCObject*);
     void onFavoritesOnlyToggle(CCObject*);
     void onHideFavoritesToggle(CCObject*);

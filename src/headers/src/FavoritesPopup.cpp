@@ -19,7 +19,7 @@ std::string toLowercase(std::string s) {
 };
 
 bool FavoritesPopup::setup() {
-    setID("favorite-mods"_spr);
+    setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
 
     // geode loader
@@ -54,57 +54,87 @@ bool FavoritesPopup::setup() {
 
     // Create search input
     m_searchInput = TextInput::create(300.f, "Search Mods", "bigFont.fnt");
+    m_searchInput->setID("search-box");
     m_searchInput->setPosition({ contentSize.width / 2.f - 40.f, contentSize.height - 60.f });
     m_searchInput->setDelegate(this);
     m_searchInput->setMaxCharCount(50);
 
     m_mainLayer->addChild(m_searchInput);
 
-    // Create favorites only checkbox
+    // Clear search box button sprite
+    auto searchClearBtnSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn07_001.png");
+    searchClearBtnSprite->setScale(0.875f);
+
+    // Create clear search box button
+    auto searchClearBtn = CCMenuItemSpriteExtra::create(
+        searchClearBtnSprite,
+        this,
+        menu_selector(FavoritesPopup::onClearSearch)
+    );
+    searchClearBtn->setID("clear-search-btn");
+    searchClearBtn->setAnchorPoint({ 0.5, 0.5 });
+    searchClearBtn->ignoreAnchorPointForPosition(false);
+    searchClearBtn->setPosition({ 30.f, m_searchInput->getPositionY() });
+
+    m_overlayMenu->addChild(searchClearBtn);
+
+    // Menu for checkboxes
+    auto checkboxMenu = CCMenu::create();
+    checkboxMenu->setID("checkbox-menu");
+    checkboxMenu->setPosition(CCPointZero);
+
+    m_mainLayer->addChild(checkboxMenu);
+
     auto favOnlyOffSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
     auto favOnlyOnSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+
     favOnlyOffSprite->setScale(0.8f);
     favOnlyOnSprite->setScale(0.8f);
 
+    // Create favorites only checkbox
     m_favoritesOnlyToggle = CCMenuItemToggler::create(
         favOnlyOffSprite,
         favOnlyOnSprite,
         this,
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
+    m_favoritesOnlyToggle->setID("favorites-only-toggler");
     m_favoritesOnlyToggle->setPosition({ contentSize.width - 70.f, contentSize.height - 60.f });
 
-    // Create hide favorites checkbox
+    checkboxMenu->addChild(m_favoritesOnlyToggle);
+
     auto hideFavOffSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
     auto hideFavOnSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+
     hideFavOffSprite->setScale(0.8f);
     hideFavOnSprite->setScale(0.8f);
 
+    // Create hide favorites checkbox
     m_hideFavoritesToggle = CCMenuItemToggler::create(
         hideFavOffSprite,
         hideFavOnSprite,
         this,
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
+    m_hideFavoritesToggle->setID("hide-favorites-toggler");
     m_hideFavoritesToggle->setPosition({ contentSize.width - 30.f, contentSize.height - 60.f });
 
-    // Create star icon above favorites only toggle
-    auto starIcon = CCSprite::createWithSpriteFrameName("GJ_starsIcon_001.png");
-    starIcon->setPosition({ contentSize.width - 70.f, contentSize.height - 40.f });
-    starIcon->setScale(0.6f);
-
-    // Create eye icon above hide favorites toggle
-    auto eyeIcon = CCSprite::createWithSpriteFrameName("GJ_starsIcon_gray_001.png");
-    eyeIcon->setPosition({ contentSize.width - 30.f, contentSize.height - 40.f });
-    eyeIcon->setScale(0.6f);
-
-    auto checkboxMenu = CCMenu::create();
-    checkboxMenu->addChild(m_favoritesOnlyToggle);
     checkboxMenu->addChild(m_hideFavoritesToggle);
-    checkboxMenu->setPosition(CCPointZero);
-    m_mainLayer->addChild(checkboxMenu);
-    m_mainLayer->addChild(starIcon);
-    m_mainLayer->addChild(eyeIcon);
+
+    // Create icon above favorites only toggle
+    auto starOnIcon = CCSprite::createWithSpriteFrameName("GJ_starsIcon_001.png");
+    starOnIcon->setID("favorites-icon");
+    starOnIcon->setPosition({ contentSize.width - 70.f, contentSize.height - 40.f });
+    starOnIcon->setScale(0.6f);
+
+    // Create icon above hide favorites toggle
+    auto starOffIcon = CCSprite::createWithSpriteFrameName("GJ_starsIcon_gray_001.png");
+    starOffIcon->setID("non-favorites-icon");
+    starOffIcon->setPosition({ contentSize.width - 30.f, contentSize.height - 40.f });
+    starOffIcon->setScale(0.6f);
+
+    m_mainLayer->addChild(starOnIcon);
+    m_mainLayer->addChild(starOffIcon);
 
     // Create info button
     auto infoBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
@@ -115,9 +145,11 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onInfoButton)
     );
+    infoBtn->setID("info-btn");
     infoBtn->setPosition({ contentSize.width - 15.f, contentSize.height - 25.f });
 
     auto infoMenu = CCMenu::create();
+    infoMenu->setID("info-menu");
     infoMenu->setPosition(CCPointZero);
 
     infoMenu->addChild(infoBtn);
@@ -133,6 +165,7 @@ bool FavoritesPopup::setup() {
 
     // Create scroll layer
     m_scrollLayer = ScrollLayer::create({ scrollSize.width - 12.5f, scrollSize.height - 12.5f });
+    m_scrollLayer->setID("scroll-layer");
     m_scrollLayer->setAnchorPoint({ 0.5, 0.5 });
     m_scrollLayer->ignoreAnchorPointForPosition(false);
     m_scrollLayer->setPosition(scrollBG->getPosition());
@@ -183,12 +216,15 @@ bool FavoritesPopup::setup() {
         log::debug("Mod settings button disabled");
     };
 
-    // button to clear favorites
     auto clearAllBtnSprite = ButtonSprite::create("Clear");
+
+    // button to clear favorites
     auto clearAllBtn = CCMenuItemSpriteExtra::create(
         clearAllBtnSprite,
         this,
-        menu_selector(FavoritesPopup::onPromptClearAll));
+        menu_selector(FavoritesPopup::onPromptClearAll)
+    );
+    clearAllBtn->setID("clear-all-favorites-btn");
     clearAllBtn->setPosition({ widthCS / 2.f, 5.f });
     clearAllBtn->setVisible(true);
     clearAllBtn->setZOrder(3);
@@ -227,7 +263,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             } else if (m_hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
                 if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
             } else { // Normal mode: show all matching mods, with favorites prioritized
-                if (isFavorited || matchesSearch) filteredMods.push_back(mod);
+                if (matchesSearch) filteredMods.push_back(mod);
             };
         } else {
             log::error("Mod {} must be enabled to show", mod->getID());
@@ -265,6 +301,12 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 void FavoritesPopup::textChanged(CCTextInputNode* input) {
     m_searchText = input->getString();
     this->refreshModList(false);
+};
+
+void FavoritesPopup::onClearSearch(CCObject*) {
+    m_searchText = "";
+    m_searchInput->setString("", true);
+    log::debug("Cleared search box");
 };
 
 void FavoritesPopup::onModSettings(CCObject*) {

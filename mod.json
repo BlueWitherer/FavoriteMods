@@ -8,7 +8,7 @@
 	},
 	"id": "cheeseworks.favoritemods",
 	"name": "Favorite Mods",
-	"version": "v1.0.0",
+	"version": "v1.0.1",
 	"developers": [
 		"Cheeseworks",
 		"ArcticWoof"
@@ -59,7 +59,7 @@
 			"type": "bool",
 			"name": "Clear Search on Refresh",
 			"description": "Clear the search box when refreshing the mod list.",
-			"default": true
+			"default": false
 		},
 		"settings-btn": {
 			"type": "bool",
