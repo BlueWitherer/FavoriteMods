@@ -20,10 +20,10 @@ protected:
 
     bool isFavorite = false;
 
-    bool init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr);
+    bool init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr, bool geodeTheme = false);
     void onViewMod(CCObject*);
     void onFavorite(CCObject*);
     void updateFavoriteIcon();
 public:
-    static ModItem* create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr);
+    static ModItem* create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr, bool geodeTheme = false);
 };

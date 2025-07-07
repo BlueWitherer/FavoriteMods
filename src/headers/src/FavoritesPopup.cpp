@@ -18,14 +18,32 @@ std::string toLowercase(std::string s) {
     return str;
 };
 
+bool FavoritesPopup::init(float width, float height, bool geodeTheme) {
+    m_geodeTheme = geodeTheme;
+
+    if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
+        setCloseButtonSpr(
+            CircleButtonSprite::createWithSpriteFrameName(
+                "geode.loader/close.png",
+                0.875f,
+                m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
+            )
+        );
+        return true;
+    } else {
+        log::error("Could not initialize favorites popup");
+        return false;
+    };
+};
+
 bool FavoritesPopup::setup() {
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
 
-    // geode loader
-    auto loader = Loader::get();
-
     auto [widthCS, heightCS] = m_mainLayer->getContentSize();
+
+    // geode mod loader
+    auto loader = Loader::get();
 
     // Create main content area
     auto contentSize = CCSize{ 400.f, 290.f };
@@ -201,8 +219,12 @@ bool FavoritesPopup::setup() {
 
     if (m_thisMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
-        auto modSettingsBtnSprite = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
-        modSettingsBtnSprite->setScale(0.875f);
+        auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+            "geode.loader/settings.png",
+            1.f,
+            m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
+        );
+        modSettingsBtnSprite->setScale(0.75f);
 
         auto modSettingsBtn = CCMenuItemSpriteExtra::create(
             modSettingsBtnSprite,
@@ -216,7 +238,9 @@ bool FavoritesPopup::setup() {
         log::debug("Mod settings button disabled");
     };
 
-    auto clearAllBtnSprite = ButtonSprite::create("Clear");
+    // clear favs btn sprite
+    auto clearAllBtnSprite = ButtonSprite::create("Clear", "bigFont.fnt", m_geodeTheme ? "geode.loader/GE_button_05-uhd.png" : "GJ_button_01-uhd.png", 0.875f);
+    clearAllBtnSprite->setScale(0.75f);
 
     // button to clear favorites
     auto clearAllBtn = CCMenuItemSpriteExtra::create(
@@ -225,7 +249,7 @@ bool FavoritesPopup::setup() {
         menu_selector(FavoritesPopup::onPromptClearAll)
     );
     clearAllBtn->setID("clear-all-favorites-btn");
-    clearAllBtn->setPosition({ widthCS / 2.f, 5.f });
+    clearAllBtn->setPosition({ widthCS / 2.f, 1.25f });
     clearAllBtn->setVisible(true);
     clearAllBtn->setZOrder(3);
 
@@ -377,10 +401,10 @@ void FavoritesPopup::onModFavoriteChanged() {
     this->refreshModList(false);
 };
 
-FavoritesPopup* FavoritesPopup::create() {
+FavoritesPopup* FavoritesPopup::create(bool geodeTheme) {
     auto ret = new FavoritesPopup();
 
-    if (ret && ret->initAnchored(400.f, 280.f)) {
+    if (ret && ret->init(400.f, 280.f, geodeTheme)) {
         ret->autorelease();
         return ret;
     };

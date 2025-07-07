@@ -14,24 +14,26 @@ auto getThisMod = getMod();
 
 // use alpha's geode utils to modify layer
 class $nodeModify(MyModsLayer, ModsLayer) {
+    struct Fields {
+        bool m_isGeodeTheme = false; // check for geode theme
+    };
+
     void modify() {
         log::info("Hooked ModsLayer...");
 
+        // geode mod loader
         auto loader = Loader::get();
         auto geodeMod = loader->getLoadedMod("geode.loader");
 
         log::debug("Geode mod found: {}", geodeMod->getName());
 
-        // check for purply geode theme
-        bool isGeodeTheme = false;
-
         if (geodeMod) {
             try {
-                isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
-                log::debug("Geode theme enabled: {}", isGeodeTheme);
+                m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
+                log::debug("Geode theme enabled: {}", m_fields->m_isGeodeTheme);
             } catch (...) {
                 log::warn("Could not get geode theme setting, defaulting to false");
-                isGeodeTheme = false;
+                m_fields->m_isGeodeTheme = false;
             };
         } else {
             log::error("Failed to get Geode loader");
@@ -58,7 +60,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
                 "GJ_starsIcon_001.png",
                 0.875f,
-                (isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green)
+                (m_fields->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green)
             );
 
             favBtnSprite->setScale(0.8f);
@@ -114,7 +116,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         bool alerts = getThisMod->getSettingValue<bool>("alerts");
 
         try {
-            auto popup = FavoritesPopup::create();
+            auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme);
 
             if (popup) {
                 popup->show();

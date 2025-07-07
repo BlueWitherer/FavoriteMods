@@ -28,6 +28,7 @@ protected:
     bool m_hideFavorites = false;
 
     bool setup() override;
+    bool init(float width, float height, bool geodeTheme = false);
     void textChanged(CCTextInputNode* input) override;
 
     void refreshModList(bool clearSearch = false);
@@ -40,7 +41,7 @@ protected:
     void onInfoButton(CCObject*);
     void onModSettings(CCObject*);
 public:
-    static FavoritesPopup* create();
+    static FavoritesPopup* create(bool geodeTheme = false);
 
     void onModFavoriteChanged(); // New method for ModItem to call
 };

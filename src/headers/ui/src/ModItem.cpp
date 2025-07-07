@@ -3,28 +3,33 @@
 
 #include <Geode/ui/GeodeUI.hpp>
 
+#include <Geode/utils/ColorProvider.hpp>
+
 using namespace geode::prelude;
 
-bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
+bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme) {
     m_mod = mod;
     m_parentPopup = parentPopup;
+    m_geodeTheme = geodeTheme;
 
     // Check if this mod is already favorited
     isFavorite = m_thisMod->getSavedValue<bool>(m_mod->getID(), false);
 
     if (CCNode::init()) {
+        ccColor4B bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
+
         this->setID(m_mod->getID());
         this->setAnchorPoint({ 0, 1 });
         this->setContentSize(size);
 
         // Background for mod item
-        m_backgroundSprite = CCScale9Sprite::create("square02_001.png");
+        m_backgroundSprite = CCScale9Sprite::create("square02b_001.png");
         m_backgroundSprite->setContentSize(size);
         m_backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
         m_backgroundSprite->ignoreAnchorPointForPosition(false);
         m_backgroundSprite->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
-        m_backgroundSprite->setColor({ 125, 125, 125 });
-        m_backgroundSprite->setOpacity(50);
+        m_backgroundSprite->setColor(to3B(bgColor));
+        m_backgroundSprite->setOpacity(bgColor.a);
 
         this->addChild(m_backgroundSprite);
 
@@ -147,10 +152,10 @@ void ModItem::updateFavoriteIcon() {
     };
 };
 
-ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
+ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme) {
     auto ret = new ModItem();
 
-    if (!ret || !ret->init(mod, size, parentPopup)) {
+    if (!ret || !ret->init(mod, size, parentPopup, geodeTheme)) {
         CC_SAFE_DELETE(ret);
         return nullptr;
     };
