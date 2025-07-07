@@ -1,11 +1,16 @@
 #include "../ModItem.hpp"
+#include "../../FavoritesPopup.hpp"
 
 #include <Geode/ui/GeodeUI.hpp>
 
 using namespace geode::prelude;
 
-bool ModItem::init(Mod* mod, CCSize const& size) {
+bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
     m_mod = mod;
+    m_parentPopup = parentPopup;
+
+    // Check if this mod is already favorited
+    isFavorite = getMod()->getSavedValue<bool>(m_mod->getID(), false);
 
     if (CCNode::init()) {
         this->setID(m_mod->getID());
@@ -70,10 +75,12 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
         );
 
         // Favorite button here :)
-        auto favBtnSprite = CCSprite::createWithSpriteFrameName("GJ_starsIcon_gray_001.png");
+        auto favBtnSprite = CCSprite::createWithSpriteFrameName(
+            isFavorite ? "GJ_starsIcon_001.png" : "GJ_starsIcon_gray_001.png"
+        );
         favBtnSprite->setScale(0.875f);
 
-        auto favBtn = CCMenuItemSpriteExtra::create(
+        m_favButton = CCMenuItemSpriteExtra::create(
             favBtnSprite,
             this,
             menu_selector(ModItem::onFavorite)
@@ -97,7 +104,7 @@ bool ModItem::init(Mod* mod, CCSize const& size) {
         btnMenu->setLayout(btnMenuLayout);
 
         btnMenu->addChild(viewBtn);
-        btnMenu->addChild(favBtn);
+        btnMenu->addChild(m_favButton);
 
         this->addChild(btnMenu);
 
@@ -114,13 +121,39 @@ void ModItem::onViewMod(CCObject*) {
 };
 
 void ModItem::onFavorite(CCObject*) {
-    Notification::create("Favorites are a work in progress!", NotificationIcon::Info, 2.5f)->show();
-};
+    // Toggle favorite status
+    isFavorite = !isFavorite;
+    
+    // Save the favorite status
+    getMod()->setSavedValue<bool>(m_mod->getID(), isFavorite);
+    
+    // Update the icon
+    updateFavoriteIcon();
+    
+    // Notify parent popup to refresh
+    if (m_parentPopup) {
+        m_parentPopup->onModFavoriteChanged();
+    }
+    
+    // Show notification
+    std::string message = isFavorite ? "Added to favorites!" : "Removed from favorites!";
+    Notification::create(message, NotificationIcon::Success, 1.5f)->show();
+}
 
-ModItem* ModItem::create(Mod* mod, CCSize const& size) {
+void ModItem::updateFavoriteIcon() {
+    if (m_favButton) {
+        auto newSprite = CCSprite::createWithSpriteFrameName(
+            isFavorite ? "GJ_starsIcon_001.png" : "GJ_starsIcon_gray_001.png"
+        );
+        newSprite->setScale(0.875f);
+        m_favButton->setNormalImage(newSprite);
+    }
+}
+
+ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
     auto ret = new ModItem();
 
-    if (!ret || !ret->init(mod, size)) {
+    if (!ret || !ret->init(mod, size, parentPopup)) {
         CC_SAFE_DELETE(ret);
         return nullptr;
     };

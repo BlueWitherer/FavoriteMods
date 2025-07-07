@@ -10,13 +10,11 @@ protected:
 
     ScrollLayer* m_scrollLayer = nullptr;
     CCMenu* m_buttonMenu = nullptr;
-    LoadingCircle* m_loadingCircle = nullptr;
 
     bool setup() override;
     void refreshModList();
-    void onDelayedRefresh(float dt);
 public:
     static FavoritesPopup* create();
 
-    void onRefresh(CCObject*);
+    void onModFavoriteChanged(); // New method for ModItem to call
 };

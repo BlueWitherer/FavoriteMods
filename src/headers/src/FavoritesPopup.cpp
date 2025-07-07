@@ -61,8 +61,8 @@ bool FavoritesPopup::setup() {
 
     // Sort if favorited or otherwise in alphabetical order
     std::sort(allMods.begin(), allMods.end(), [](const Mod* a, const Mod* b) -> bool {
-        auto aFav = getMod()->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
-        auto bFav = getMod()->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
+        auto aFav = getMod()->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
+        auto bFav = getMod()->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
@@ -70,50 +70,15 @@ bool FavoritesPopup::setup() {
               });
 
     for (Mod* mod : allMods) { // Add all mod items to scrolllayer
-        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }));
+        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
         log::debug("Added container for mod {}", mod->getID());
     };
 
     m_scrollLayer->m_contentLayer->updateLayout();
     m_scrollLayer->scrollToTop();
 
-    // Create refresh button
-    auto refreshBtn = CCMenuItemSpriteExtra::create(
-        CCSprite::createWithSpriteFrameName("GJ_updateBtn_001.png"),
-        this,
-        menu_selector(FavoritesPopup::onRefresh)
-    );
-    refreshBtn->setPosition({ contentSize.width - 30.f, contentSize.height - 30.f });
-
-    auto refreshMenu = CCMenu::create();
-    refreshMenu->addChild(refreshBtn);
-    refreshMenu->setPosition(CCPointZero);
-    m_mainLayer->addChild(refreshMenu);
-
     return true;
 };
-
-void FavoritesPopup::onRefresh(CCObject*) {
-    // Show loading circle
-    if (m_loadingCircle) {
-        m_loadingCircle->removeFromParent();
-    }
-    
-    m_loadingCircle = LoadingCircle::create();
-    m_loadingCircle->setPosition(m_scrollLayer->getPosition());
-    m_loadingCircle->show();
-    m_mainLayer->addChild(m_loadingCircle);
-
-    // Hide scroll layer during loading
-    m_scrollLayer->setVisible(false);
-
-    // Scheduling time
-    this->scheduleOnce(schedule_selector(FavoritesPopup::onDelayedRefresh), 2.5f);
-}
-
-void FavoritesPopup::onDelayedRefresh(float dt) {
-    this->refreshModList();
-}
 
 void FavoritesPopup::refreshModList() {
     // Clear and recreate scroll content
@@ -124,8 +89,8 @@ void FavoritesPopup::refreshModList() {
 
     // Sort if favorited or otherwise in alphabetical order
     std::sort(allMods.begin(), allMods.end(), [](const Mod* a, const Mod* b) -> bool {
-        auto aFav = getMod()->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
-        auto bFav = getMod()->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
+        auto aFav = getMod()->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
+        auto bFav = getMod()->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
@@ -133,24 +98,18 @@ void FavoritesPopup::refreshModList() {
     });
 
     for (Mod* mod : allMods) { // Add all mod items to scrolllayer
-        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }));
+        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
         log::debug("Added container for mod {}", mod->getID());
     };
 
     m_scrollLayer->m_contentLayer->updateLayout();
     m_scrollLayer->scrollToTop();
-
-    // Hide loading circle and show scroll layer
-    if (m_loadingCircle) {
-        m_loadingCircle->fadeAndRemove();
-        m_loadingCircle = nullptr;
-    }
-    
-    m_scrollLayer->setVisible(true);
-
-    // Show confirmation
-    Notification::create("Favorites list refreshed!", NotificationIcon::Success)->show();
 };
+
+void FavoritesPopup::onModFavoriteChanged() {
+    // Refresh the mod list to re-sort based on new favorite status
+    this->refreshModList();
+}
 
 FavoritesPopup* FavoritesPopup::create() {
     log::debug("FavoritesPopup::create() called");
