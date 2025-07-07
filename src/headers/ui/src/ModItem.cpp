@@ -24,24 +24,9 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
         m_backgroundSprite->ignoreAnchorPointForPosition(false);
         m_backgroundSprite->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
         m_backgroundSprite->setColor({ 125, 125, 125 });
-        m_backgroundSprite->setOpacity(150);
+        m_backgroundSprite->setOpacity(50);
         
         this->addChild(m_backgroundSprite);
-        
-        // Create rounded gradient background for favorites (initially hidden)
-        m_gradientBackground = CCScale9Sprite::create("square02_001.png");
-        m_gradientBackground->setContentSize(size);
-        m_gradientBackground->setAnchorPoint({ 0.5, 0.5 });
-        m_gradientBackground->ignoreAnchorPointForPosition(false);
-        m_gradientBackground->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
-        m_gradientBackground->setColor({ 255, 215, 0 }); // Gold color
-        m_gradientBackground->setOpacity(200);
-        m_gradientBackground->setVisible(false);
-        
-        this->addChild(m_gradientBackground);
-        
-        // Set initial background appearance based on favorite status
-        updateBackground();
 
         // Mod icon sprite
         auto modIcon = geode::createModLogo(m_mod->getPackagePath());
@@ -142,18 +127,17 @@ void ModItem::onFavorite(CCObject*) {
     // Save the favorite status
     getMod()->setSavedValue<bool>(m_mod->getID(), isFavorite);
     
-    // Update the icon and background
+    // Update the icon
     updateFavoriteIcon();
-    updateBackground();
     
     // Notify parent popup to refresh
     if (m_parentPopup) {
         m_parentPopup->onModFavoriteChanged();
     }
     
-    // Show notification
-    std::string message = isFavorite ? "Added to favorites!" : "Removed from favorites!";
-    Notification::create(message, NotificationIcon::Success, 1.5f)->show();
+    // Show notification (very annoying)
+    //std::string message = isFavorite ? "Added to favorites!" : "Removed from favorites!";
+    //Notification::create(message, NotificationIcon::Success, 1.5f)->show();
 }
 
 void ModItem::updateFavoriteIcon() {
@@ -163,20 +147,6 @@ void ModItem::updateFavoriteIcon() {
         );
         newSprite->setScale(0.875f);
         m_favButton->setNormalImage(newSprite);
-    }
-}
-
-void ModItem::updateBackground() {
-    if (m_backgroundSprite && m_gradientBackground) {
-        if (isFavorite) {
-            // Show gradient background for favorited mods
-            m_backgroundSprite->setVisible(false);
-            m_gradientBackground->setVisible(true);
-        } else {
-            // Show default background for non-favorited mods
-            m_backgroundSprite->setVisible(true);
-            m_gradientBackground->setVisible(false);
-        }
     }
 }
 

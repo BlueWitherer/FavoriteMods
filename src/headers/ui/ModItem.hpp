@@ -12,7 +12,6 @@ protected:
     CCMenuItemSpriteExtra* m_favButton = nullptr;
     FavoritesPopup* m_parentPopup = nullptr;
     CCScale9Sprite* m_backgroundSprite = nullptr;
-    CCScale9Sprite* m_gradientBackground = nullptr;
 
     bool isFavorite = false;
 
@@ -20,7 +19,6 @@ protected:
     void onViewMod(CCObject*);
     void onFavorite(CCObject*);
     void updateFavoriteIcon();
-    void updateBackground();
 public:
     static ModItem* create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr);
 };
