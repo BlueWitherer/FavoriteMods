@@ -10,6 +10,8 @@ class FavoritesPopup; // Forward declaration
 
 class ModItem : public CCNode {
 protected:
+    bool m_geodeTheme = false; // Make sure visuals go with geode theme
+
     Mod* m_mod; // Fetched mod
     Mod* m_thisMod = getMod(); // Get this mod
     CCMenuItemSpriteExtra* m_favButton = nullptr;

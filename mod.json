@@ -52,7 +52,7 @@
 		"alerts": {
 			"type": "bool",
 			"name": "Error Alerts",
-			"description": "Show alerts when errors occur.",
+			"description": "Show alert pop-ups when errors occur.",
 			"default": false
 		}
 	},

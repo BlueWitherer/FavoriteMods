@@ -22,4 +22,4 @@ To add favorites, simply look for the mod by scrolling or typing its name or ID 
 ---
 
 ### Credits
-- **[ArcticWoof](id:7689052)**: Helped significantly in designing UI
+- **[ArcticWoof](user:7689052)**: Helped significantly in designing UI
