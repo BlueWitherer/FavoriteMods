@@ -21,14 +21,11 @@ std::string toLowercase(std::string str) {
 };
 
 bool FavoritesPopup::setup() {
-    log::debug("FavoritesPopup::setup() called");
-
-    auto loader = Loader::get();
-
-    auto winSize = CCDirector::sharedDirector()->getWinSize();
-
     setID("favorite-mods"_spr);
     setTitle("Favorite Mods");
+
+    // geode loader
+    auto loader = Loader::get();
 
     // Create main content area
     auto contentSize = CCSize{ 400.f, 280.f };
@@ -83,14 +80,6 @@ bool FavoritesPopup::setup() {
     return true;
 };
 
-void FavoritesPopup::onAddFavorite(CCObject*) {
-    FLAlertLayer::create("Add Favorite", "This would add a mod to your favorites!", "OK")->show();
-};
-
-void FavoritesPopup::onRemoveFavorite(CCObject*) {
-    FLAlertLayer::create("Remove Favorite", "This would remove the selected mod from favorites!", "OK")->show();
-};
-
 void FavoritesPopup::onRefresh(CCObject*) {
     // Clear and recreate scroll content
     m_scrollLayer->m_contentLayer->removeAllChildren();
@@ -112,8 +101,4 @@ FavoritesPopup* FavoritesPopup::create() {
     log::error("Failed to create FavoritesPopup!");
     CC_SAFE_DELETE(ret);
     return nullptr;
-};
-
-void FavoritesPopup::onViewMod(CCObject*) {
-    FLAlertLayer::create("View Mod", "This would open the mod details!", "OK")->show();
 };

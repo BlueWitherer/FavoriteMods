@@ -2,7 +2,7 @@
 
 #include <Geode/ui/GeodeUI.hpp>
 
-#include <Geode/utils/ColorProvider.hpp>
+using namespace geode::prelude;
 
 bool ModItem::init(Mod* mod, CCSize const& size) {
     m_mod = mod;

@@ -1,9 +1,13 @@
+#pragma once
+
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
 
-class FavoritesPopup : public geode::Popup<> {
+class FavoritesPopup : public Popup<> {
 protected:
+    bool m_pendingUpdate = false;
+
     ScrollLayer* m_scrollLayer = nullptr;
     CCMenu* m_buttonMenu = nullptr;
 
@@ -11,8 +15,5 @@ protected:
 public:
     static FavoritesPopup* create();
 
-    void onAddFavorite(CCObject*);
-    void onRemoveFavorite(CCObject*);
     void onRefresh(CCObject*);
-    void onViewMod(CCObject*);
 };
