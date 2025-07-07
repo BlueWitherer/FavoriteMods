@@ -57,6 +57,7 @@ bool FavoritesPopup::setup() {
     m_searchInput->setPosition({ contentSize.width / 2.f - 40.f, contentSize.height - 60.f });
     m_searchInput->setDelegate(this);
     m_searchInput->setMaxCharCount(50);
+
     m_mainLayer->addChild(m_searchInput);
 
     // Create favorites only checkbox
@@ -197,9 +198,11 @@ bool FavoritesPopup::setup() {
     return true;
 };
 
-void FavoritesPopup::refreshModList() {
+void FavoritesPopup::refreshModList(bool clearSearch) {
     // Clear and recreate scroll content
     m_scrollLayer->m_contentLayer->removeAllChildren();
+    if (clearSearch && m_thisMod->getSettingValue<bool>("refresh-clear-search")) m_searchText = "";
+    m_searchInput->setString(m_searchText, false);
 
     auto loader = Loader::get();
     auto allMods = loader->getAllMods();
@@ -247,7 +250,7 @@ void FavoritesPopup::refreshModList() {
     };
 
     m_scrollLayer->m_contentLayer->updateLayout();
-    m_scrollLayer->scrollToTop();
+    if (m_thisMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
 
     // Show/hide "No mods found" message
     if (filteredMods.empty()) {
@@ -261,7 +264,7 @@ void FavoritesPopup::refreshModList() {
 
 void FavoritesPopup::textChanged(CCTextInputNode* input) {
     m_searchText = input->getString();
-    this->refreshModList();
+    this->refreshModList(false);
 };
 
 void FavoritesPopup::onModSettings(CCObject*) {
@@ -277,7 +280,7 @@ void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
         m_hideFavoritesToggle->toggle(false);
     };
 
-    this->refreshModList();
+    this->refreshModList(true);
 };
 
 void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
@@ -289,7 +292,7 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
         m_favoritesOnlyToggle->toggle(false);
     };
 
-    this->refreshModList();
+    this->refreshModList(true);
 };
 
 void FavoritesPopup::onInfoButton(CCObject*) {
@@ -321,7 +324,7 @@ void FavoritesPopup::onClearAll() {
         if (m_thisMod->getSavedValue<bool>(modId)) m_thisMod->setSavedValue(modId, false);
     };
 
-    this->refreshModList();
+    this->refreshModList(true);
 
     Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
     log::info("Cleared all favorite mods");
@@ -329,7 +332,7 @@ void FavoritesPopup::onClearAll() {
 
 void FavoritesPopup::onModFavoriteChanged() {
     // Refresh the mod list to re-sort based on new favorite status
-    this->refreshModList();
+    this->refreshModList(false);
 };
 
 FavoritesPopup* FavoritesPopup::create() {

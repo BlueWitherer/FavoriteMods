@@ -49,6 +49,18 @@
 			"name": "Interface",
 			"description": "Functionality of UI."
 		},
+		"auto-scroll": {
+			"type": "bool",
+			"name": "Automatically Scroll Up",
+			"description": "Snap the scoll area to the top when toggling favorites.",
+			"default": true
+		},
+		"refresh-clear-search": {
+			"type": "bool",
+			"name": "Clear Search on Refresh",
+			"description": "Clear the search box when refreshing the mod list.",
+			"default": true
+		},
 		"settings-btn": {
 			"type": "bool",
 			"name": "Mod Settings Button",

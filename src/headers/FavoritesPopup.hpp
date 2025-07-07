@@ -9,7 +9,7 @@ using namespace geode::prelude;
 class FavoritesPopup : public Popup<>, public TextInputDelegate {
 protected:
     bool m_geodeTheme = false; // Make sure visuals go with geode theme
-    
+
     Mod* m_thisMod = getMod(); // Get this mod
     bool m_pendingUpdate = false;
 
@@ -30,7 +30,7 @@ protected:
     bool setup() override;
     void textChanged(CCTextInputNode* input) override;
 
-    void refreshModList();
+    void refreshModList(bool clearSearch = false);
     void onClearAll(); // Clear all favorites
 
     void onPromptClearAll(CCObject*);
