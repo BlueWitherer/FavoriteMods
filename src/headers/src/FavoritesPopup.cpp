@@ -165,18 +165,22 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->m_contentLayer->updateLayout();
     m_scrollLayer->scrollToTop();
 
-    // geode mod settings popup button
-    auto modSettingsBtnSprite = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
-    modSettingsBtnSprite->setScale(0.875f);
+    if (m_thisMod->getSettingValue<bool>("settings-btn")) {
+        // geode mod settings popup button
+        auto modSettingsBtnSprite = CCSprite::createWithSpriteFrameName("GJ_optionsBtn02_001.png");
+        modSettingsBtnSprite->setScale(0.875f);
 
-    auto modSettingsBtn = CCMenuItemSpriteExtra::create(
-        modSettingsBtnSprite,
-        this,
-        menu_selector(FavoritesPopup::onModSettings));
-    modSettingsBtn->setID("mod-settings-button");
-    modSettingsBtn->setPosition({ 25.f, 25.f });
+        auto modSettingsBtn = CCMenuItemSpriteExtra::create(
+            modSettingsBtnSprite,
+            this,
+            menu_selector(FavoritesPopup::onModSettings));
+        modSettingsBtn->setID("mod-settings-button");
+        modSettingsBtn->setPosition({ 25.f, 25.f });
 
-    m_overlayMenu->addChild(modSettingsBtn);
+        m_overlayMenu->addChild(modSettingsBtn);
+    } else {
+        log::debug("Mod settings button disabled");
+    };
 
     // button to clear favorites
     auto clearAllBtnSprite = ButtonSprite::create("Clear");

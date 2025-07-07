@@ -27,7 +27,7 @@ To add favorites, simply look for the mod by scrolling or typing its name or ID 
 ---
 
 ### Credits
-- @DumbCaveSpider: Helped significantly in designing UI
+- **[ArcticWoof](https://www.github.com/DumbCaveSpider/)**: Helped significantly in designing UI
 
 ---
 

@@ -44,6 +44,17 @@
 			"description": "Only list mods that you have enabled on your client.",
 			"default": false
 		},
+		"ui": {
+			"type": "title",
+			"name": "Interface",
+			"description": "Functionality of UI."
+		},
+		"settings-btn": {
+			"type": "bool",
+			"name": "Mod Settings Button",
+			"description": "Create a quick mod settings button in the favorites pop-up.",
+			"default": false
+		},
 		"other": {
 			"type": "title",
 			"name": "Other",
