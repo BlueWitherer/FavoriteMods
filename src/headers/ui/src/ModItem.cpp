@@ -18,22 +18,37 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup) {
         this->setContentSize(size);
 
         // Background for mod item
-        auto itemBG = CCScale9Sprite::create("square02_001.png");
-        itemBG->setContentSize(size);
-        itemBG->setAnchorPoint({ 0.5, 0.5 });
-        itemBG->ignoreAnchorPointForPosition(false);
-        itemBG->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
-        itemBG->setColor({ 125, 125, 125 });
-        itemBG->setOpacity(150);
-
-        this->addChild(itemBG);
+        m_backgroundSprite = CCScale9Sprite::create("square02_001.png");
+        m_backgroundSprite->setContentSize(size);
+        m_backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
+        m_backgroundSprite->ignoreAnchorPointForPosition(false);
+        m_backgroundSprite->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
+        m_backgroundSprite->setColor({ 125, 125, 125 });
+        m_backgroundSprite->setOpacity(150);
+        
+        this->addChild(m_backgroundSprite);
+        
+        // Create rounded gradient background for favorites (initially hidden)
+        m_gradientBackground = CCScale9Sprite::create("square02_001.png");
+        m_gradientBackground->setContentSize(size);
+        m_gradientBackground->setAnchorPoint({ 0.5, 0.5 });
+        m_gradientBackground->ignoreAnchorPointForPosition(false);
+        m_gradientBackground->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
+        m_gradientBackground->setColor({ 255, 215, 0 }); // Gold color
+        m_gradientBackground->setOpacity(200);
+        m_gradientBackground->setVisible(false);
+        
+        this->addChild(m_gradientBackground);
+        
+        // Set initial background appearance based on favorite status
+        updateBackground();
 
         // Mod icon sprite
         auto modIcon = geode::createModLogo(m_mod->getPackagePath());
-        modIcon->setScale(0.38f);
-        modIcon->setPosition({ 25.f, this->getScaledContentHeight() / 2.f });
+        modIcon->setScale(0.5f);
+        modIcon->setPosition({ 20.f, this->getScaledContentHeight() / 2.f });
         modIcon->ignoreAnchorPointForPosition(false);
-        modIcon->setAnchorPoint({ 0.5, 0.5 });
+        modIcon->setAnchorPoint({ 0.5, 0.5 }); 
 
         this->addChild(modIcon);
 
@@ -127,8 +142,9 @@ void ModItem::onFavorite(CCObject*) {
     // Save the favorite status
     getMod()->setSavedValue<bool>(m_mod->getID(), isFavorite);
     
-    // Update the icon
+    // Update the icon and background
     updateFavoriteIcon();
+    updateBackground();
     
     // Notify parent popup to refresh
     if (m_parentPopup) {
@@ -147,6 +163,20 @@ void ModItem::updateFavoriteIcon() {
         );
         newSprite->setScale(0.875f);
         m_favButton->setNormalImage(newSprite);
+    }
+}
+
+void ModItem::updateBackground() {
+    if (m_backgroundSprite && m_gradientBackground) {
+        if (isFavorite) {
+            // Show gradient background for favorited mods
+            m_backgroundSprite->setVisible(false);
+            m_gradientBackground->setVisible(true);
+        } else {
+            // Show default background for non-favorited mods
+            m_backgroundSprite->setVisible(true);
+            m_gradientBackground->setVisible(false);
+        }
     }
 }
 

@@ -251,17 +251,7 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
 void FavoritesPopup::onInfoButton(CCObject*) {
     std::string helpText = 
         "Welcome to the Favorite Mods! Here's how to use it:\n\n"
-        "**Favoriting Mods:**\n"
-        "- Click the heart icon next to any mod to add it to your favorites\n"
-        "- Favorited mods will always appear at the top of the list\n\n"
-        "**Search:**\n"
-        "- Use the search box at the top to filter mods by name\n"
-        "- Search is case-insensitive and updates in real-time\n\n"
-        "**View Options:**\n"
-        "- **Favorites Only:** Show only your favorited mods\n"
-        "- **Hide Favorites:** Show only non-favorited mods\n"
-        "- These options are mutually exclusive\n\n"
-        "Enjoy organizing your mods!";
+        "to do: change text\n";
     
     auto popup = geode::MDPopup::create(
         "Favorite Mods Help",
