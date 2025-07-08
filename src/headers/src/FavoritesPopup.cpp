@@ -324,7 +324,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
 void FavoritesPopup::textChanged(CCTextInputNode* input) {
     m_searchText = input->getString();
-    this->refreshModList(false);
+    refreshModList(false);
 };
 
 void FavoritesPopup::onClearSearch(CCObject*) {
@@ -346,7 +346,7 @@ void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
         m_hideFavoritesToggle->toggle(false);
     };
 
-    this->refreshModList(true);
+    refreshModList(true);
 };
 
 void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
@@ -358,7 +358,7 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
         m_favoritesOnlyToggle->toggle(false);
     };
 
-    this->refreshModList(true);
+    refreshModList(true);
 };
 
 void FavoritesPopup::onInfoButton(CCObject*) {
@@ -376,7 +376,7 @@ void FavoritesPopup::onPromptClearAll(CCObject*) {
         "Are you sure you want to <cr>clear all your favorite mods</c>?",
         "Cancel", "Yes",
         [this](auto, bool btn2) {
-            if (btn2) this->onClearAll();
+            if (btn2) onClearAll();
         },
         true);
 };
@@ -390,7 +390,7 @@ void FavoritesPopup::onClearAll() {
         if (m_thisMod->getSavedValue<bool>(modId)) m_thisMod->setSavedValue(modId, false);
     };
 
-    this->refreshModList(true);
+    refreshModList(true);
 
     Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
     log::info("Cleared all favorite mods");
@@ -398,7 +398,7 @@ void FavoritesPopup::onClearAll() {
 
 void FavoritesPopup::onModFavoriteChanged() {
     // Refresh the mod list to re-sort based on new favorite status
-    this->refreshModList(false);
+    refreshModList(false);
 };
 
 FavoritesPopup* FavoritesPopup::create(bool geodeTheme) {

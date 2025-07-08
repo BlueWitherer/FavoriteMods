@@ -47,7 +47,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         };
 
         // get the actions menu
-        if (auto actionsMenu = as<CCMenu*>(this->getChildByID("actions-menu"))) {
+        if (auto actionsMenu = as<CCMenu*>(getChildByID("actions-menu"))) {
             log::debug("Actions menu found successfully!");
 
             // Check if favorites button already exists
@@ -82,32 +82,6 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             log::info("Favorites button added to actions menu successfully!");
         } else {
             log::error("Failed to find actions menu with ID 'actions-menu'");
-
-            // Debug: List all children to see what's available
-            log::debug("Available children:");
-            auto children = this->getChildren();
-
-            if (children) {
-                for (int i = 0; i < children->count(); i++) {
-                    auto child = static_cast<CCNode*>(children->objectAtIndex(i));
-
-                    if (child) {
-                        auto menu = typeinfo_cast<CCMenu*>(child);
-
-                        if (menu) {
-                            log::debug("Found menu at index {}, ID: '{}'", i, child->getID());
-                        } else {
-                            log::debug("Found non-menu node at index {}, ID: '{}'", i, child->getID());
-                        };
-                    } else {
-                        log::error("Node not found at index {}", (int)i);
-                    };
-                };
-            } else {
-                log::error("Nodes not found");
-            };
-
-            return;
         };
     };
 

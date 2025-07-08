@@ -18,29 +18,29 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
     if (CCNode::init()) {
         ccColor4B bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
 
-        this->setID(m_mod->getID());
-        this->setAnchorPoint({ 0, 1 });
-        this->setContentSize(size);
+        setID(m_mod->getID());
+        setAnchorPoint({ 0, 1 });
+        setContentSize(size);
 
         // Background for mod item
         m_backgroundSprite = CCScale9Sprite::create("square02b_001.png");
         m_backgroundSprite->setContentSize(size);
         m_backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
         m_backgroundSprite->ignoreAnchorPointForPosition(false);
-        m_backgroundSprite->setPosition({ this->getScaledContentWidth() / 2.f, this->getScaledContentHeight() / 2.f });
+        m_backgroundSprite->setPosition({ getScaledContentWidth() / 2.f, getScaledContentHeight() / 2.f });
         m_backgroundSprite->setColor(to3B(bgColor));
         m_backgroundSprite->setOpacity(bgColor.a);
 
-        this->addChild(m_backgroundSprite);
+        addChild(m_backgroundSprite);
 
         // Mod icon sprite
         auto modIcon = geode::createModLogo(m_mod->getPackagePath());
         modIcon->setScale(0.5f);
-        modIcon->setPosition({ 20.f, this->getScaledContentHeight() / 2.f });
+        modIcon->setPosition({ 20.f, getScaledContentHeight() / 2.f });
         modIcon->ignoreAnchorPointForPosition(false);
         modIcon->setAnchorPoint({ 0.5, 0.5 });
 
-        this->addChild(modIcon);
+        addChild(modIcon);
 
         // Mod name label
         auto nameLabel = CCLabelBMFont::create(m_mod->getName().c_str(), "bigFont.fnt");
@@ -48,7 +48,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         nameLabel->setScale(0.4f);
         nameLabel->setAnchorPoint({ 0.f, 0.5f });
 
-        this->addChild(nameLabel);
+        addChild(nameLabel);
 
         // Version label
         auto versionLabel = CCLabelBMFont::create(m_mod->getVersion().toVString().c_str(), "goldFont.fnt");
@@ -57,7 +57,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         versionLabel->setAnchorPoint({ 0.f, 0.5f });
         versionLabel->setColor({ 200, 200, 200 });
 
-        this->addChild(versionLabel);
+        addChild(versionLabel);
 
         // ID label
         auto idLabel = CCLabelBMFont::create(m_mod->getID().c_str(), "bigFont.fnt");
@@ -67,7 +67,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         idLabel->setColor({ 125, 125, 125 });
         idLabel->setOpacity(125);
 
-        this->addChild(idLabel);
+        addChild(idLabel);
 
         // View button
         auto viewBtnSprite = ButtonSprite::create("View", "bigFont.fnt", "GJ_button_01.png", 0.875f);
@@ -80,9 +80,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         );
 
         // Favorite button here :)
-        auto favBtnSprite = CCSprite::createWithSpriteFrameName(
-            isFavorite ? "GJ_starsIcon_001.png" : "GJ_starsIcon_gray_001.png"
-        );
+        auto favBtnSprite = CCSprite::createWithSpriteFrameName(isFavorite ? "GJ_starsIcon_001.png" : "GJ_starsIcon_gray_001.png");
         favBtnSprite->setScale(0.875f);
 
         m_favButton = CCMenuItemSpriteExtra::create(
@@ -94,8 +92,8 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         // Create menu for buttons
         auto btnMenu = CCMenu::create();
         btnMenu->setAnchorPoint({ 1, 0.5 });
-        btnMenu->setPosition({ this->getScaledContentWidth() - 10.f, this->getScaledContentHeight() / 2.f });
-        btnMenu->setScaledContentSize({ this->getScaledContentWidth() * 0.375f, this->getScaledContentHeight() - 10.f });
+        btnMenu->setPosition({ getScaledContentWidth() - 10.f, getScaledContentHeight() / 2.f });
+        btnMenu->setScaledContentSize({ getScaledContentWidth() * 0.375f, getScaledContentHeight() - 10.f });
 
         // Layout to automatically position buttons on menu
         auto btnMenuLayout = RowLayout::create();
@@ -111,7 +109,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         btnMenu->addChild(viewBtn);
         btnMenu->addChild(m_favButton);
 
-        this->addChild(btnMenu);
+        addChild(btnMenu);
 
         btnMenu->updateLayout();
 
