@@ -329,11 +329,12 @@ void FavoritesPopup::textChanged(CCTextInputNode* input) {
 
 void FavoritesPopup::onClearSearch(CCObject*) {
     m_searchText = "";
-    m_searchInput->setString("", true);
+    m_searchInput->setString(m_searchText, true);
     log::debug("Cleared search box");
 };
 
 void FavoritesPopup::onModSettings(CCObject*) {
+    log::debug("Opening mod settings popup");
     openSettingsPopup(m_thisMod);
 };
 
@@ -344,6 +345,8 @@ void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
     if (m_showFavoritesOnly && m_hideFavorites) {
         m_hideFavorites = false;
         m_hideFavoritesToggle->toggle(false);
+    } else {
+        log::debug("Hide favorites mode already off");
     };
 
     refreshModList(true);
@@ -356,6 +359,8 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
     if (m_hideFavorites && m_showFavoritesOnly) {
         m_showFavoritesOnly = false;
         m_favoritesOnlyToggle->toggle(false);
+    } else {
+        log::debug("Favorites only mode already off");
     };
 
     refreshModList(true);
@@ -364,7 +369,7 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
 void FavoritesPopup::onInfoButton(CCObject*) {
     auto popup = FLAlertLayer::create(
         "Help",
-        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>star icon</c> located to the right-hand side of the interface. You can also press it again to <cr>remove</c> it from your favorites.",
+        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>star button</c> located to the right-hand side of the interface item. You can also press it again to <cr>remove it</c> from your favorites.",
         "OK"
     );
     popup->show();
