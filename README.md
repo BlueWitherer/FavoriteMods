@@ -38,3 +38,7 @@ To add favorites, simply look for the mod by scrolling or typing its name or ID 
 ### Issues
 ###### What's wrong?!
 **[⚠️ Report a problem with the mod](../../issues/)**
+
+### Development
+###### Work with the mod directly.
+**[⌨️ Check the API out](./incl/)**

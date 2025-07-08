@@ -79,5 +79,10 @@
 			"default": false
 		}
 	},
+	"api": {
+		"include": [
+			"incl/*.hpp"
+		]
+	},
 	"early-load": false
 }
