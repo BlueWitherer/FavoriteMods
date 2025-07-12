@@ -35,10 +35,12 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         };
 
         // showcase itself when the player loads for the first time
-        if (getThisMod->hasSavedValue(getThisMod->getID())) {
+        if (getThisMod->hasSavedValue("already-loaded")) {
             log::debug("User has loaded the mod before");
         } else {
             log::info("User has loaded this mod for the first time!");
+
+            getThisMod->setSavedValue("already-loaded", false);
             getThisMod->setSavedValue(getThisMod->getID(), true);
         };
 

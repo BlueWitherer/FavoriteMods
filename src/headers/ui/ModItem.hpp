@@ -21,10 +21,13 @@ protected:
 
     bool isFavorite = false;
 
-    bool init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr, bool geodeTheme = false);
     void onViewMod(CCObject*);
     void onFavorite(CCObject*);
+
+    CCLabelBMFont* firstTimeText();
     void updateFavoriteIcon();
+
+    bool init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr, bool geodeTheme = false);
 public:
     static ModItem* create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup = nullptr, bool geodeTheme = false);
 };

@@ -72,9 +72,9 @@ bool FavoritesPopup::setup() {
     m_mainLayer->addChild(scrollBG);
 
     // Create search input
-    m_searchInput = TextInput::create(300.f, "Search Mods", "bigFont.fnt");
+    m_searchInput = TextInput::create(265.f, "Search Mods", "bigFont.fnt");
     m_searchInput->setID("search-box");
-    m_searchInput->setPosition({ contentSize.width / 2.f - 40.f, contentSize.height - 60.f });
+    m_searchInput->setPosition({ contentSize.width / 2.f - 20.f, contentSize.height - 60.f });
     m_searchInput->setDelegate(this);
     m_searchInput->setMaxCharCount(50);
 
@@ -90,10 +90,10 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onClearSearch)
     );
-    searchClearBtn->setID("clear-search-btn");
+    searchClearBtn->setID("clear-search-button");
     searchClearBtn->setAnchorPoint({ 0.5, 0.5 });
     searchClearBtn->ignoreAnchorPointForPosition(false);
-    searchClearBtn->setPosition({ 30.f, m_searchInput->getPositionY() });
+    searchClearBtn->setPosition({ 26.f, m_searchInput->getPositionY() });
 
     m_overlayMenu->addChild(searchClearBtn);
 
@@ -165,7 +165,7 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onInfoButton)
     );
-    infoBtn->setID("info-btn");
+    infoBtn->setID("info-button");
     infoBtn->setPosition({ contentSize.width - 15.f, contentSize.height - 25.f });
 
     auto infoMenu = CCMenu::create();
@@ -222,7 +222,7 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->m_contentLayer->updateLayout();
     m_scrollLayer->scrollToTop();
 
-    if (m_thisMod->getSettingValue<bool>("settings-btn")) {
+    if (m_thisMod->getSettingValue<bool>("settings-button")) {
         // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
             "geode.loader/settings.png",
@@ -236,7 +236,7 @@ bool FavoritesPopup::setup() {
             this,
             menu_selector(FavoritesPopup::onModSettings));
         modSettingsBtn->setID("mod-settings-button");
-        modSettingsBtn->setPosition({ 25.f, 25.f });
+        modSettingsBtn->setPosition({ 22.5f, 22.5f });
 
         m_overlayMenu->addChild(modSettingsBtn);
     } else {
@@ -253,13 +253,14 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onPromptClearAll)
     );
-    clearAllBtn->setID("clear-all-favorites-btn");
+    clearAllBtn->setID("clear-favorites-button");
     clearAllBtn->setPosition({ widthCS / 2.f, 1.25f });
     clearAllBtn->setVisible(true);
     clearAllBtn->setZOrder(3);
 
     m_overlayMenu->addChild(clearAllBtn);
 
+    m_thisMod->setSavedValue("already-loaded", true);
     return true;
 };
 
@@ -382,7 +383,7 @@ void FavoritesPopup::onInfoButton(CCObject*) {
 
 void FavoritesPopup::onPromptClearAll(CCObject*) {
     createQuickPopup(
-        "Clear All Favorites",
+        "Clear Favorites",
         "Are you sure you want to <cr>clear all your favorite mods</c>?",
         "Cancel", "Yes",
         [this](auto, bool btn2) {
