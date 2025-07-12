@@ -49,6 +49,12 @@
 			"name": "Interface",
 			"description": "Functionality of UI."
 		},
+		"minimal": {
+			"type": "bool",
+			"name": "Minimalist List",
+			"description": "Show only important details of a mod in the favorites list.",
+			"default": true
+		},
 		"auto-scroll": {
 			"type": "bool",
 			"name": "Automatically Scroll Up",

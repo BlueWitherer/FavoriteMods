@@ -54,34 +54,44 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
         addChild(nameLabel);
 
-        auto devs = m_mod->getDevelopers();
-        auto devLabelText = devs[0];
-        int andMore = as<int>(devs.size()) - 1;
+        // offset to position the id's x by if showing label version
+        auto idLabelOffset = 0.f;
 
-        if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
+        // Avoid showing more details
+        if (m_thisMod->getSettingValue<bool>("minimal")) {
+            idLabelOffset = 0.f; // make sure its 0 lul
+        } else {
+            auto devs = m_mod->getDevelopers();
+            auto devLabelText = devs[0];
+            int andMore = as<int>(devs.size()) - 1;
 
-        // Mod name label
-        auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
-        devLabel->setID("mod-developers");
-        devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, 25.f });
-        devLabel->setScale(0.25f);
-        devLabel->setAnchorPoint({ 0, 0.5 });
+            if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
 
-        addChild(devLabel);
+            // Mod developers label
+            auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
+            devLabel->setID("mod-developers");
+            devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, 25.f });
+            devLabel->setScale(0.25f);
+            devLabel->setAnchorPoint({ 0, 0.5 });
 
-        // Version label
-        auto versionLabel = CCLabelBMFont::create(m_mod->getVersion().toVString().c_str(), "goldFont.fnt");
-        versionLabel->setID("mod-version");
-        versionLabel->setPosition({ 37.5f, 15.f });
-        versionLabel->setScale(0.3f);
-        versionLabel->setAnchorPoint({ 0, 0.5 });
+            addChild(devLabel);
 
-        addChild(versionLabel);
+            // Version label
+            auto versionLabel = CCLabelBMFont::create(m_mod->getVersion().toVString().c_str(), "goldFont.fnt");
+            versionLabel->setID("mod-version");
+            versionLabel->setPosition({ 37.5f, 15.f });
+            versionLabel->setScale(0.3f);
+            versionLabel->setAnchorPoint({ 0, 0.5 });
+
+            idLabelOffset += 2.5f + versionLabel->getScaledContentWidth();
+
+            addChild(versionLabel);
+        };
 
         // ID label
         auto idLabel = CCLabelBMFont::create(m_mod->getID().c_str(), "bigFont.fnt");
         idLabel->setID("mod-id");
-        idLabel->setPosition({ versionLabel->getScaledContentWidth() + 40.f, 15.f });
+        idLabel->setPosition({ 37.5f + idLabelOffset, 15.f });
         idLabel->setScale(0.25f);
         idLabel->setAnchorPoint({ 0, 0.5 });
         idLabel->setOpacity(125);
