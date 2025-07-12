@@ -38,10 +38,10 @@
 		"enhancement"
 	],
 	"settings": {
-		"enabled-required": {
+		"enabled-only": {
 			"type": "bool",
 			"name": "Only Show Enabled Mods",
-			"description": "Only list mods that you have enabled on your client.",
+			"description": "Only load the list with mods that you have <cg>enabled</c> on your client.",
 			"default": false
 		},
 		"ui": {

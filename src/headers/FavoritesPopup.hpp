@@ -30,6 +30,7 @@ protected:
     bool init(float width, float height, bool geodeTheme = false);
     void textChanged(CCTextInputNode* input) override;
 
+    void loadModList(std::vector<Mod*> allMods);
     void refreshModList(bool clearSearch = false);
     void onClearAll(); // Clear all favorites
 

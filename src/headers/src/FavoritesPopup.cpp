@@ -214,15 +214,12 @@ bool FavoritesPopup::setup() {
         return toLowercase(a->getName()) < toLowercase(b->getName()); // Alphabetical order
               });
 
-    for (Mod* mod : allMods) { // Add all mod items to scrolllayer
-        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
-        log::debug("Added container for mod {}", mod->getID());
-    };
+    loadModList(allMods);
 
     m_scrollLayer->m_contentLayer->updateLayout();
     m_scrollLayer->scrollToTop();
 
-    if (m_thisMod->getSettingValue<bool>("settings-button")) {
+    if (m_thisMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
             "geode.loader/settings.png",
@@ -234,7 +231,8 @@ bool FavoritesPopup::setup() {
         auto modSettingsBtn = CCMenuItemSpriteExtra::create(
             modSettingsBtnSprite,
             this,
-            menu_selector(FavoritesPopup::onModSettings));
+            menu_selector(FavoritesPopup::onModSettings)
+        );
         modSettingsBtn->setID("mod-settings-button");
         modSettingsBtn->setPosition({ 22.5f, 22.5f });
 
@@ -264,6 +262,15 @@ bool FavoritesPopup::setup() {
     return true;
 };
 
+void FavoritesPopup::loadModList(std::vector<Mod*> allMods) {
+    for (Mod* mod : allMods) { // Add all mod items to scrolllayer
+        bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
+        if (list) m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
+
+        log::debug("Added list item for mod {}", mod->getID());
+    };
+};
+
 void FavoritesPopup::refreshModList(bool clearSearch) {
     // Clear and recreate scroll content
     m_scrollLayer->m_contentLayer->removeAllChildren();
@@ -283,20 +290,13 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != std::string::npos
             || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != std::string::npos;
 
-        bool filterEnabled = m_thisMod->getSettingValue<bool>("enabled-required"); // Filter to only show enabled mods
-        bool enabledFilter = !filterEnabled || mod->isEnabled() && filterEnabled; // Show all mods, or filter through only enabled mods
-
-        if (enabledFilter) {
-            // If favorites-only is enabled, only show favorited mods
-            if (m_showFavoritesOnly) {
-                if (isFavorited && matchesSearch) filteredMods.push_back(mod);
-            } else if (m_hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
-                if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
-            } else { // Normal mode: show all matching mods, with favorites prioritized
-                if (matchesSearch) filteredMods.push_back(mod);
-            };
-        } else {
-            log::error("Mod {} must be enabled to show", mod->getID());
+        // If favorites-only is enabled, only show favorited mods
+        if (m_showFavoritesOnly) {
+            if (isFavorited && matchesSearch) filteredMods.push_back(mod);
+        } else if (m_hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
+            if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
+        } else { // Normal mode: show all matching mods, with favorites prioritized
+            if (matchesSearch) filteredMods.push_back(mod);
         };
     };
 
@@ -310,10 +310,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
         return toLowercase(a->getName()) < toLowercase(b->getName()); // Alphabetical order
               });
 
-    for (Mod* mod : filteredMods) { // Add filtered mod items to scrolllayer
-        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
-        log::debug("Added container for mod {}", mod->getID());
-    };
+    loadModList(filteredMods);
 
     m_scrollLayer->m_contentLayer->updateLayout();
     if (m_thisMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
