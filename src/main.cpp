@@ -28,17 +28,13 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         log::debug("Geode mod found: {}", geodeMod->getName());
 
         if (geodeMod) {
-            try {
-                m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
-                log::debug("Geode theme enabled: {}", m_fields->m_isGeodeTheme);
-            } catch (...) {
-                log::warn("Could not get geode theme setting, defaulting to false");
-                m_fields->m_isGeodeTheme = false;
-            };
+            m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
+            log::debug("Geode theme enabled: {}", m_fields->m_isGeodeTheme);
         } else {
             log::error("Failed to get Geode loader");
         };
 
+        // showcase itself when the player loads for the first time
         if (getThisMod->hasSavedValue(getThisMod->getID())) {
             log::debug("User has loaded the mod before");
         } else {
@@ -87,24 +83,16 @@ class $nodeModify(MyModsLayer, ModsLayer) {
 
     void onFavoritesBtn(CCObject*) {
         log::debug("Favorites button clicked!");
+
         bool alerts = getThisMod->getSettingValue<bool>("alerts");
+        auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme);
 
-        try {
-            auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme);
-
-            if (popup) {
-                popup->show();
-                log::debug("Favorites popup shown successfully");
-            } else {
-                log::error("Failed to create favorites popup!");
-                if (alerts) FLAlertLayer::create("Error", "Failed to create favorites popup!", "OK")->show();
-            };
-        } catch (const std::exception& e) { // lets try catch something shall we :p
-            log::error("Exception while showing favorites popup: {}", e.what());
-            if (alerts) FLAlertLayer::create("Error", "An error occurred while showing the favorites popup!", "OK")->show();
-        } catch (...) {
-            log::error("Unknown error occurred while showing favorites popup");
-            if (alerts) FLAlertLayer::create("Error", "An unknown error occurred while showing the favorites popup!", "OK")->show();
+        if (popup) {
+            popup->show();
+            log::debug("Favorites popup shown successfully");
+        } else {
+            log::error("Failed to create favorites popup!");
+            if (alerts) FLAlertLayer::create("Oops!", "An error occured while attempting to show this pop-up. <cg>Please try again.</c>", "OK")->show();
         };
     };
 };

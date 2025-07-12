@@ -24,7 +24,8 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
         // Background for mod item
         m_backgroundSprite = CCScale9Sprite::create("square02b_001.png");
-        m_backgroundSprite->setContentSize(size);
+        m_backgroundSprite->setScale(0.5f);
+        m_backgroundSprite->setContentSize({ size.width * 2.f, size.height * 2.f });
         m_backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
         m_backgroundSprite->ignoreAnchorPointForPosition(false);
         m_backgroundSprite->setPosition({ getScaledContentWidth() / 2.f, getScaledContentHeight() / 2.f });

@@ -1,4 +1,6 @@
 # v1.0.2
+- Fixed touch priority issue with scrolling UI
+- Fixed visual issue with mod list item UI
 - Added mod API
 
 # v1.0.1

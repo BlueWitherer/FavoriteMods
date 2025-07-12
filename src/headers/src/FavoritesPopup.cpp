@@ -55,6 +55,7 @@ bool FavoritesPopup::setup() {
     m_overlayMenu->ignoreAnchorPointForPosition(false);
     m_overlayMenu->setPosition({ widthCS / 2.f, heightCS / 2.f });
     m_overlayMenu->setScaledContentSize(m_mainLayer->getScaledContentSize());
+    m_overlayMenu->setTouchPriority(m_overlayMenu->getTouchPriority() - 3);
     m_overlayMenu->setZOrder(10);
 
     m_mainLayer->addChild(m_overlayMenu);
@@ -100,6 +101,7 @@ bool FavoritesPopup::setup() {
     auto checkboxMenu = CCMenu::create();
     checkboxMenu->setID("checkbox-menu");
     checkboxMenu->setPosition(CCPointZero);
+    checkboxMenu->setTouchPriority(checkboxMenu->getTouchPriority() - 2);
 
     m_mainLayer->addChild(checkboxMenu);
 
@@ -169,6 +171,7 @@ bool FavoritesPopup::setup() {
     auto infoMenu = CCMenu::create();
     infoMenu->setID("info-menu");
     infoMenu->setPosition(CCPointZero);
+    infoMenu->setTouchPriority(infoMenu->getTouchPriority() - 1);
 
     infoMenu->addChild(infoBtn);
     m_mainLayer->addChild(infoMenu);
@@ -179,7 +182,15 @@ bool FavoritesPopup::setup() {
     m_noModsLabel->setScale(0.5f);
     m_noModsLabel->setColor({ 150, 150, 150 });
     m_noModsLabel->setVisible(false);
+
     m_mainLayer->addChild(m_noModsLabel);
+
+    // Create layout for scroll content layer
+    auto scrollLayerLayout = ColumnLayout::create()
+        ->setAxisAlignment(AxisAlignment::End) // seriously why is this end at top but start at bottom?
+        ->setAxisReverse(true) // haha wtf is top reverse but bottom isnt LMAO
+        ->setAutoGrowAxis(360.f)
+        ->setGap(5.f);
 
     // Create scroll layer
     m_scrollLayer = ScrollLayer::create({ scrollSize.width - 12.5f, scrollSize.height - 12.5f });
@@ -187,13 +198,7 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->setAnchorPoint({ 0.5, 0.5 });
     m_scrollLayer->ignoreAnchorPointForPosition(false);
     m_scrollLayer->setPosition(scrollBG->getPosition());
-    m_scrollLayer->m_contentLayer->setLayout(
-        ColumnLayout::create()
-        ->setAxisAlignment(AxisAlignment::End) // seriously why is this end at top but start at bottom?
-        ->setAxisReverse(true) // haha wtf is top reverse but bottom isnt LMAO
-        ->setAutoGrowAxis(360.f)
-        ->setGap(5.f)
-    );
+    m_scrollLayer->m_contentLayer->setLayout(scrollLayerLayout);
 
     m_mainLayer->addChild(m_scrollLayer);
 
@@ -239,7 +244,7 @@ bool FavoritesPopup::setup() {
     };
 
     // clear favs btn sprite
-    auto clearAllBtnSprite = ButtonSprite::create("Clear", "bigFont.fnt", m_geodeTheme ? "geode.loader/GE_button_05-uhd.png" : "GJ_button_01-uhd.png", 0.875f);
+    auto clearAllBtnSprite = ButtonSprite::create("Clear", "bigFont.fnt", m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png", 0.875f);
     clearAllBtnSprite->setScale(0.75f);
 
     // button to clear favorites
