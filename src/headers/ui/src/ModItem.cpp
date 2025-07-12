@@ -190,7 +190,7 @@ void ModItem::updateFavoriteIcon() {
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {
-    if (m_thisMod->getSavedValue<bool>("already-loaded") || m_thisMod->hasSavedValue(m_thisMod->getID())) { // check if mod loaded before
+    if (m_thisMod->getSavedValue<bool>("already-loaded")) { // check if mod loaded before
         return nullptr;
     } else if (m_mod->getID().compare(m_thisMod->getID()) == 0) { // create the help text if loaded for the first time
         log::info("Mod loaded for the first time, creating help text...");
