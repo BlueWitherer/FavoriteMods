@@ -1,6 +1,7 @@
 # v1.0.2
 - Fixed touch priority issue with scrolling UI
-- Fixed visual issue with mod list item UI
+- Fixed texture size issue with Clear button
+- Fixed visual issue with mod list item background UI
 - Added mod API
 
 # v1.0.1

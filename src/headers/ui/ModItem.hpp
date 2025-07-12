@@ -14,6 +14,7 @@ protected:
 
     Mod* m_mod; // Fetched mod
     Mod* m_thisMod = getMod(); // Get this mod
+
     CCMenuItemSpriteExtra* m_favButton = nullptr;
     FavoritesPopup* m_parentPopup = nullptr;
     CCScale9Sprite* m_backgroundSprite = nullptr;

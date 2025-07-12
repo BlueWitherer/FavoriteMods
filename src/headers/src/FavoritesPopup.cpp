@@ -55,7 +55,7 @@ bool FavoritesPopup::setup() {
     m_overlayMenu->ignoreAnchorPointForPosition(false);
     m_overlayMenu->setPosition({ widthCS / 2.f, heightCS / 2.f });
     m_overlayMenu->setScaledContentSize(m_mainLayer->getScaledContentSize());
-    m_overlayMenu->setTouchPriority(m_overlayMenu->getTouchPriority() - 3);
+    m_overlayMenu->setTouchPriority(-505);
     m_overlayMenu->setZOrder(10);
 
     m_mainLayer->addChild(m_overlayMenu);
@@ -101,7 +101,7 @@ bool FavoritesPopup::setup() {
     auto checkboxMenu = CCMenu::create();
     checkboxMenu->setID("checkbox-menu");
     checkboxMenu->setPosition(CCPointZero);
-    checkboxMenu->setTouchPriority(checkboxMenu->getTouchPriority() - 2);
+    checkboxMenu->setTouchPriority(-504);
 
     m_mainLayer->addChild(checkboxMenu);
 
@@ -171,7 +171,7 @@ bool FavoritesPopup::setup() {
     auto infoMenu = CCMenu::create();
     infoMenu->setID("info-menu");
     infoMenu->setPosition(CCPointZero);
-    infoMenu->setTouchPriority(infoMenu->getTouchPriority() - 1);
+    infoMenu->setTouchPriority(-503);
 
     infoMenu->addChild(infoBtn);
     m_mainLayer->addChild(infoMenu);

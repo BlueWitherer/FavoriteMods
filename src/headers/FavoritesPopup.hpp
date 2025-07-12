@@ -8,10 +8,10 @@ using namespace geode::prelude;
 
 class FavoritesPopup : public Popup<>, public TextInputDelegate {
 protected:
+    bool m_pendingUpdate = false;
     bool m_geodeTheme = false; // Make sure visuals go with geode theme
 
     Mod* m_thisMod = getMod(); // Get this mod
-    bool m_pendingUpdate = false;
 
     ScrollLayer* m_scrollLayer = nullptr;
 
