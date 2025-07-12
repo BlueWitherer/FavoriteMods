@@ -190,13 +190,13 @@ void ModItem::updateFavoriteIcon() {
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {
-    if (m_thisMod->getSavedValue<bool>("already-loaded")) { // check if mod loaded before
+    if (m_thisMod->getSavedValue<bool>("already-loaded") || !m_thisMod->getSavedValue<bool>(m_thisMod->getID())) { // check if mod loaded before
         return nullptr;
     } else if (m_mod->getID().compare(m_thisMod->getID()) == 0) { // create the help text if loaded for the first time
         log::info("Mod loaded for the first time, creating help text...");
 
         // Help text for first-time users
-        auto help = CCLabelBMFont::create("Press to toggle ->", "chatFont.fnt");
+        auto help = CCLabelBMFont::create("Press to Toggle ->", "chatFont.fnt");
         help->setID("first-time-help-text");
         help->setScale(0.5f);
         help->setColor({ 200, 200, 200 });

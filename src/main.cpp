@@ -10,6 +10,7 @@
 
 using namespace geode::prelude;
 
+// it's modding time :3
 auto getThisMod = getMod();
 
 // use alpha's geode utils to modify layer

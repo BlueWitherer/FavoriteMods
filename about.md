@@ -1,7 +1,7 @@
 # Favorite Mods
 **Add installed Geode mods as your favorites!**
 
-_by **[Cheeseworks](user:6408873)** & more!_
+*by* ***[Cheeseworks](user:6408873)*** *& more!*
 
 ---
 
