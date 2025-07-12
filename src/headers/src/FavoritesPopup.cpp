@@ -10,10 +10,7 @@ using namespace geode::prelude;
 
 std::string toLowercase(std::string s) {
     std::string str = s;
-
-    for (auto& c : str) {
-        c = tolower(c);
-    };
+    for (auto& c : str) c = tolower(c);
 
     return str;
 };
@@ -226,7 +223,7 @@ bool FavoritesPopup::setup() {
             1.f,
             m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
         );
-        modSettingsBtnSprite->setScale(0.75f);
+        modSettingsBtnSprite->setScale(0.625f);
 
         auto modSettingsBtn = CCMenuItemSpriteExtra::create(
             modSettingsBtnSprite,
@@ -234,7 +231,7 @@ bool FavoritesPopup::setup() {
             menu_selector(FavoritesPopup::onModSettings)
         );
         modSettingsBtn->setID("mod-settings-button");
-        modSettingsBtn->setPosition({ 22.5f, 22.5f });
+        modSettingsBtn->setPosition({ 0.f, 0.f });
 
         m_overlayMenu->addChild(modSettingsBtn);
     } else {
@@ -280,13 +277,13 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     auto loader = Loader::get();
     auto allMods = loader->getAllMods();
 
-    // Filter mods based on search text and toggle settings
+    // Filtered mods based on search text and toggle settings
     std::vector<Mod*> filteredMods;
 
     for (Mod* mod : allMods) {
         bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
 
-        bool matchesSearch = m_searchText.empty() && mod->getID() != "geode.loader" // Skip geode by default
+        bool matchesSearch = (m_searchText.empty() && mod->getID() != std::string("geode.loader")) // Skip geode by default
             || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != std::string::npos
             || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != std::string::npos;
 
@@ -393,6 +390,7 @@ void FavoritesPopup::onClearAll() {
     auto loader = Loader::get();
     auto allMods = loader->getAllMods();
 
+    // Turn off favorite from every mod
     for (Mod* mod : allMods) {
         auto modId = mod->getID();
         if (m_thisMod->getSavedValue<bool>(modId)) m_thisMod->setSavedValue(modId, false);

@@ -57,7 +57,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         // offset to position the id's x by if showing label version
         auto idLabelOffset = 0.f;
 
-        // Avoid showing more details
+        // Avoid showing more details if minimalist setting is on
         if (m_thisMod->getSettingValue<bool>("minimal")) {
             idLabelOffset = 0.f; // make sure its 0 lul
         } else {
@@ -67,7 +67,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
             if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
 
-            // Mod developers label
+            // Developers label
             auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
             devLabel->setID("mod-developers");
             devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, 25.f });
