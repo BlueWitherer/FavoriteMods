@@ -413,7 +413,7 @@ void FavoritesPopup::onModFavoriteChanged() {
 FavoritesPopup* FavoritesPopup::create(bool geodeTheme, bool heartIcons) {
     auto ret = new FavoritesPopup();
 
-    if (ret && ret->init(400.f, 280.f, geodeTheme)) {
+    if (ret && ret->init(400.f, 280.f, geodeTheme, heartIcons)) {
         ret->autorelease();
         return ret;
     };

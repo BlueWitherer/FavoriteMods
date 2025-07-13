@@ -219,7 +219,7 @@ CCLabelBMFont* ModItem::firstTimeText() {
 ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme, bool heartIcons) {
     auto ret = new ModItem();
 
-    if (!ret || !ret->init(mod, size, parentPopup, geodeTheme)) {
+    if (!ret || !ret->init(mod, size, parentPopup, geodeTheme, heartIcons)) {
         CC_SAFE_DELETE(ret);
         return nullptr;
     };
