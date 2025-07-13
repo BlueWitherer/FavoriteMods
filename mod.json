@@ -42,7 +42,7 @@
 			"type": "bool",
 			"name": "Only List Enabled Mods",
 			"description": "Only load the list with mods that you have <cg>enabled</c> on your client.",
-			"default": false
+			"default": true
 		},
 		"ui": {
 			"type": "title",
@@ -77,17 +77,6 @@
 			"type": "bool",
 			"name": "Hearts",
 			"description": "Replace the star icons with heart icons! <3",
-			"default": false
-		},
-		"dev": {
-			"type": "title",
-			"name": "Developers",
-			"description": "Settings for developers."
-		},
-		"alerts": {
-			"type": "bool",
-			"name": "Error Alerts",
-			"description": "Show alert pop-ups when errors occur.",
 			"default": false
 		}
 	},

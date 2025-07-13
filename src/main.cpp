@@ -16,7 +16,7 @@ auto getThisMod = getMod();
 // use alpha's geode utils to modify layer
 class $nodeModify(MyModsLayer, ModsLayer) {
     struct Fields {
-        bool m_isGeodeTheme = false; // check for geode theme
+        bool m_isGeodeTheme = false; // setting for geode theme
         bool m_isHeartIcons = false; // if the player wants heart buttons
     };
 
@@ -26,6 +26,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         // geode mod loader
         auto loader = Loader::get();
 
+        // get the geode mod
         if (auto geodeMod = loader->getLoadedMod("geode.loader")) {
             log::debug("Geode mod found: {}", geodeMod->getName());
             m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
@@ -84,14 +85,12 @@ class $nodeModify(MyModsLayer, ModsLayer) {
     void onFavoritesBtn(CCObject*) {
         log::debug("Favorites button clicked!");
 
-        bool alerts = getThisMod->getSettingValue<bool>("alerts");
-
+        // create the favorites pop-up
         if (auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons)) {
             popup->show();
             log::debug("Favorites popup shown successfully");
         } else {
             log::error("Failed to create favorites popup!");
-            if (alerts) FLAlertLayer::create("Oops!", "An error occured while attempting to show this pop-up. <cg>Please try again.</c>", "OK")->show();
         };
     };
 };

@@ -58,17 +58,6 @@ bool FavoritesPopup::setup() {
 
     m_mainLayer->addChild(m_overlayMenu);
 
-    // Background for scroll area
-    auto scrollBG = CCScale9Sprite::create("square02b_001.png");
-    scrollBG->setContentSize(scrollSize);
-    scrollBG->setAnchorPoint({ 0.5, 0.5 });
-    scrollBG->ignoreAnchorPointForPosition(false);
-    scrollBG->setPosition({ contentSize.width / 2.f, (contentSize.height / 2.f) - 35.f });
-    scrollBG->setColor({ 0, 0, 0 });
-    scrollBG->setOpacity(100);
-
-    m_mainLayer->addChild(scrollBG);
-
     // Create search input
     m_searchInput = TextInput::create(265.f, "Search Mods", "bigFont.fnt");
     m_searchInput->setID("search-box");
@@ -183,7 +172,18 @@ bool FavoritesPopup::setup() {
 
     m_mainLayer->addChild(m_noModsLabel);
 
-    // Create layout for scroll content layer
+    // Background for scroll layer
+    auto scrollBG = CCScale9Sprite::create("square02b_001.png");
+    scrollBG->setContentSize(scrollSize);
+    scrollBG->setAnchorPoint({ 0.5, 0.5 });
+    scrollBG->ignoreAnchorPointForPosition(false);
+    scrollBG->setPosition({ contentSize.width / 2.f, (contentSize.height / 2.f) - 35.f });
+    scrollBG->setColor({ 0, 0, 0 });
+    scrollBG->setOpacity(100);
+
+    m_mainLayer->addChild(scrollBG);
+
+    // Create layout for scroll layer
     auto scrollLayerLayout = ColumnLayout::create()
         ->setAxisAlignment(AxisAlignment::End) // seriously why is this end at top but start at bottom?
         ->setAxisReverse(true) // haha wtf is top reverse but bottom isnt LMAO
