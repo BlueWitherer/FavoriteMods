@@ -1,6 +1,7 @@
 # v1.0.4
 - Added toggle setting `Hearts`
   - Hearts can now optionally be displayed instead of stars for favorites
+- Set default value for setting *`Only List Enabled Mods`* to `false`
 - Other tweaks
 
 # v1.0.3

@@ -15,18 +15,17 @@ Here's some sample code to check a mod to see if it is favorited.
 ```cpp
 using namespace favorites;
 
-Handler * getHandler = Handler::get();
-
 class $modify(MenuLayer) {
     bool init() {
         if (!MenuLayer::init()) return false;
 
         Mod* myMod = geode::getMod();
 
+        // Check if your mod is a player's favorite
         if (isFavorite(myMod->getID())) {
             log::info("Yay! {} is a favorite!", myMod->getName());
         } else {
-            log::info("Aw man... You should totally add {} to your favorites!", myMod->getName());
+            log::warn("Aw man... You should totally add {} to your favorites!", myMod->getName());
         };
 
         return true;

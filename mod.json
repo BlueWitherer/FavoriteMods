@@ -40,7 +40,7 @@
 	"settings": {
 		"enabled-only": {
 			"type": "bool",
-			"name": "Only Show Enabled Mods",
+			"name": "Only List Enabled Mods",
 			"description": "Only load the list with mods that you have <cg>enabled</c> on your client.",
 			"default": false
 		},
@@ -73,21 +73,21 @@
 			"description": "Create a quick mod settings button in the favorites pop-up.",
 			"default": false
 		},
-		"other": {
+		"hearts": {
+			"type": "bool",
+			"name": "Hearts",
+			"description": "Replace the star icons with heart icons! <3",
+			"default": false
+		},
+		"dev": {
 			"type": "title",
-			"name": "Other",
-			"description": "Miscellaneous mod functions."
+			"name": "Developers",
+			"description": "Settings for developers."
 		},
 		"alerts": {
 			"type": "bool",
 			"name": "Error Alerts",
 			"description": "Show alert pop-ups when errors occur.",
-			"default": false
-		},
-		"hearts": {
-			"type": "bool",
-			"name": "Hearts",
-			"description": "Replace the star icons with heart icons! <3",
 			"default": false
 		}
 	},

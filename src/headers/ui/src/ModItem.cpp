@@ -12,8 +12,8 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
     m_mod = mod;
     m_parentPopup = parentPopup;
     m_geodeTheme = geodeTheme;
+    m_heartIcons = heartIcons;
 
-    m_heartTheme = m_thisMod->getSettingValue<bool>("hearts");
     m_favorite = m_thisMod->getSavedValue<bool>(m_mod->getID(), false);
 
     if (CCNode::init()) {
@@ -111,12 +111,12 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         );
         viewBtn->setID("view-button");
 
-        auto on = m_heartTheme ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto off = m_heartTheme ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+        auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
         // Favorite button here :)
         auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
-        favBtnSprite->setScale(m_heartTheme ? 0.625f : 0.875f);
+        favBtnSprite->setScale(m_heartIcons ? 0.625f : 0.875f);
 
         m_favButton = CCMenuItemSpriteExtra::create(
             favBtnSprite,
@@ -185,11 +185,11 @@ void ModItem::onFavorite(CCObject*) {
 
 void ModItem::updateFavoriteIcon() {
     if (m_favButton) {
-        auto on = m_heartTheme ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto off = m_heartTheme ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+        auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
         auto newSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
-        newSprite->setScale(m_heartTheme ? 0.625f : 0.875f);
+        newSprite->setScale(m_heartIcons ? 0.625f : 0.875f);
 
         m_favButton->setNormalImage(newSprite);
     } else {

@@ -13,7 +13,7 @@ protected:
     bool m_favorite = false; // If the mod is favorite
 
     bool m_geodeTheme = false; // Make sure visuals go with geode theme
-    bool m_heartTheme = false; // Heart UI mode
+    bool m_heartIcons = false; // Hearts UI mode
 
     Mod* m_mod; // Fetched mod
     Mod* m_thisMod = getMod(); // Get this mod

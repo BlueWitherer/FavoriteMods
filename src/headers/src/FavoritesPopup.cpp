@@ -17,8 +17,7 @@ std::string toLowercase(std::string s) {
 
 bool FavoritesPopup::init(float width, float height, bool geodeTheme, bool heartIcons) {
     m_geodeTheme = geodeTheme;
-
-    m_heartTheme = m_thisMod->getSettingValue<bool>("hearts");
+    m_heartIcons = heartIcons;
 
     if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
         setCloseButtonSpr(
@@ -141,16 +140,16 @@ bool FavoritesPopup::setup() {
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
     // Create icon above favorites only toggle
-    auto starOnIcon = CCSprite::createWithSpriteFrameName(m_heartTheme ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
+    auto starOnIcon = CCSprite::createWithSpriteFrameName(m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
     starOnIcon->setID("favorites-icon");
     starOnIcon->setPosition({ contentSize.width - 70.f, contentSize.height - 40.f });
-    starOnIcon->setScale(m_heartTheme ? 0.375f : 0.625f);
+    starOnIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
 
     // Create icon above hide favorites toggle
-    auto starOffIcon = CCSprite::createWithSpriteFrameName(m_heartTheme ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png");
+    auto starOffIcon = CCSprite::createWithSpriteFrameName(m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png");
     starOffIcon->setID("non-favorites-icon");
     starOffIcon->setPosition({ contentSize.width - 30.f, contentSize.height - 40.f });
-    starOffIcon->setScale(m_heartTheme ? 0.375f : 0.625f);
+    starOffIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
 
     m_mainLayer->addChild(starOnIcon);
     m_mainLayer->addChild(starOffIcon);
@@ -266,14 +265,16 @@ void FavoritesPopup::loadModList(std::vector<Mod*> allMods) {
         bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
         if (list) m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
 
-        log::debug("Added list item for mod {}", mod->getID());
+        log::debug("{} list item for mod {}", list ? "Processed" : "Skipped", mod->getID());
     };
 };
 
 void FavoritesPopup::refreshModList(bool clearSearch) {
     // Clear and recreate scroll content
     m_scrollLayer->m_contentLayer->removeAllChildren();
+
     if (clearSearch && m_thisMod->getSettingValue<bool>("refresh-clear-search")) m_searchText = "";
+
     m_searchInput->setString(m_searchText, false);
 
     auto loader = Loader::get();

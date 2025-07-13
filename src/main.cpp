@@ -25,16 +25,17 @@ class $nodeModify(MyModsLayer, ModsLayer) {
 
         // geode mod loader
         auto loader = Loader::get();
-        auto geodeMod = loader->getLoadedMod("geode.loader");
 
-        log::debug("Geode mod found: {}", geodeMod->getName());
-
-        if (geodeMod) {
+        if (auto geodeMod = loader->getLoadedMod("geode.loader")) {
+            log::debug("Geode mod found: {}", geodeMod->getName());
             m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
             log::debug("Geode theme enabled: {}", m_fields->m_isGeodeTheme);
         } else {
             log::error("Failed to get Geode loader");
         };
+
+        // check if the player wants hearts instead
+        m_fields->m_isHeartIcons = getThisMod->getSettingValue<bool>("hearts");
 
         // showcase itself when the player loads for the first time
         if (getThisMod->hasSavedValue("already-loaded")) {
@@ -49,9 +50,6 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         // get the actions menu
         if (auto actionsMenu = as<CCMenu*>(getChildByID("actions-menu"))) {
             log::debug("Actions menu found successfully!");
-
-            // check if the player wants hearts instead
-            m_fields->m_isHeartIcons = getThisMod->getSettingValue<bool>("hearts");
 
             // favorites button sprite
             auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
@@ -87,9 +85,8 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         log::debug("Favorites button clicked!");
 
         bool alerts = getThisMod->getSettingValue<bool>("alerts");
-        auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons);
 
-        if (popup) {
+        if (auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons)) {
             popup->show();
             log::debug("Favorites popup shown successfully");
         } else {
