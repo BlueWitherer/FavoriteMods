@@ -49,28 +49,18 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         if (auto actionsMenu = as<CCMenu*>(getChildByID("actions-menu"))) {
             log::debug("Actions menu found successfully!");
 
-            // Check if favorites button already exists
-            if (actionsMenu->getChildByID("favorites"_spr)) {
-                log::debug("Favorites button already exists, skipping creation");
-                return;
-            };
-
             // check if the player wants hearts instead
             bool hearts = getThisMod->getSettingValue<bool>("hearts");
 
-            auto favBtnSpriteIcon = CCSprite::createWithSpriteFrameName(hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
-            favBtnSpriteIcon->setScale(0.875f);
-
-            if (hearts) favBtnSpriteIcon->setColor({ 255, 0, 0 });
-
             // favorites button sprite
-            auto favBtnSprite = CircleButtonSprite::create(
-                favBtnSpriteIcon,
-                (m_fields->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green),
+            auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+                hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
+                hearts ? 1.f : 0.875f,
+                m_fields->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
                 CircleBaseSize::Medium
             );
-
             favBtnSprite->setScale(0.8f);
+
             log::debug("Favorites button sprite created successfully");
 
             // create favorites button
@@ -79,8 +69,8 @@ class $nodeModify(MyModsLayer, ModsLayer) {
                 this,
                 menu_selector(MyModsLayer::onFavoritesBtn)
             );
-
             favBtn->setID("favorites"_spr);
+
             log::debug("Favorites button created successfully");
 
             actionsMenu->addChild(favBtn);
