@@ -9,6 +9,7 @@ using namespace geode::prelude;
 class FavoritesPopup : public Popup<>, public TextInputDelegate {
 protected:
     bool m_geodeTheme = false; // Make sure visuals go with geode theme
+    bool m_heartTheme = false; // Heart UI mode
 
     Mod* m_thisMod = getMod(); // Get this mod
 

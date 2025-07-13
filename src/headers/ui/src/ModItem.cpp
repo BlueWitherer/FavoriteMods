@@ -12,10 +12,11 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
     m_parentPopup = parentPopup;
     m_geodeTheme = geodeTheme;
 
-    // Check if this mod is already favorited
-    isFavorite = m_thisMod->getSavedValue<bool>(m_mod->getID(), false);
+    m_heartTheme = m_thisMod->getSettingValue<bool>("hearts");
+    m_favorite = m_thisMod->getSavedValue<bool>(m_mod->getID(), false);
 
     if (CCNode::init()) {
+        // node background theme color
         ccColor4B bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
 
         setID(m_mod->getID());
@@ -109,15 +110,12 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         );
         viewBtn->setID("view-button");
 
-        // check if the player wants hearts instead
-        bool hearts = m_thisMod->getSettingValue<bool>("hearts");
-
-        auto on = hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto off = hearts ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+        auto on = m_heartTheme ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto off = m_heartTheme ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
         // Favorite button here :)
-        auto favBtnSprite = CCSprite::createWithSpriteFrameName(isFavorite ? on : off);
-        favBtnSprite->setScale(hearts ? 0.625f : 0.875f);
+        auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
+        favBtnSprite->setScale(m_heartTheme ? 0.625f : 0.875f);
 
         m_favButton = CCMenuItemSpriteExtra::create(
             favBtnSprite,
@@ -172,10 +170,10 @@ void ModItem::onViewMod(CCObject*) {
 
 void ModItem::onFavorite(CCObject*) {
     // Toggle favorite status
-    isFavorite = !isFavorite;
+    m_favorite = !m_favorite;
 
     // Save the favorite status
-    m_thisMod->setSavedValue<bool>(m_mod->getID(), isFavorite);
+    m_thisMod->setSavedValue<bool>(m_mod->getID(), m_favorite);
 
     // Update the icon
     updateFavoriteIcon();
@@ -186,14 +184,11 @@ void ModItem::onFavorite(CCObject*) {
 
 void ModItem::updateFavoriteIcon() {
     if (m_favButton) {
-        // check if the player wants hearts instead
-        bool hearts = m_thisMod->getSettingValue<bool>("hearts");
+        auto on = m_heartTheme ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto off = m_heartTheme ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
-        auto on = hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto off = hearts ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
-
-        auto newSprite = CCSprite::createWithSpriteFrameName(isFavorite ? on : off);
-        newSprite->setScale(hearts ? 0.625f : 0.875f);
+        auto newSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
+        newSprite->setScale(m_heartTheme ? 0.625f : 0.875f);
 
         m_favButton->setNormalImage(newSprite);
     } else {

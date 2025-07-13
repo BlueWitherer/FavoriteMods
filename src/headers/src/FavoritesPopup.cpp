@@ -18,6 +18,8 @@ std::string toLowercase(std::string s) {
 bool FavoritesPopup::init(float width, float height, bool geodeTheme) {
     m_geodeTheme = geodeTheme;
 
+    m_heartTheme = m_thisMod->getSettingValue<bool>("hearts");
+
     if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
         setCloseButtonSpr(
             CircleButtonSprite::createWithSpriteFrameName(
@@ -138,20 +140,17 @@ bool FavoritesPopup::setup() {
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
-    // check if the player wants hearts instead
-    bool hearts = m_thisMod->getSettingValue<bool>("hearts");
-
     // Create icon above favorites only toggle
-    auto starOnIcon = CCSprite::createWithSpriteFrameName(hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
+    auto starOnIcon = CCSprite::createWithSpriteFrameName(m_heartTheme ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
     starOnIcon->setID("favorites-icon");
     starOnIcon->setPosition({ contentSize.width - 70.f, contentSize.height - 40.f });
-    starOnIcon->setScale(hearts ? 0.375f : 0.625f);
+    starOnIcon->setScale(m_heartTheme ? 0.375f : 0.625f);
 
     // Create icon above hide favorites toggle
-    auto starOffIcon = CCSprite::createWithSpriteFrameName(hearts ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png");
+    auto starOffIcon = CCSprite::createWithSpriteFrameName(m_heartTheme ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png");
     starOffIcon->setID("non-favorites-icon");
     starOffIcon->setPosition({ contentSize.width - 30.f, contentSize.height - 40.f });
-    starOffIcon->setScale(hearts ? 0.375f : 0.625f);
+    starOffIcon->setScale(m_heartTheme ? 0.375f : 0.625f);
 
     m_mainLayer->addChild(starOnIcon);
     m_mainLayer->addChild(starOffIcon);
@@ -226,7 +225,7 @@ bool FavoritesPopup::setup() {
             1.f,
             m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
         );
-        modSettingsBtnSprite->setScale(0.625f);
+        modSettingsBtnSprite->setScale(0.75f);
 
         auto modSettingsBtn = CCMenuItemSpriteExtra::create(
             modSettingsBtnSprite,
@@ -372,7 +371,7 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
 void FavoritesPopup::onInfoButton(CCObject*) {
     auto popup = FLAlertLayer::create(
         "Help",
-        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>star button</c> located to the right-hand side of the interface item. You can also press it again to <cr>remove it</c> from your favorites.",
+        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>favorite button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.",
         "OK"
     );
     popup->show();
