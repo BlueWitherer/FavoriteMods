@@ -8,7 +8,7 @@
 	},
 	"id": "cheeseworks.favoritemods",
 	"name": "Favorite Mods",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"developers": [
 		"Cheeseworks",
 		"ArcticWoof"
@@ -82,6 +82,12 @@
 			"type": "bool",
 			"name": "Error Alerts",
 			"description": "Show alert pop-ups when errors occur.",
+			"default": false
+		},
+		"hearts": {
+			"type": "bool",
+			"name": "Hearts",
+			"description": "Replace the star icons with heart icons! <3",
 			"default": false
 		}
 	},

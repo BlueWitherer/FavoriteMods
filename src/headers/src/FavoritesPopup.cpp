@@ -138,17 +138,20 @@ bool FavoritesPopup::setup() {
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
+    // check if the player wants hearts instead
+    bool hearts = m_thisMod->getSettingValue<bool>("hearts");
+
     // Create icon above favorites only toggle
-    auto starOnIcon = CCSprite::createWithSpriteFrameName("GJ_starsIcon_001.png");
+    auto starOnIcon = CCSprite::createWithSpriteFrameName(hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
     starOnIcon->setID("favorites-icon");
     starOnIcon->setPosition({ contentSize.width - 70.f, contentSize.height - 40.f });
-    starOnIcon->setScale(0.6f);
+    starOnIcon->setScale(hearts ? 0.375f : 0.625f);
 
     // Create icon above hide favorites toggle
-    auto starOffIcon = CCSprite::createWithSpriteFrameName("GJ_starsIcon_gray_001.png");
+    auto starOffIcon = CCSprite::createWithSpriteFrameName(hearts ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png");
     starOffIcon->setID("non-favorites-icon");
     starOffIcon->setPosition({ contentSize.width - 30.f, contentSize.height - 40.f });
-    starOffIcon->setScale(0.6f);
+    starOffIcon->setScale(hearts ? 0.375f : 0.625f);
 
     m_mainLayer->addChild(starOnIcon);
     m_mainLayer->addChild(starOffIcon);

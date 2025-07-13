@@ -109,9 +109,15 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         );
         viewBtn->setID("view-button");
 
+        // check if the player wants hearts instead
+        bool hearts = m_thisMod->getSettingValue<bool>("hearts");
+
+        auto on = hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto off = hearts ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+
         // Favorite button here :)
-        auto favBtnSprite = CCSprite::createWithSpriteFrameName(isFavorite ? "GJ_starsIcon_001.png" : "GJ_starsIcon_gray_001.png");
-        favBtnSprite->setScale(0.875f);
+        auto favBtnSprite = CCSprite::createWithSpriteFrameName(isFavorite ? on : off);
+        favBtnSprite->setScale(hearts ? 0.625f : 0.875f);
 
         m_favButton = CCMenuItemSpriteExtra::create(
             favBtnSprite,
@@ -180,8 +186,14 @@ void ModItem::onFavorite(CCObject*) {
 
 void ModItem::updateFavoriteIcon() {
     if (m_favButton) {
-        auto newSprite = CCSprite::createWithSpriteFrameName(isFavorite ? "GJ_starsIcon_001.png" : "GJ_starsIcon_gray_001.png");
-        newSprite->setScale(0.875f);
+        // check if the player wants hearts instead
+        bool hearts = m_thisMod->getSettingValue<bool>("hearts");
+
+        auto on = hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto off = hearts ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+
+        auto newSprite = CCSprite::createWithSpriteFrameName(isFavorite ? on : off);
+        newSprite->setScale(hearts ? 0.625f : 0.875f);
 
         m_favButton->setNormalImage(newSprite);
     } else {

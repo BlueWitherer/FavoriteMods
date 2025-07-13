@@ -55,11 +55,19 @@ class $nodeModify(MyModsLayer, ModsLayer) {
                 return;
             };
 
-            // favorites button sprite (pls change this with a mod icon :D)
-            auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
-                "GJ_starsIcon_001.png",
-                0.875f,
-                (m_fields->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green)
+            // check if the player wants hearts instead
+            bool hearts = getThisMod->getSettingValue<bool>("hearts");
+
+            auto favBtnSpriteIcon = CCSprite::createWithSpriteFrameName(hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
+            favBtnSpriteIcon->setScale(0.875f);
+
+            if (hearts) favBtnSpriteIcon->setColor({ 255, 0, 0 });
+
+            // favorites button sprite
+            auto favBtnSprite = CircleButtonSprite::create(
+                favBtnSpriteIcon,
+                (m_fields->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green),
+                CircleBaseSize::Medium
             );
 
             favBtnSprite->setScale(0.8f);

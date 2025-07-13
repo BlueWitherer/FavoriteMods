@@ -1,3 +1,7 @@
+# v1.0.4
+- Added toggle setting `Hearts`
+  - Hearts can now optionally be displayed instead of stars for favorites
+
 # v1.0.3
 - Added toggle setting `Minimalist List`
   - Added optional developer label to mod list item
