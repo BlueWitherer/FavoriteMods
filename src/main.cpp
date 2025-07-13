@@ -17,6 +17,7 @@ auto getThisMod = getMod();
 class $nodeModify(MyModsLayer, ModsLayer) {
     struct Fields {
         bool m_isGeodeTheme = false; // check for geode theme
+        bool m_isHeartIcons = false; // if the player wants heart buttons
     };
 
     void modify() {
@@ -50,12 +51,12 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             log::debug("Actions menu found successfully!");
 
             // check if the player wants hearts instead
-            bool hearts = getThisMod->getSettingValue<bool>("hearts");
+            m_fields->m_isHeartIcons = getThisMod->getSettingValue<bool>("hearts");
 
             // favorites button sprite
             auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
-                hearts ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
-                hearts ? 1.f : 0.875f,
+                m_fields->m_isHeartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
+                m_fields->m_isHeartIcons ? 1.f : 0.875f,
                 m_fields->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
                 CircleBaseSize::Medium
             );
@@ -86,7 +87,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         log::debug("Favorites button clicked!");
 
         bool alerts = getThisMod->getSettingValue<bool>("alerts");
-        auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme);
+        auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons);
 
         if (popup) {
             popup->show();

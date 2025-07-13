@@ -1,4 +1,5 @@
 #include "../ModItem.hpp"
+
 #include "../../FavoritesPopup.hpp"
 
 #include <Geode/ui/GeodeUI.hpp>
@@ -7,7 +8,7 @@
 
 using namespace geode::prelude;
 
-bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme) {
+bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme, bool heartIcons) {
     m_mod = mod;
     m_parentPopup = parentPopup;
     m_geodeTheme = geodeTheme;
@@ -215,7 +216,7 @@ CCLabelBMFont* ModItem::firstTimeText() {
     return nullptr;
 };
 
-ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme) {
+ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme, bool heartIcons) {
     auto ret = new ModItem();
 
     if (!ret || !ret->init(mod, size, parentPopup, geodeTheme)) {

@@ -15,7 +15,7 @@ std::string toLowercase(std::string s) {
     return str;
 };
 
-bool FavoritesPopup::init(float width, float height, bool geodeTheme) {
+bool FavoritesPopup::init(float width, float height, bool geodeTheme, bool heartIcons) {
     m_geodeTheme = geodeTheme;
 
     m_heartTheme = m_thisMod->getSettingValue<bool>("hearts");
@@ -92,7 +92,7 @@ bool FavoritesPopup::setup() {
     searchClearBtn->setID("clear-search-button");
     searchClearBtn->setAnchorPoint({ 0.5, 0.5 });
     searchClearBtn->ignoreAnchorPointForPosition(false);
-    searchClearBtn->setPosition({ 26.f, m_searchInput->getPositionY() });
+    searchClearBtn->setPosition({ 26.5f, m_searchInput->getPositionY() });
 
     m_overlayMenu->addChild(searchClearBtn);
 
@@ -179,7 +179,7 @@ bool FavoritesPopup::setup() {
     m_noModsLabel = CCLabelBMFont::create("No mods found :(", "bigFont.fnt");
     m_noModsLabel->setPosition({ contentSize.width / 2.f, contentSize.height / 2.f - 35.f });
     m_noModsLabel->setScale(0.5f);
-    m_noModsLabel->setColor({ 150, 150, 150 });
+    m_noModsLabel->setColor({ 125, 125, 125 });
     m_noModsLabel->setVisible(false);
 
     m_mainLayer->addChild(m_noModsLabel);
@@ -233,7 +233,7 @@ bool FavoritesPopup::setup() {
             menu_selector(FavoritesPopup::onModSettings)
         );
         modSettingsBtn->setID("mod-settings-button");
-        modSettingsBtn->setPosition({ 0.f, 0.f });
+        modSettingsBtn->setPosition({ 2.5f, 2.5f });
 
         m_overlayMenu->addChild(modSettingsBtn);
     } else {
@@ -409,7 +409,7 @@ void FavoritesPopup::onModFavoriteChanged() {
     refreshModList(false);
 };
 
-FavoritesPopup* FavoritesPopup::create(bool geodeTheme) {
+FavoritesPopup* FavoritesPopup::create(bool geodeTheme, bool heartIcons) {
     auto ret = new FavoritesPopup();
 
     if (ret && ret->init(400.f, 280.f, geodeTheme)) {
