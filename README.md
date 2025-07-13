@@ -31,6 +31,14 @@ To add favorites, simply look for the mod by scrolling or typing its name or ID 
 
 ---
 
+![preview1](previews/preview-1.png)
+![preview2](previews/preview-2.png)
+![preview3](previews/preview-3.png)
+![preview4](previews/preview-4.png)
+![preview5](previews/preview-5.png) 
+
+---
+
 ### Changelog
 ###### What's new?!
 **[📜 View the latest updates and patches](./changelog.md)**
