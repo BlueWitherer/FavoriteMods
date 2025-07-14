@@ -1,6 +1,8 @@
 # v1.0.4
 - Added toggle setting `Hearts`
   - Hearts can now optionally be displayed instead of stars for favorites
+- Added ability to search for mods by short description
+- Added optional mod description button in mod list item
 - Set default value for setting *`Only List Enabled Mods`* to `true`
 - Removed toggle setting *`Error Alerts`*
 - Other tweaks

@@ -58,13 +58,13 @@
 		"auto-scroll": {
 			"type": "bool",
 			"name": "Automatically Scroll Up",
-			"description": "Snap the scoll area to the top when toggling favorites.",
+			"description": "Snap the scroll area to the top when changing favorites.",
 			"default": true
 		},
 		"refresh-clear-search": {
 			"type": "bool",
 			"name": "Clear Search on Refresh",
-			"description": "Clear the search box when refreshing the mod list.",
+			"description": "Clear the search box when filtering the mod list.",
 			"default": false
 		},
 		"settings-btn": {

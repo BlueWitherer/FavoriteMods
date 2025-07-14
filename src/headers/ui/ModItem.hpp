@@ -22,6 +22,7 @@ protected:
     FavoritesPopup* m_parentPopup = nullptr;
     CCScale9Sprite* m_backgroundSprite = nullptr;
 
+    void onModDesc(CCObject*);
     void onViewMod(CCObject*);
     void onFavorite(CCObject*);
 

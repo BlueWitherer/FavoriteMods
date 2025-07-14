@@ -27,6 +27,7 @@ bool FavoritesPopup::init(float width, float height, bool geodeTheme, bool heart
                 m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
             )
         );
+
         return true;
     } else {
         log::error("Could not initialize favorites popup");
@@ -214,7 +215,7 @@ bool FavoritesPopup::setup() {
 
     loadModList(allMods);
 
-    m_scrollLayer->m_contentLayer->updateLayout();
+    m_scrollLayer->m_contentLayer->updateLayout(true);
     m_scrollLayer->scrollToTop();
 
     if (m_thisMod->getSettingValue<bool>("settings-btn")) {
@@ -263,7 +264,7 @@ bool FavoritesPopup::setup() {
 void FavoritesPopup::loadModList(std::vector<Mod*> allMods) {
     for (Mod* mod : allMods) { // Add all mod items to scrolllayer
         bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
-        if (list) m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this));
+        if (list) m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this, m_geodeTheme, m_heartIcons));
 
         log::debug("{} list item for mod {}", list ? "Processed" : "Skipped", mod->getID());
     };
@@ -284,11 +285,14 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     std::vector<Mod*> filteredMods;
 
     for (Mod* mod : allMods) {
+        auto npos = std::string::npos; // for dry code :]
         bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
 
-        bool matchesSearch = (m_searchText.empty() && mod->getID() != std::string("geode.loader")) // Skip geode by default
-            || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != std::string::npos
-            || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != std::string::npos;
+        // evil lines >:3
+        bool matchesSearch = (m_searchText.empty() && (mod->getID() != std::string("geode.loader"))) // Skip geode by default
+            || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != npos // search via name
+            || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != npos // search via description
+            || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != npos; // search via id
 
         // If favorites-only is enabled, only show favorited mods
         if (m_showFavoritesOnly) {
@@ -312,10 +316,10 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     loadModList(filteredMods);
 
-    m_scrollLayer->m_contentLayer->updateLayout();
+    m_scrollLayer->m_contentLayer->updateLayout(true);
     if (m_thisMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
 
-    // Show/hide "No mods found" message
+    // Toggle "No mods found" message
     if (filteredMods.empty()) {
         m_noModsLabel->setVisible(true);
         m_scrollLayer->setVisible(false);
@@ -395,8 +399,8 @@ void FavoritesPopup::onClearAll() {
 
     // Turn off favorite from every mod
     for (Mod* mod : allMods) {
-        auto modId = mod->getID();
-        if (m_thisMod->getSavedValue<bool>(modId)) m_thisMod->setSavedValue(modId, false);
+        auto modId = mod->getID(); // get the mod id
+        if (m_thisMod->getSavedValue<bool>(modId, false)) m_thisMod->setSavedValue(modId, false);
     };
 
     refreshModList(true);

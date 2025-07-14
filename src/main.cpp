@@ -74,7 +74,7 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             log::debug("Favorites button created successfully");
 
             actionsMenu->addChild(favBtn);
-            actionsMenu->updateLayout();
+            actionsMenu->updateLayout(true);
 
             log::info("Favorites button added to actions menu successfully!");
         } else {

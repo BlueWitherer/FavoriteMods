@@ -56,50 +56,6 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
         addChild(nameLabel);
 
-        // offset to position the id's x by if showing label version
-        auto idLabelOffset = 0.f;
-
-        // Avoid showing more details if minimalist setting is on
-        if (m_thisMod->getSettingValue<bool>("minimal")) {
-            idLabelOffset = 0.f; // make sure its 0 lul
-        } else {
-            auto devs = m_mod->getDevelopers();
-            auto devLabelText = devs[0];
-            int andMore = as<int>(devs.size()) - 1;
-
-            if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
-
-            // Developers label
-            auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
-            devLabel->setID("mod-developers");
-            devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, 25.f });
-            devLabel->setScale(0.25f);
-            devLabel->setAnchorPoint({ 0, 0.5 });
-
-            addChild(devLabel);
-
-            // Version label
-            auto versionLabel = CCLabelBMFont::create(m_mod->getVersion().toVString().c_str(), "goldFont.fnt");
-            versionLabel->setID("mod-version");
-            versionLabel->setPosition({ 37.5f, 15.f });
-            versionLabel->setScale(0.3f);
-            versionLabel->setAnchorPoint({ 0, 0.5 });
-
-            idLabelOffset += 2.5f + versionLabel->getScaledContentWidth();
-
-            addChild(versionLabel);
-        };
-
-        // ID label
-        auto idLabel = CCLabelBMFont::create(m_mod->getID().c_str(), "bigFont.fnt");
-        idLabel->setID("mod-id");
-        idLabel->setPosition({ 37.5f + idLabelOffset, 15.f });
-        idLabel->setScale(0.25f);
-        idLabel->setAnchorPoint({ 0, 0.5 });
-        idLabel->setOpacity(125);
-
-        addChild(idLabel);
-
         // View button
         auto viewBtnSprite = ButtonSprite::create("View", "bigFont.fnt", "GJ_button_01.png", 0.875f);
         viewBtnSprite->setScale(0.75f);
@@ -148,7 +104,64 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
         addChild(btnMenu);
 
-        btnMenu->updateLayout();
+        btnMenu->updateLayout(true);
+
+        // offset to position the id's x by if showing label version
+        auto idLabelOffset = 0.f;
+
+        // Avoid showing more details if minimalist setting is on
+        if (m_thisMod->getSettingValue<bool>("minimal")) {
+            idLabelOffset = 0.f; // make sure its 0 lul
+        } else {
+            auto devs = m_mod->getDevelopers();
+            auto devLabelText = devs[0];
+            int andMore = as<int>(devs.size()) - 1;
+
+            if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
+
+            // Developers label
+            auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
+            devLabel->setID("mod-developers");
+            devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, 25.f });
+            devLabel->setScale(0.25f);
+            devLabel->setAnchorPoint({ 0, 0.5 });
+
+            addChild(devLabel);
+
+            // Version label
+            auto versionLabel = CCLabelBMFont::create(m_mod->getVersion().toVString().c_str(), "goldFont.fnt");
+            versionLabel->setID("mod-version");
+            versionLabel->setPosition({ 37.5f, 15.f });
+            versionLabel->setScale(0.3f);
+            versionLabel->setAnchorPoint({ 0, 0.5 });
+
+            idLabelOffset += 2.5f + versionLabel->getScaledContentWidth();
+
+            addChild(versionLabel);
+
+            auto descBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoBtn_001.png");
+            descBtnSprite->setScale(0.375f);
+
+            auto descBtn = CCMenuItemSpriteExtra::create(
+                descBtnSprite,
+                this,
+                menu_selector(ModItem::onModDesc)
+            );
+            descBtn->setID("mod-description-button");
+
+            btnMenu->addChild(descBtn);
+            btnMenu->updateLayout(true);
+        };
+
+        // ID label
+        auto idLabel = CCLabelBMFont::create(m_mod->getID().c_str(), "bigFont.fnt");
+        idLabel->setID("mod-id");
+        idLabel->setPosition({ 37.5f + idLabelOffset, 15.f });
+        idLabel->setScale(0.25f);
+        idLabel->setAnchorPoint({ 0, 0.5 });
+        idLabel->setOpacity(125);
+
+        addChild(idLabel);
 
         if (auto helpTxt = firstTimeText()) {
             log::debug("Adding help text...");
@@ -184,7 +197,7 @@ void ModItem::onFavorite(CCObject*) {
 };
 
 void ModItem::updateFavoriteIcon() {
-    if (m_favButton) {
+    if (m_favButton) { // Make sure the favorite button has already been created
         auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
         auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
@@ -192,13 +205,26 @@ void ModItem::updateFavoriteIcon() {
         newSprite->setScale(m_heartIcons ? 0.625f : 0.875f);
 
         m_favButton->setNormalImage(newSprite);
+        log::info("Updated state for {} to {}", m_mod->getID(), m_favorite ? "favorite" : "non-favorite");
     } else {
-        log::error("Favorite button not found");
+        log::error("Favorite button not found for {}", m_mod->getID());
     };
 };
 
+void ModItem::onModDesc(CCObject*) {
+    auto popup = FLAlertLayer::create(
+        m_mod->getName().c_str(),
+        m_mod->getDescription().value_or("<cr>No description available.</c>").c_str(),
+        "OK"
+    );
+    popup->show();
+};
+
 CCLabelBMFont* ModItem::firstTimeText() {
-    if (m_thisMod->getSavedValue<bool>("already-loaded") || !m_thisMod->getSavedValue<bool>(m_thisMod->getID())) { // check if mod loaded before
+    // check if mod loaded before
+    if (m_thisMod->getSavedValue<bool>("already-loaded", false)
+        || !m_thisMod->getSavedValue<bool>(m_thisMod->getID(), false)
+        || !m_thisMod->getSettingValue<bool>("minimal")) {
         return nullptr;
     } else if (m_mod->getID().compare(m_thisMod->getID()) == 0) { // create the help text if loaded for the first time
         log::info("Mod loaded for the first time, creating help text...");
