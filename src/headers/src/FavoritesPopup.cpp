@@ -277,13 +277,14 @@ bool FavoritesPopup::setup() {
 
     m_overlayMenu->addChild(statsBtn);
 
-    if (m_usePages) {
+    if (m_usePages) { // if the player has pages enabled
         auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
 
         auto pageForwardBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
         pageForwardBtnSprite->setScale(0.875f);
         pageForwardBtnSprite->setFlipX(true);
 
+        // create go forward page button
         m_pageForwardBtn = CCMenuItemSpriteExtra::create(
             pageForwardBtnSprite,
             this,
@@ -297,6 +298,7 @@ bool FavoritesPopup::setup() {
         pageBackwardBtnSprite->setScale(0.875f);
         pageBackwardBtnSprite->setFlipX(false);
 
+        // create go back page button
         m_pageBackwardBtn = CCMenuItemSpriteExtra::create(
             pageBackwardBtnSprite,
             this,
@@ -309,7 +311,8 @@ bool FavoritesPopup::setup() {
         m_overlayMenu->addChild(m_pageForwardBtn);
         m_overlayMenu->addChild(m_pageBackwardBtn);
 
-        m_pagesLabel = CCLabelBMFont::create("Loading...", "goldFont.fnt");
+        // create pages label
+        m_pagesLabel = CCLabelBMFont::create("Loading pages...", "goldFont.fnt");
         m_pagesLabel->setID("pages-label");
         m_pagesLabel->setAnchorPoint({ 0, 1 });
         m_pagesLabel->setPosition({ m_thisMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f });
@@ -331,10 +334,8 @@ bool FavoritesPopup::setup() {
 
 void FavoritesPopup::loadModList(std::vector<Mod*> allMods) {
     for (Mod* mod : allMods) { // Add all mod items to scrolllayer
-        bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
-        if (list) m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this, m_geodeTheme, m_heartIcons));
-
-        log::debug("{} list item for mod {}", list ? "Processed" : "Skipped", mod->getID());
+        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this, m_geodeTheme, m_heartIcons));
+        log::debug("Processed list item for mod {}", mod->getID());
     };
 };
 
@@ -353,22 +354,29 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     std::vector<Mod*> filteredMods;
 
     for (Mod* mod : allMods) {
-        auto empty = std::string::npos; // dry code xd
-        bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
+        // if the player only wants to show enabled mods
+        bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
 
-        // evil lines >:3
-        bool matchesSearch = (m_searchText.empty() && (mod->getID() != std::string("geode.loader"))) // Skip geode by default
-            || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != empty // search via name
-            || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != empty // search via description
-            || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != empty; // search via id
+        if (list) {
+            auto empty = std::string::npos; // dry code xd
+            bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
 
-        // If favorites-only is enabled, only show favorited mods
-        if (m_showFavoritesOnly) {
-            if (isFavorited && matchesSearch) filteredMods.push_back(mod);
-        } else if (m_hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
-            if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
-        } else { // Normal mode: show all matching mods, with favorites prioritized
-            if (matchesSearch) filteredMods.push_back(mod);
+            // evil lines >:3
+            bool matchesSearch = (m_searchText.empty() && (mod->getID() != std::string("geode.loader"))) // Skip geode by default
+                || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != empty // search via name
+                || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != empty // search via description
+                || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != empty; // search via id
+
+            // If favorites-only is enabled, only show favorited mods
+            if (m_showFavoritesOnly) {
+                if (isFavorited && matchesSearch) filteredMods.push_back(mod);
+            } else if (m_hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
+                if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
+            } else { // Normal mode: show all matching mods, with favorites prioritized
+                if (matchesSearch) filteredMods.push_back(mod);
+            };
+        } else {
+            log::warn("Skipping disabled mod {}", mod->getID());
         };
     };
 
@@ -414,7 +422,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             loadModList(std::vector<Mod*>(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex));
 
             if (m_pagesLabel) {
-                auto pageText = fmt::format("Page {} / {}, Total {} Mods", p_page, p_totalPages, p_totalItems);
+                auto pageText = fmt::format("Page {}/{}, Total {} Mods", p_page, p_totalPages, p_totalItems);
                 m_pagesLabel->setCString(pageText.c_str());
             } else {
                 log::error("Couldn't find page count label");
