@@ -55,6 +55,31 @@
 			"description": "Show only important details of a mod in the favorites list.",
 			"default": true
 		},
+		"pages": {
+			"type": "bool",
+			"name": "List Pages",
+			"description": "Split the full mod list into multiple pages.",
+			"default": true
+		},
+		"pages-count": {
+			"type": "int",
+			"name": "Mods Per Page",
+			"description": "How many mods to show at a time in one page.",
+			"default": 10,
+			"min": 5,
+			"max": 50,
+			"enable-if": "pages",
+			"enable-if-description": "Enable pages to adjust list limits.",
+			"control": {
+				"input": true,
+				"slider": true,
+				"slider-step": 1,
+				"arrows": true,
+				"arrow-step": 5,
+				"big-arrows": true,
+				"big-arrow-step": 10
+			}
+		},
 		"auto-scroll": {
 			"type": "bool",
 			"name": "Automatically Scroll Up",

@@ -1,4 +1,7 @@
 # v1.0.4
+- Added pages to mod list
+  - Added toggle setting `List Pages`
+  - Added number setting `Mods Per Page`
 - Added toggle setting `Hearts`
   - Hearts can now optionally be displayed instead of stars for favorites
 - Added ability to search for mods by short description

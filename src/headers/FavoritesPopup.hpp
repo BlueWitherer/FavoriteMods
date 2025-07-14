@@ -10,10 +10,21 @@ class FavoritesPopup : public Popup<>, public TextInputDelegate {
 protected:
     bool m_geodeTheme = false; // Make sure visuals go with geode theme
     bool m_heartIcons = false; // Heart UI mode
+    bool m_usePages = false; // Use the list page system
 
     Mod* m_thisMod = getMod(); // Get this mod
 
     ScrollLayer* m_scrollLayer = nullptr;
+
+    int p_page = 1;
+
+    int p_itemsPerPage = 0;
+
+    int p_totalItems = 0;
+    int p_totalPages = 0;
+
+    CCMenuItemSpriteExtra* m_pageForwardBtn = nullptr;
+    CCMenuItemSpriteExtra* m_pageBackwardBtn = nullptr;
 
     CCMenu* m_overlayMenu = nullptr;
     TextInput* m_searchInput = nullptr;
@@ -34,6 +45,9 @@ protected:
     void loadModList(std::vector<Mod*> allMods);
     void refreshModList(bool clearSearch = false);
     void onClearAll(); // Clear all favorites
+
+    void onPageForward(CCObject*);
+    void onPageBackward(CCObject*);
 
     void onClearSearch(CCObject*);
     void onPromptClearAll(CCObject*);

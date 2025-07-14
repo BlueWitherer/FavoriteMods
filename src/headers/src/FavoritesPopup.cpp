@@ -21,6 +21,12 @@ bool FavoritesPopup::init(float width, float height, bool geodeTheme, bool heart
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
+    m_usePages = m_thisMod->getSettingValue<bool>("pages");
+
+    p_page = 1;
+
+    p_itemsPerPage = as<int>(m_thisMod->getSettingValue<int64_t>("pages-count"));
+
     if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
         setCloseButtonSpr(
             CircleButtonSprite::createWithSpriteFrameName(
@@ -203,22 +209,10 @@ bool FavoritesPopup::setup() {
 
     m_mainLayer->addChild(m_scrollLayer);
 
-    auto allMods = loader->getAllMods();
-
-    // Sort if favorited or otherwise in alphabetical order
-    std::sort(allMods.begin(), allMods.end(), [this](const Mod* a, const Mod* b) -> bool {
-        auto aFav = m_thisMod->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
-        auto bFav = m_thisMod->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
-
-        if (aFav != bFav) return aFav > bFav; // Favorited mods first
-
-        return toLowercase(a->getName()) < toLowercase(b->getName()); // Alphabetical order
-              });
-
-    loadModList(allMods);
-
     m_scrollLayer->m_contentLayer->updateLayout(true);
     m_scrollLayer->scrollToTop();
+
+    refreshModList(true);
 
     if (m_thisMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
@@ -285,6 +279,43 @@ bool FavoritesPopup::setup() {
 
     m_overlayMenu->addChild(statsBtn);
 
+    if (m_usePages) {
+        auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
+
+        auto pageForwardBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
+        pageForwardBtnSprite->setScale(0.875f);
+        pageForwardBtnSprite->setFlipX(true);
+
+        m_pageForwardBtn = CCMenuItemSpriteExtra::create(
+            pageForwardBtnSprite,
+            this,
+            menu_selector(FavoritesPopup::onPageForward)
+        );
+        m_pageForwardBtn->setID("page-forward-button");
+        m_pageForwardBtn->setPosition({ widthCS + 17.5f , m_scrollLayer->getPositionY() });
+        m_pageForwardBtn->setVisible(true);
+
+        auto pageBackwardBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
+        pageBackwardBtnSprite->setScale(0.875f);
+        pageBackwardBtnSprite->setFlipX(false);
+
+        m_pageBackwardBtn = CCMenuItemSpriteExtra::create(
+            pageBackwardBtnSprite,
+            this,
+            menu_selector(FavoritesPopup::onPageBackward)
+        );
+        m_pageBackwardBtn->setID("page-backward-button");
+        m_pageBackwardBtn->setPosition({ -17.5f , m_scrollLayer->getPositionY() });
+        m_pageBackwardBtn->setVisible(false);
+
+        m_overlayMenu->addChild(m_pageForwardBtn);
+        m_overlayMenu->addChild(m_pageBackwardBtn);
+
+        log::info("Page buttons created");
+    } else {
+        log::warn("Skipping page buttons");
+    };
+
     m_thisMod->setSavedValue("already-loaded", true);
 
     return true;
@@ -309,6 +340,14 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     auto loader = Loader::get();
     auto allMods = loader->getAllMods();
+
+    // TODO: fix filtering
+    if (m_usePages) {
+        p_totalItems = as<int>(allMods.size());
+        p_totalPages = as<int>(std::ceil(as<float>(p_totalItems) / as<float>(p_itemsPerPage)));
+    } else {
+        log::debug("Pages disabled");
+    };
 
     // Filtered mods based on search text and toggle settings
     std::vector<Mod*> filteredMods;
@@ -343,7 +382,33 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
         return toLowercase(a->getName()) < toLowercase(b->getName()); // Alphabetical order
               });
 
-    loadModList(filteredMods);
+    if (m_usePages) {
+        log::info("Loading page {} of {}...", p_page, p_totalPages);
+
+        int startIndex = p_page * p_itemsPerPage;
+        int endIndex = std::min(startIndex + p_itemsPerPage, p_totalItems);
+
+        if (p_page >= p_totalPages) {
+            log::debug("Reached last page");
+
+            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(false);
+            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(true);
+        } else if (p_page <= 1) {
+            log::debug("Reached first page");
+
+            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(true);
+            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(false);
+        } else {
+            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(true);
+            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(true);
+        };
+
+        std::vector<Mod*> pageMods(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex);
+        loadModList(pageMods);
+    } else {
+        log::debug("Loading all mods");
+        loadModList(filteredMods);
+    };
 
     m_scrollLayer->m_contentLayer->updateLayout(true);
     if (m_thisMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
@@ -398,6 +463,20 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
     } else {
         log::debug("Favorites only mode already off");
     };
+
+    refreshModList(true);
+};
+
+void FavoritesPopup::onPageForward(CCObject*) {
+    if (p_page < p_totalPages) p_page++;
+    if (p_page >= p_totalPages) p_page = p_totalPages;
+
+    refreshModList(true);
+};
+
+void FavoritesPopup::onPageBackward(CCObject*) {
+    if (p_page > 1) p_page--;
+    if (p_page <= 1) p_page = 1;
 
     refreshModList(true);
 };
