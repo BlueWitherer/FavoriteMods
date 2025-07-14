@@ -212,8 +212,6 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->m_contentLayer->updateLayout(true);
     m_scrollLayer->scrollToTop();
 
-    refreshModList(true);
-
     if (m_thisMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
@@ -311,10 +309,20 @@ bool FavoritesPopup::setup() {
         m_overlayMenu->addChild(m_pageForwardBtn);
         m_overlayMenu->addChild(m_pageBackwardBtn);
 
+        m_pagesLabel = CCLabelBMFont::create("Loading...", "goldFont.fnt");
+        m_pagesLabel->setID("pages-label");
+        m_pagesLabel->setAnchorPoint({ 0, 1 });
+        m_pagesLabel->setPosition({ 0.f, -1.25f });
+        m_pagesLabel->setScale(0.375f);
+
+        m_mainLayer->addChild(m_pagesLabel);
+
         log::info("Page buttons created");
     } else {
         log::warn("Skipping page buttons");
     };
+
+    refreshModList(true);
 
     m_thisMod->setSavedValue("already-loaded", true);
 
@@ -386,7 +394,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             p_page = p_totalPages;
 
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(false);
-            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(p_totalPages <= 1);
+            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(p_totalPages > 1);
         } else if (p_page <= 1) {
             log::debug("Reached first page");
 
@@ -402,8 +410,15 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
         int startIndex = (p_page - 1) * p_itemsPerPage;
         int endIndex = std::min(startIndex + p_itemsPerPage, p_totalItems);
 
-        if (startIndex >= 0 && startIndex < as<int>(filteredMods.size())) {
+        if (startIndex >= 0 && startIndex < p_totalItems) {
             loadModList(std::vector<Mod*>(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex));
+
+            if (m_pagesLabel) {
+                auto pageText = fmt::format("Page {} / {}, Total {} Mods", p_page, p_totalPages, p_totalItems);
+                m_pagesLabel->setCString(pageText.c_str());
+            } else {
+                log::error("Couldn't find page count label");
+            };
         } else {
             log::error("Invalid start index for filtered mods vector: {}", startIndex);
         };
