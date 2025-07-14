@@ -312,7 +312,7 @@ bool FavoritesPopup::setup() {
         m_pagesLabel = CCLabelBMFont::create("Loading...", "goldFont.fnt");
         m_pagesLabel->setID("pages-label");
         m_pagesLabel->setAnchorPoint({ 0, 1 });
-        m_pagesLabel->setPosition({ 0.f, -1.25f });
+        m_pagesLabel->setPosition({ m_thisMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f });
         m_pagesLabel->setScale(0.375f);
 
         m_mainLayer->addChild(m_pagesLabel);
@@ -394,13 +394,13 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             p_page = p_totalPages;
 
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(false);
-            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(p_totalPages > 1);
+            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
         } else if (p_page <= 1) {
             log::debug("Reached first page");
 
             p_page = 1;
 
-            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(p_totalPages > 1);
+            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
             if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(false);
         } else {
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(true);

@@ -1,5 +1,5 @@
 # v1.0.4
-- Added pages to mod list
+- Added pagination to mod list
   - Added toggle setting `List Pages`
   - Added number setting `Mods Per Page`
 - Added toggle setting `Hearts`
