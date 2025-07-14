@@ -341,14 +341,6 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     auto loader = Loader::get();
     auto allMods = loader->getAllMods();
 
-    // TODO: fix filtering
-    if (m_usePages) {
-        p_totalItems = as<int>(allMods.size());
-        p_totalPages = as<int>(std::ceil(as<float>(p_totalItems) / as<float>(p_itemsPerPage)));
-    } else {
-        log::debug("Pages disabled");
-    };
-
     // Filtered mods based on search text and toggle settings
     std::vector<Mod*> filteredMods;
 
@@ -382,30 +374,40 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
         return toLowercase(a->getName()) < toLowercase(b->getName()); // Alphabetical order
               });
 
-    if (m_usePages) {
-        log::info("Loading page {} of {}...", p_page, p_totalPages);
+    if (m_usePages) { // load every set amount of mods in separate pages
+        p_totalItems = as<int>(filteredMods.size());
+        p_totalPages = as<int>(std::ceil(as<float>(p_totalItems) / as<float>(p_itemsPerPage)));
 
-        int startIndex = p_page * p_itemsPerPage;
-        int endIndex = std::min(startIndex + p_itemsPerPage, p_totalItems);
+        log::info("Loading page {} of {}", p_page, p_totalPages);
 
         if (p_page >= p_totalPages) {
             log::debug("Reached last page");
 
+            p_page = p_totalPages;
+
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(false);
-            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(true);
+            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(p_totalPages <= 1);
         } else if (p_page <= 1) {
             log::debug("Reached first page");
 
-            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(true);
+            p_page = 1;
+
+            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(p_totalPages > 1);
             if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(false);
         } else {
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(true);
             if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(true);
         };
 
-        std::vector<Mod*> pageMods(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex);
-        loadModList(pageMods);
-    } else {
+        int startIndex = (p_page - 1) * p_itemsPerPage;
+        int endIndex = std::min(startIndex + p_itemsPerPage, p_totalItems);
+
+        if (startIndex >= 0 && startIndex < as<int>(filteredMods.size())) {
+            loadModList(std::vector<Mod*>(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex));
+        } else {
+            log::error("Invalid start index for filtered mods vector: {}", startIndex);
+        };
+    } else { // or screw it just load 'em all!
         log::debug("Loading all mods");
         loadModList(filteredMods);
     };

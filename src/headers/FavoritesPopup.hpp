@@ -18,13 +18,15 @@ protected:
 
     int p_page = 1;
 
-    int p_itemsPerPage = 0;
+    int p_itemsPerPage = 10;
 
     int p_totalItems = 0;
     int p_totalPages = 0;
 
     CCMenuItemSpriteExtra* m_pageForwardBtn = nullptr;
     CCMenuItemSpriteExtra* m_pageBackwardBtn = nullptr;
+
+    CCLabelBMFont* m_pagesLabel = nullptr;
 
     CCMenu* m_overlayMenu = nullptr;
     TextInput* m_searchInput = nullptr;
