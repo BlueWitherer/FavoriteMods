@@ -2,6 +2,8 @@
 
 #include "../ui/ModItem.hpp"
 
+#include <fmt/core.h>
+
 #include <Geode/Geode.hpp>
 
 #include <Geode/ui/GeodeUI.hpp>
@@ -223,7 +225,8 @@ bool FavoritesPopup::setup() {
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
             "geode.loader/settings.png",
             1.f,
-            m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
+            m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
+            CircleBaseSize::Medium
         );
         modSettingsBtnSprite->setScale(0.75f);
 
@@ -240,8 +243,13 @@ bool FavoritesPopup::setup() {
         log::debug("Mod settings button disabled");
     };
 
-    // clear favs btn sprite
-    auto clearAllBtnSprite = ButtonSprite::create("Clear", "bigFont.fnt", m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png", 0.875f);
+    // clear favs button sprite
+    auto clearAllBtnSprite = ButtonSprite::create(
+        "Clear",
+        "bigFont.fnt",
+        m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
+        0.875f
+    );
     clearAllBtnSprite->setScale(0.75f);
 
     // button to clear favorites
@@ -252,12 +260,33 @@ bool FavoritesPopup::setup() {
     );
     clearAllBtn->setID("clear-favorites-button");
     clearAllBtn->setPosition({ widthCS / 2.f, 1.25f });
-    clearAllBtn->setVisible(true);
     clearAllBtn->setZOrder(3);
 
     m_overlayMenu->addChild(clearAllBtn);
 
+    // favorites stats button sprite
+    auto statsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+        "geode.loader/changelog.png",
+        0.875f,
+        m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
+        CircleBaseSize::Medium
+    );
+    statsBtnSprite->setScale(0.5f);
+
+    // button to view funny favorites stats
+    auto statsBtn = CCMenuItemSpriteExtra::create(
+        statsBtnSprite,
+        this,
+        menu_selector(FavoritesPopup::onGetStats)
+    );
+    statsBtn->setID("favorites-stats-button");
+    statsBtn->setPosition({ widthCS - 1.25f, 1.25f });
+    statsBtn->setZOrder(3);
+
+    m_overlayMenu->addChild(statsBtn);
+
     m_thisMod->setSavedValue("already-loaded", true);
+
     return true;
 };
 
@@ -285,14 +314,14 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     std::vector<Mod*> filteredMods;
 
     for (Mod* mod : allMods) {
-        auto npos = std::string::npos; // for dry code :]
+        auto empty = std::string::npos; // dry code xd
         bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
 
         // evil lines >:3
         bool matchesSearch = (m_searchText.empty() && (mod->getID() != std::string("geode.loader"))) // Skip geode by default
-            || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != npos // search via name
-            || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != npos // search via description
-            || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != npos; // search via id
+            || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != empty // search via name
+            || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != empty // search via description
+            || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != empty; // search via id
 
         // If favorites-only is enabled, only show favorited mods
         if (m_showFavoritesOnly) {
@@ -374,12 +403,13 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
 };
 
 void FavoritesPopup::onInfoButton(CCObject*) {
-    auto popup = FLAlertLayer::create(
+    auto body = fmt::format("To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.", m_heartIcons ? "heart" : "star");
+
+    FLAlertLayer::create(
         "Help",
-        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>favorite button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.",
+        body.c_str(),
         "OK"
-    );
-    popup->show();
+    )->show();
 };
 
 void FavoritesPopup::onPromptClearAll(CCObject*) {
@@ -391,6 +421,40 @@ void FavoritesPopup::onPromptClearAll(CCObject*) {
             if (btn2) onClearAll();
         },
         true);
+};
+
+void FavoritesPopup::onGetStats(CCObject*) {
+    int favorite = 0; // favorited mods
+    int enabled = 0; // all enabled mods
+    int disabled = 0; // all disabled mods
+    int total = 0; // all installed mods
+
+    auto loader = Loader::get();
+
+    for (Mod* mod : loader->getAllMods()) {
+        total++;
+
+        if (m_thisMod->getSavedValue<bool>(mod->getID())) favorite++;
+
+        if (mod->isEnabled()) {
+            enabled++;
+        } else {
+            disabled++;
+        };
+    };
+
+    auto faveCount = fmt::format("<cy>{}</c> Favorites", favorite);
+    auto enableCount = fmt::format("<cg>{}</c> Mods Enabled", enabled);
+    auto disableCount = fmt::format("<cr>{}</c> Mods Disabled", disabled);
+    auto totalCount = fmt::format("<cj>{}</c> Mods Installed", total);
+
+    auto body = fmt::format("{}\n\n{}\n{}\n\n{}", faveCount, enableCount, disableCount, totalCount);
+
+    FLAlertLayer::create(
+        "Statistics",
+        body.c_str(),
+        "OK"
+    )->show();
 };
 
 void FavoritesPopup::onClearAll() {

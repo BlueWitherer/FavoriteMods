@@ -57,7 +57,12 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         addChild(nameLabel);
 
         // View button
-        auto viewBtnSprite = ButtonSprite::create("View", "bigFont.fnt", "GJ_button_01.png", 0.875f);
+        auto viewBtnSprite = ButtonSprite::create(
+            "View",
+            "bigFont.fnt",
+            m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
+            0.875f
+        );
         viewBtnSprite->setScale(0.75f);
 
         auto viewBtn = CCMenuItemSpriteExtra::create(
@@ -139,9 +144,16 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
             addChild(versionLabel);
 
-            auto descBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoBtn_001.png");
+            // sprite for description button
+            auto descBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+                "geode.loader/message.png",
+                0.875f,
+                m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
+                CircleBaseSize::Medium
+            );
             descBtnSprite->setScale(0.375f);
 
+            // Mod description button
             auto descBtn = CCMenuItemSpriteExtra::create(
                 descBtnSprite,
                 this,

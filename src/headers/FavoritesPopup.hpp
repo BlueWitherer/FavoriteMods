@@ -40,6 +40,7 @@ protected:
     void onFavoritesOnlyToggle(CCObject*);
     void onHideFavoritesToggle(CCObject*);
     void onInfoButton(CCObject*);
+    void onGetStats(CCObject*);
     void onModSettings(CCObject*);
 public:
     static FavoritesPopup* create(bool geodeTheme = false, bool heartIcons = false);
