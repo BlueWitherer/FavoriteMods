@@ -1,3 +1,5 @@
+# v1.0.5
+
 # v1.0.4
 - Added pagination to mod list
   - Added toggle setting `List Pages`

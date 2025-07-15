@@ -8,7 +8,7 @@ else()
 endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 
-project(FavoriteMods VERSION 1.0.4)
+project(FavoriteMods VERSION 1.0.5)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp incl/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
