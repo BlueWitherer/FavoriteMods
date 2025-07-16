@@ -1,6 +1,6 @@
 #include "../FavoritesPopup.hpp"
 
-#include "../ui/ModItem.hpp"
+#include "../ModItem.hpp"
 
 #include <fmt/core.h>
 
@@ -196,7 +196,8 @@ bool FavoritesPopup::setup() {
     auto scrollLayerLayout = ColumnLayout::create()
         ->setAxisAlignment(AxisAlignment::End) // seriously why is this end at top but start at bottom?
         ->setAxisReverse(true) // haha wtf is top reverse but bottom isnt LMAO
-        ->setAutoGrowAxis(360.f)
+        ->setAutoGrowAxis(0.f)
+        ->setGrowCrossAxis(false)
         ->setGap(5.f);
 
     // Create scroll layer
@@ -205,6 +206,7 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->setAnchorPoint({ 0.5, 0.5 });
     m_scrollLayer->ignoreAnchorPointForPosition(false);
     m_scrollLayer->setPosition(scrollBG->getPosition());
+
     m_scrollLayer->m_contentLayer->setLayout(scrollLayerLayout);
 
     m_mainLayer->addChild(m_scrollLayer);
@@ -530,7 +532,6 @@ void FavoritesPopup::onPromptClearAll(CCObject*) {
 void FavoritesPopup::onGetStats(CCObject*) {
     int favorite = 0; // favorited mods
     int enabled = 0; // all enabled mods
-    int disabled = 0; // all disabled mods
     int total = 0; // all installed mods
 
     auto loader = Loader::get();
@@ -539,20 +540,14 @@ void FavoritesPopup::onGetStats(CCObject*) {
         total++;
 
         if (m_thisMod->getSavedValue<bool>(mod->getID())) favorite++;
-
-        if (mod->isEnabled()) {
-            enabled++;
-        } else {
-            disabled++;
-        };
+        if (mod->isEnabled()) enabled++;
     };
 
     auto faveCount = fmt::format("<cy>{}</c> Favorites", favorite);
-    auto enableCount = fmt::format("<cg>{}</c> Mods Enabled", enabled);
-    auto disableCount = fmt::format("<cr>{}</c> Mods Disabled", disabled);
+    auto enableCount = fmt::format("<cg>{}</c> Mods Enabled, <cr>{}</c> Disabled", enabled, total - enabled);
     auto totalCount = fmt::format("<cj>{}</c> Mods Installed", total);
 
-    auto body = fmt::format("{}\n\n{}\n{}\n\n{}", faveCount, enableCount, disableCount, totalCount);
+    auto body = fmt::format("{}\n\n{}\n{}", faveCount, enableCount, totalCount);
 
     FLAlertLayer::create(
         "Statistics",

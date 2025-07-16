@@ -1,6 +1,6 @@
 #include "../ModItem.hpp"
 
-#include "../../FavoritesPopup.hpp"
+#include "../FavoritesPopup.hpp"
 
 #include <Geode/ui/GeodeUI.hpp>
 
