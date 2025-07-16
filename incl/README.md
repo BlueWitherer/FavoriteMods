@@ -1,28 +1,24 @@
-# <img src="../logo.png" width="30" alt="The mod's logo." /> Favorite Mods
+# [<img src="../logo.png" width="30" alt="The mod's logo." />](https://www.geode-sdk.org/mods/cheeseworks.favoritemods) Favorite Mods
 Add installed Geode mods as your favorites!
 
 ### Development
 ###### Work with the mod directly.
-You can access data from Favorite Mods by including the [`Favorites.hpp`](./Favorites.hpp) file in your code. Make sure to use the `favorites` namespace to directly access all the needed classes and values.
+You can access data from Favorite Mods by including the [`Favorites.hpp`](./Favorites.hpp) file in your code. The `favorites` namespace has all the methods you need.
 
 ```cpp
 #include <cheeseworks.favoritemods/incl/Favorites.hpp>
-
-using namespace favorites;
 ```
 
 Here's some sample code to check a mod to see if it is favorited.
 ```cpp
-using namespace favorites;
-
 class $modify(MenuLayer) {
     bool init() {
         if (!MenuLayer::init()) return false;
 
-        Mod* myMod = geode::getMod();
+        Mod* myMod = Mod::get();
 
         // Check if your mod is a player's favorite
-        if (isFavorite(myMod->getID())) {
+        if (favorites::isFavorite(myMod->getID())) {
             log::info("Yay! {} is a favorite!", myMod->getName());
         } else {
             log::warn("Aw man... You should totally add {} to your favorites!", myMod->getName());
