@@ -1,6 +1,7 @@
 # v1.0.5
 - Fixed empty gap in mod list
 - Adjusted counts in stats pop-up
+- Other tweaks
 
 # v1.0.4
 - Added pagination to mod list

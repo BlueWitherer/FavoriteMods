@@ -202,7 +202,7 @@ bool FavoritesPopup::setup() {
 
     // Create scroll layer
     m_scrollLayer = ScrollLayer::create({ scrollSize.width - 12.5f, scrollSize.height - 12.5f });
-    m_scrollLayer->setID("scroll-layer");
+    m_scrollLayer->setID("mod-list");
     m_scrollLayer->setAnchorPoint({ 0.5, 0.5 });
     m_scrollLayer->ignoreAnchorPointForPosition(false);
     m_scrollLayer->setPosition(scrollBG->getPosition());

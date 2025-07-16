@@ -53,6 +53,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         nameLabel->setPosition({ 37.5f, 25.f });
         nameLabel->setScale(0.4f);
         nameLabel->setAnchorPoint({ 0, 0.5 });
+        nameLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
 
         addChild(nameLabel);
 
@@ -87,14 +88,15 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         m_favButton->setID("favorite");
 
         // Layout to automatically position buttons on button menu
-        auto btnMenuLayout = RowLayout::create();
-        btnMenuLayout->setDefaultScaleLimits(0.625f, 0.875f);
-        btnMenuLayout->setAxisAlignment(AxisAlignment::End);
-        btnMenuLayout->setCrossAxisAlignment(AxisAlignment::Center);
-        btnMenuLayout->setCrossAxisLineAlignment(AxisAlignment::Center);
-        btnMenuLayout->setAutoGrowAxis(true);
-        btnMenuLayout->setAxisReverse(true);
-        btnMenuLayout->setGap(7.5f);
+        auto btnMenuLayout = RowLayout::create()
+            ->setDefaultScaleLimits(0.625f, 0.875f)
+            ->setAxisAlignment(AxisAlignment::End)
+            ->setCrossAxisAlignment(AxisAlignment::Center)
+            ->setCrossAxisLineAlignment(AxisAlignment::Center)
+            ->setGrowCrossAxis(false)
+            ->setAutoGrowAxis(0.f)
+            ->setAxisReverse(true)
+            ->setGap(7.5f);
 
         // Create menu for buttons
         auto btnMenu = CCMenu::create();
@@ -104,6 +106,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         btnMenu->setScaledContentSize({ getScaledContentWidth() * 0.375f, getScaledContentHeight() - 10.f });
         btnMenu->setLayout(btnMenuLayout);
 
+        // add the previous buttons
         btnMenu->addChild(viewBtn);
         btnMenu->addChild(m_favButton);
 
@@ -130,6 +133,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, 25.f });
             devLabel->setScale(0.25f);
             devLabel->setAnchorPoint({ 0, 0.5 });
+            devLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
 
             addChild(devLabel);
 
@@ -139,6 +143,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             versionLabel->setPosition({ 37.5f, 15.f });
             versionLabel->setScale(0.3f);
             versionLabel->setAnchorPoint({ 0, 0.5 });
+            versionLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
 
             idLabelOffset += 2.5f + versionLabel->getScaledContentWidth();
 
@@ -172,16 +177,17 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         idLabel->setScale(0.25f);
         idLabel->setAnchorPoint({ 0, 0.5 });
         idLabel->setOpacity(125);
+        idLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
 
         addChild(idLabel);
 
+        // for first time users
         if (auto helpTxt = firstTimeText()) {
             log::debug("Adding help text...");
-
-            helpTxt->setAnchorPoint({ 1, 0.5 });
             helpTxt->setPosition({ getScaledContentWidth() - (btnMenu->getScaledContentWidth() + 2.5f), getScaledContentHeight() / 2.f });
-
             addChild(helpTxt);
+        } else {
+            btnMenu->updateLayout(true); // xd
         };
 
         return true;
@@ -245,6 +251,7 @@ CCLabelBMFont* ModItem::firstTimeText() {
         auto help = CCLabelBMFont::create("Press to Toggle ->", "chatFont.fnt");
         help->setID("first-time-help-text");
         help->setScale(0.5f);
+        help->setAnchorPoint({ 1, 0.5 });
         help->setColor({ 200, 200, 200 });
         help->setOpacity(200);
 
