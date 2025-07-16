@@ -230,12 +230,11 @@ void ModItem::updateFavoriteIcon() {
 };
 
 void ModItem::onModDesc(CCObject*) {
-    auto popup = FLAlertLayer::create(
+    FLAlertLayer::create(
         m_mod->getName().c_str(),
         m_mod->getDescription().value_or("<cr>No description available.</c>").c_str(),
         "OK"
-    );
-    popup->show();
+    )->show();
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {

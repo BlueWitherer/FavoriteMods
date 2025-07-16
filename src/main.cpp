@@ -88,8 +88,9 @@ class $nodeModify(MyModsLayer, ModsLayer) {
         // create the favorites pop-up
         if (auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons)) {
             popup->show();
-            log::debug("Favorites popup shown successfully");
+            log::info("Favorites popup created successfully");
         } else {
+            Notification::create("An error occurred, please re-open this page and try again", NotificationIcon::Error, 1.25f)->show();
             log::error("Failed to create favorites popup!");
         };
     };

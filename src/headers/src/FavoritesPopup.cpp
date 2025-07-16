@@ -114,7 +114,7 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
-    m_favoritesOnlyToggle->setID("favorites-only-toggler");
+    m_favoritesOnlyToggle->setID("show-favorites-only");
     m_favoritesOnlyToggle->setPosition({ contentSize.width - 70.f, contentSize.height - 60.f });
 
     checkboxMenu->addChild(m_favoritesOnlyToggle);
@@ -132,7 +132,7 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
-    m_hideFavoritesToggle->setID("hide-favorites-toggler");
+    m_hideFavoritesToggle->setID("hide-all-favorites");
     m_hideFavoritesToggle->setPosition({ contentSize.width - 30.f, contentSize.height - 60.f });
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
@@ -174,6 +174,7 @@ bool FavoritesPopup::setup() {
 
     // Create "No mods found" label (initially hidden)
     m_noModsLabel = CCLabelBMFont::create("No mods found :(", "bigFont.fnt");
+    m_noModsLabel->setID("no-mods-label");
     m_noModsLabel->setPosition({ contentSize.width / 2.f, contentSize.height / 2.f - 35.f });
     m_noModsLabel->setScale(0.5f);
     m_noModsLabel->setColor({ 125, 125, 125 });
@@ -363,7 +364,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             auto empty = std::string::npos; // dry code xd
             bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
 
-            // evil lines >:3
+            // evil bool >:3
             bool matchesSearch = (m_searchText.empty() && (mod->getID() != std::string("geode.loader"))) // Skip geode by default
                 || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != empty // search via name
                 || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != empty // search via description
@@ -374,7 +375,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
                 if (isFavorited && matchesSearch) filteredMods.push_back(mod);
             } else if (m_hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
                 if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
-            } else { // Normal mode: show all matching mods, with favorites prioritized
+            } else { // show all matching mods, with favorites prioritized
                 if (matchesSearch) filteredMods.push_back(mod);
             };
         } else {
@@ -398,32 +399,32 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
         log::info("Loading page {} of {}", p_page, p_totalPages);
 
-        if (p_page >= p_totalPages) {
+        if (p_page >= p_totalPages) { // if at the last page
             log::debug("Reached last page");
 
             p_page = p_totalPages;
 
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(false);
             if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
-        } else if (p_page <= 1) {
+        } else if (p_page <= 1) { // if at the first page
             log::debug("Reached first page");
 
             p_page = 1;
 
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
             if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(false);
-        } else {
+        } else { // if somewhere in the middle
             if (m_pageForwardBtn) m_pageForwardBtn->setVisible(true);
             if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(true);
         };
 
-        int startIndex = (p_page - 1) * p_itemsPerPage;
-        int endIndex = std::min(startIndex + p_itemsPerPage, p_totalItems);
+        int startIndex = (p_page - 1) * p_itemsPerPage; // show this mod first
+        int endIndex = std::min(startIndex + p_itemsPerPage, p_totalItems); // show this mod last
 
-        if (startIndex >= 0 && startIndex < p_totalItems) {
+        if (startIndex >= 0 && startIndex < p_totalItems) { // make sure the things exist
             loadModList(std::vector<Mod*>(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex));
 
-            if (m_pagesLabel) {
+            if (m_pagesLabel) { // make sure the page label exists
                 auto pageText = fmt::format("Page {}/{}, Total {} Mods", p_page, p_totalPages, p_totalItems);
                 m_pagesLabel->setCString(pageText.c_str());
             } else {
@@ -495,20 +496,21 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
 };
 
 void FavoritesPopup::onPageForward(CCObject*) {
-    if (p_page < p_totalPages) p_page++;
-    if (p_page >= p_totalPages) p_page = p_totalPages;
+    if (p_page < p_totalPages) p_page++; // turn the page forward
+    if (p_page >= p_totalPages) p_page = p_totalPages; // if max pages just stay at 1
 
     refreshModList(true);
 };
 
 void FavoritesPopup::onPageBackward(CCObject*) {
-    if (p_page > 1) p_page--;
-    if (p_page <= 1) p_page = 1;
+    if (p_page > 1) p_page--; // turn the page backward
+    if (p_page <= 1) p_page = 1; // if max pages just stay at 1
 
     refreshModList(true);
 };
 
 void FavoritesPopup::onInfoButton(CCObject*) {
+    // lol
     auto body = fmt::format("To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.", m_heartIcons ? "heart" : "star");
 
     FLAlertLayer::create(
@@ -536,7 +538,7 @@ void FavoritesPopup::onGetStats(CCObject*) {
 
     auto loader = Loader::get();
 
-    for (Mod* mod : loader->getAllMods()) {
+    for (Mod* mod : loader->getAllMods()) { // gotta count 'em all!
         total++;
 
         if (m_thisMod->getSavedValue<bool>(mod->getID())) favorite++;
@@ -563,7 +565,7 @@ void FavoritesPopup::onClearAll() {
     // Turn off favorite from every mod
     for (Mod* mod : allMods) {
         auto modId = mod->getID(); // get the mod id
-        if (m_thisMod->getSavedValue<bool>(modId, false)) m_thisMod->setSavedValue(modId, false);
+        if (m_thisMod->getSavedValue<bool>(modId, false)) m_thisMod->setSavedValue(modId, false); // prevent creating more saves
     };
 
     refreshModList(true);
