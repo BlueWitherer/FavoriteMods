@@ -47,14 +47,14 @@ bool FavoritesPopup::setup() {
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
 
-    auto [widthCS, heightCS] = m_mainLayer->getContentSize();
-
     // geode mod loader
     auto loader = Loader::get();
 
     // Create main content area
-    auto contentSize = CCSize{ 400.f, 290.f };
-    auto scrollSize = CCSize{ 380.f, 200.5f };
+    auto contentSize = m_mainLayer->getContentSize();
+    auto scrollSize = CCSize{ contentSize.width - 20.f, contentSize.height - 90.f };
+
+    auto [widthCS, heightCS] = contentSize;
 
     // for buttons to work
     m_overlayMenu = CCMenu::create();
@@ -68,7 +68,7 @@ bool FavoritesPopup::setup() {
     m_mainLayer->addChild(m_overlayMenu);
 
     // Create search input
-    m_searchInput = TextInput::create(265.f, "Search Mods", "bigFont.fnt");
+    m_searchInput = TextInput::create(contentSize.width - 135.f, "Search Mods", "bigFont.fnt");
     m_searchInput->setID("search-box");
     m_searchInput->setPosition({ contentSize.width / 2.f - 20.f, contentSize.height - 60.f });
     m_searchInput->setDelegate(this);

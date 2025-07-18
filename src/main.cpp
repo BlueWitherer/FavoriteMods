@@ -61,8 +61,6 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             );
             favBtnSprite->setScale(0.8f);
 
-            log::debug("Favorites button sprite created successfully");
-
             // create favorites button
             auto favBtn = CCMenuItemSpriteExtra::create(
                 favBtnSprite,
@@ -71,21 +69,19 @@ class $nodeModify(MyModsLayer, ModsLayer) {
             );
             favBtn->setID("favorites"_spr);
 
-            log::debug("Favorites button created successfully");
-
             actionsMenu->addChild(favBtn);
             actionsMenu->updateLayout(true);
 
-            log::info("Favorites button added to actions menu successfully!");
+            log::info("Favorites button added to actions menu successfully");
         } else {
-            log::error("Failed to find actions menu with ID 'actions-menu'");
+            log::error("Failed to find actions menu in Geode mods layer with ID 'actions-menu'");
         };
     };
 
     void onFavoritesBtn(CCObject*) {
         log::debug("Favorites button clicked!");
 
-        // create the favorites pop-up
+        // create and show the favorites pop-up
         if (auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons)) {
             popup->show();
             log::info("Favorites popup created successfully");

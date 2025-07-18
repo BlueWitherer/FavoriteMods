@@ -2,8 +2,7 @@
 - Fixed empty gap in mod list
 - Adjusted count text in mod stats pop-up
 - Added issue report button to mod list item if *`Minimalist List`* is disabled
-- Set the default value for setting *`Mod Settings Button`* to `true`
-- Minor UI sizing adjustments in mod list item
+- Fixed general UI rescaling
 - Other tweaks
 
 # v1.0.4

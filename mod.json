@@ -107,7 +107,7 @@
 			"type": "bool",
 			"name": "Mod Settings Button",
 			"description": "Create a quick mod settings button in the favorites pop-up.",
-			"default": true
+			"default": false
 		}
 	},
 	"api": {
