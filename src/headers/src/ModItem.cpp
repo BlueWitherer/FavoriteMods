@@ -62,7 +62,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             "View",
             "bigFont.fnt",
             m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
-            0.875f
+            0.75f
         );
         viewBtnSprite->setScale(0.75f);
 
@@ -76,10 +76,10 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
         auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
-        // Favorite button here :)
         auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
         favBtnSprite->setScale(m_heartIcons ? 0.625f : 0.875f);
 
+        // Favorite button here :)
         m_favButton = CCMenuItemSpriteExtra::create(
             favBtnSprite,
             this,
@@ -96,7 +96,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             ->setGrowCrossAxis(false)
             ->setAutoGrowAxis(0.f)
             ->setAxisReverse(true)
-            ->setGap(7.5f);
+            ->setGap(5.f);
 
         // Create menu for buttons
         auto btnMenu = CCMenu::create();
@@ -111,8 +111,6 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         btnMenu->addChild(m_favButton);
 
         addChild(btnMenu);
-
-        btnMenu->updateLayout(true);
 
         // offset to position the id's x by if showing label version
         auto idLabelOffset = 0.f;
@@ -167,7 +165,18 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             descBtn->setID("mod-description-button");
 
             btnMenu->addChild(descBtn);
-            btnMenu->updateLayout(true);
+
+            auto issueBtnSprite = CCSprite::createWithSpriteFrameName("geode.loader/info-warning.png");
+            issueBtnSprite->setScale(0.5f);
+
+            auto issueBtn = CCMenuItemSpriteExtra::create(
+                issueBtnSprite,
+                this,
+                menu_selector(ModItem::onModIssues)
+            );
+            issueBtn->setID("mod-issues-button");
+
+            btnMenu->addChild(issueBtn);
         };
 
         // ID label
@@ -181,14 +190,15 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
         addChild(idLabel);
 
-        // for first time users
+        // for first time users of favorites
         if (auto helpTxt = firstTimeText()) {
-            log::debug("Adding help text...");
             helpTxt->setPosition({ getScaledContentWidth() - (btnMenu->getScaledContentWidth() + 2.5f), getScaledContentHeight() / 2.f });
             addChild(helpTxt);
-        } else {
-            btnMenu->updateLayout(true); // xd
+
+            log::debug("Help text added for first time users");
         };
+
+        btnMenu->updateLayout(true);
 
         return true;
     } else {
@@ -198,6 +208,18 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
 void ModItem::onViewMod(CCObject*) {
     openInfoPopup(m_mod);
+};
+
+void ModItem::onModDesc(CCObject*) {
+    FLAlertLayer::create(
+        m_mod->getName().c_str(),
+        m_mod->getDescription().value_or("<cr>No description available.</c>").c_str(),
+        "OK"
+    )->show();
+};
+
+void ModItem::onModIssues(CCObject*) {
+    openIssueReportPopup(m_mod);
 };
 
 void ModItem::onFavorite(CCObject*) {
@@ -227,14 +249,6 @@ void ModItem::updateFavoriteIcon() {
     } else {
         log::error("Favorite button not found for {}", m_mod->getID());
     };
-};
-
-void ModItem::onModDesc(CCObject*) {
-    FLAlertLayer::create(
-        m_mod->getName().c_str(),
-        m_mod->getDescription().value_or("<cr>No description available.</c>").c_str(),
-        "OK"
-    )->show();
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {

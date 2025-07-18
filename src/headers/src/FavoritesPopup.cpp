@@ -359,13 +359,14 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     for (Mod* mod : allMods) {
         // if the player only wants to show enabled mods
         bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
+        m_searchText.empty() ? list = mod->getID() != std::string("geode.loader") : list; // if search text is empty, don't show geode loader mod
 
         if (list) {
             auto empty = std::string::npos; // dry code xd
             bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
 
             // evil bool >:3
-            bool matchesSearch = (m_searchText.empty() && (mod->getID() != std::string("geode.loader"))) // Skip geode by default
+            bool matchesSearch = m_searchText.empty() // Show all mods if search text is empty
                 || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != empty // search via name
                 || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != empty // search via description
                 || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != empty; // search via id
@@ -378,8 +379,8 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             } else { // show all matching mods, with favorites prioritized
                 if (matchesSearch) filteredMods.push_back(mod);
             };
-        } else {
-            log::warn("Skipping disabled mod {}", mod->getID());
+        } else { // if geode or disabled skip it
+            log::warn("Skipping showing mod {}", mod->getID());
         };
     };
 
@@ -421,7 +422,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
         int startIndex = (p_page - 1) * p_itemsPerPage; // show this mod first
         int endIndex = std::min(startIndex + p_itemsPerPage, p_totalItems); // show this mod last
 
-        if (startIndex >= 0 && startIndex < p_totalItems) { // make sure the things exist
+        if (startIndex >= 0 && startIndex < p_totalItems) { // make sure the mods exist
             loadModList(std::vector<Mod*>(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex));
 
             if (m_pagesLabel) { // make sure the page label exists

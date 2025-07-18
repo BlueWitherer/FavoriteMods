@@ -22,8 +22,9 @@ protected:
     FavoritesPopup* m_parentPopup = nullptr; // To access parent methods
     CCScale9Sprite* m_backgroundSprite = nullptr; // Background theme
 
-    void onModDesc(CCObject*);
     void onViewMod(CCObject*);
+    void onModDesc(CCObject*);
+    void onModIssues(CCObject*);
     void onFavorite(CCObject*);
 
     CCLabelBMFont* firstTimeText();

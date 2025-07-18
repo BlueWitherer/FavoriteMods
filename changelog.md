@@ -1,6 +1,9 @@
 # v1.0.5
 - Fixed empty gap in mod list
-- Adjusted counts in stats pop-up
+- Adjusted count text in mod stats pop-up
+- Added issue report button to mod list item if *`Minimalist List`* is disabled
+- Set the default value for setting *`Mod Settings Button`* to `true`
+- Minor UI sizing adjustments in mod list item
 - Other tweaks
 
 # v1.0.4
@@ -20,7 +23,7 @@
 # v1.0.3
 - Added toggle setting `Minimalist List`
   - Added optional developer label to mod list item
-  - Version label in mod list item will only appear if *`Minimalist List`* is enabled
+  - Version label in mod list item will only appear if *`Minimalist List`* is disabled
 - Fixed coloring for version and ID label in mod list item
 - Fixed enabled-only filter on mod list
 - Adjusted positioning for mod settings button on pop-up

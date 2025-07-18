@@ -44,10 +44,10 @@
 			"description": "Only load the list with mods that you have <cg>enabled</c> on your client.",
 			"default": true
 		},
-		"ui": {
+		"lists": {
 			"type": "title",
-			"name": "Interface",
-			"description": "Functionality of UI."
+			"name": "Mod Lists",
+			"description": "Display of mod lists."
 		},
 		"minimal": {
 			"type": "bool",
@@ -80,6 +80,11 @@
 				"big-arrow-step": 10
 			}
 		},
+		"ui": {
+			"type": "title",
+			"name": "Interface",
+			"description": "Functionality of UI."
+		},
 		"auto-scroll": {
 			"type": "bool",
 			"name": "Automatically Scroll Up",
@@ -92,17 +97,17 @@
 			"description": "Clear the search box when filtering the mod list.",
 			"default": false
 		},
-		"settings-btn": {
-			"type": "bool",
-			"name": "Mod Settings Button",
-			"description": "Create a quick mod settings button in the favorites pop-up.",
-			"default": false
-		},
 		"hearts": {
 			"type": "bool",
 			"name": "Hearts",
 			"description": "Replace the star icons with heart icons! <3",
 			"default": false
+		},
+		"settings-btn": {
+			"type": "bool",
+			"name": "Mod Settings Button",
+			"description": "Create a quick mod settings button in the favorites pop-up.",
+			"default": true
 		}
 	},
 	"api": {
