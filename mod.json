@@ -83,7 +83,13 @@
 		"ui": {
 			"type": "title",
 			"name": "Interface",
-			"description": "Functionality of UI."
+			"description": "Additional UI elements and functions."
+		},
+		"settings-btn": {
+			"type": "bool",
+			"name": "Mod Settings Button",
+			"description": "Create a quickly accessible mod settings button in the favorites pop-up.",
+			"default": false
 		},
 		"auto-scroll": {
 			"type": "bool",
@@ -100,13 +106,7 @@
 		"hearts": {
 			"type": "bool",
 			"name": "Hearts",
-			"description": "Replace the star icons with heart icons! <3",
-			"default": false
-		},
-		"settings-btn": {
-			"type": "bool",
-			"name": "Mod Settings Button",
-			"description": "Create a quick mod settings button in the favorites pop-up.",
+			"description": "Use heart icons instead of star icons! <3",
 			"default": false
 		}
 	},

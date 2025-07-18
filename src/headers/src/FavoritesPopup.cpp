@@ -52,9 +52,10 @@ bool FavoritesPopup::setup() {
 
     // Create main content area
     auto contentSize = m_mainLayer->getContentSize();
-    auto scrollSize = CCSize{ contentSize.width - 20.f, contentSize.height - 90.f };
-
     auto [widthCS, heightCS] = contentSize;
+
+    // Create scroll size
+    auto scrollSize = CCSize{ widthCS - 20.f, heightCS - 90.f };
 
     // for buttons to work
     m_overlayMenu = CCMenu::create();
@@ -68,9 +69,9 @@ bool FavoritesPopup::setup() {
     m_mainLayer->addChild(m_overlayMenu);
 
     // Create search input
-    m_searchInput = TextInput::create(contentSize.width - 135.f, "Search Mods", "bigFont.fnt");
+    m_searchInput = TextInput::create(widthCS - 135.f, "Search Mods", "bigFont.fnt");
     m_searchInput->setID("search-box");
-    m_searchInput->setPosition({ contentSize.width / 2.f - 20.f, contentSize.height - 60.f });
+    m_searchInput->setPosition({ widthCS / 2.f - 20.f, heightCS - 60.f });
     m_searchInput->setDelegate(this);
     m_searchInput->setMaxCharCount(50);
 
@@ -115,7 +116,7 @@ bool FavoritesPopup::setup() {
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
     m_favoritesOnlyToggle->setID("show-favorites-only");
-    m_favoritesOnlyToggle->setPosition({ contentSize.width - 70.f, contentSize.height - 60.f });
+    m_favoritesOnlyToggle->setPosition({ widthCS - 70.f, heightCS - 60.f });
 
     checkboxMenu->addChild(m_favoritesOnlyToggle);
 
@@ -133,20 +134,20 @@ bool FavoritesPopup::setup() {
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
     m_hideFavoritesToggle->setID("hide-all-favorites");
-    m_hideFavoritesToggle->setPosition({ contentSize.width - 30.f, contentSize.height - 60.f });
+    m_hideFavoritesToggle->setPosition({ widthCS - 30.f, heightCS - 60.f });
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
     // Create icon above favorites only toggle
     auto starOnIcon = CCSprite::createWithSpriteFrameName(m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
     starOnIcon->setID("favorites-icon");
-    starOnIcon->setPosition({ contentSize.width - 70.f, contentSize.height - 40.f });
+    starOnIcon->setPosition({ widthCS - 70.f, heightCS - 40.f });
     starOnIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
 
     // Create icon above hide favorites toggle
     auto starOffIcon = CCSprite::createWithSpriteFrameName(m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png");
     starOffIcon->setID("non-favorites-icon");
-    starOffIcon->setPosition({ contentSize.width - 30.f, contentSize.height - 40.f });
+    starOffIcon->setPosition({ widthCS - 30.f, heightCS - 40.f });
     starOffIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
 
     m_mainLayer->addChild(starOnIcon);
@@ -154,7 +155,7 @@ bool FavoritesPopup::setup() {
 
     // Create info button
     auto infoBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    infoBtnSprite->setScale(0.7f);
+    infoBtnSprite->setScale(0.75f);
 
     auto infoBtn = CCMenuItemSpriteExtra::create(
         infoBtnSprite,
@@ -162,7 +163,7 @@ bool FavoritesPopup::setup() {
         menu_selector(FavoritesPopup::onInfoButton)
     );
     infoBtn->setID("info-button");
-    infoBtn->setPosition({ contentSize.width - 15.f, contentSize.height - 25.f });
+    infoBtn->setPosition({ widthCS - 15.f, heightCS - 15.f });
 
     auto infoMenu = CCMenu::create();
     infoMenu->setID("info-menu");
@@ -175,7 +176,7 @@ bool FavoritesPopup::setup() {
     // Create "No mods found" label (initially hidden)
     m_noModsLabel = CCLabelBMFont::create("No mods found :(", "bigFont.fnt");
     m_noModsLabel->setID("no-mods-label");
-    m_noModsLabel->setPosition({ contentSize.width / 2.f, contentSize.height / 2.f - 35.f });
+    m_noModsLabel->setPosition({ widthCS / 2.f, heightCS / 2.f - 35.f });
     m_noModsLabel->setScale(0.5f);
     m_noModsLabel->setColor({ 125, 125, 125 });
     m_noModsLabel->setVisible(false);
@@ -187,7 +188,7 @@ bool FavoritesPopup::setup() {
     scrollBG->setContentSize(scrollSize);
     scrollBG->setAnchorPoint({ 0.5, 0.5 });
     scrollBG->ignoreAnchorPointForPosition(false);
-    scrollBG->setPosition({ contentSize.width / 2.f, (contentSize.height / 2.f) - 35.f });
+    scrollBG->setPosition({ widthCS / 2.f, (heightCS / 2.f) - 35.f });
     scrollBG->setColor({ 0, 0, 0 });
     scrollBG->setOpacity(100);
 
