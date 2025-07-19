@@ -1,3 +1,7 @@
+# v1.0.6
+- Removed top gap in favorites pop-up
+- Minor UI tweaks
+
 # v1.0.5
 - Fixed empty gap in mod list
 - Adjusted count text in mod stats pop-up

@@ -77,7 +77,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
         auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
-        favBtnSprite->setScale(m_heartIcons ? 0.75f : 0.875f);
+        favBtnSprite->setScale(m_heartIcons ? 0.75f : 1.f);
 
         // Favorite button here :)
         m_favButton = CCMenuItemSpriteExtra::create(
