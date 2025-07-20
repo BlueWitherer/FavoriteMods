@@ -1,3 +1,7 @@
+# v1.0.7
+- Fixed first-time help text positioning
+- Added more help text for pagination
+
 # v1.0.6
 - Removed top gap in favorites pop-up
 - Minor UI tweaks

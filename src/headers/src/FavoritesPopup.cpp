@@ -367,7 +367,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
             bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
 
             // evil bool >:3
-            bool matchesSearch = m_searchText.empty() // Show all mods if search text is empty
+            bool matchesSearch = m_searchText.empty() // show all mods if search text is empty
                 || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != empty // search via name
                 || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != empty // search via description
                 || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != empty; // search via id
@@ -381,7 +381,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
                 if (matchesSearch) filteredMods.push_back(mod);
             };
         } else { // if geode or disabled skip it
-            log::warn("Skipping showing mod {}", mod->getID());
+            log::warn("Skipping listing mod {}", mod->getID());
         };
     };
 
@@ -461,6 +461,7 @@ void FavoritesPopup::textChanged(CCTextInputNode* input) {
 void FavoritesPopup::onClearSearch(CCObject*) {
     m_searchText = "";
     m_searchInput->setString(m_searchText, true);
+
     log::debug("Cleared search box");
 };
 
@@ -513,7 +514,14 @@ void FavoritesPopup::onPageBackward(CCObject*) {
 
 void FavoritesPopup::onInfoButton(CCObject*) {
     // lol
-    auto body = fmt::format("To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.", m_heartIcons ? "heart" : "star");
+    auto body = fmt::format(
+        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.{}",
+        m_heartIcons ? "heart" : "star",
+        m_usePages ? fmt::format(
+            "\n\nYou can also use the <cc>page buttons</c> to navigate through your mods if you have more than {} favorites.",
+            p_itemsPerPage
+        ) : ""
+    );
 
     FLAlertLayer::create(
         "Help",

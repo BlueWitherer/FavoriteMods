@@ -19,6 +19,7 @@ protected:
     Mod* m_thisMod = getMod(); // Get this mod
 
     CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
+
     FavoritesPopup* m_parentPopup = nullptr; // To access parent methods
     CCScale9Sprite* m_backgroundSprite = nullptr; // Background theme
 

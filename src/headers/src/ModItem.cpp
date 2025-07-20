@@ -190,6 +190,8 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
         addChild(idLabel);
 
+        btnMenu->updateLayout(true);
+
         // for first time users of favorites
         if (auto helpTxt = firstTimeText()) {
             helpTxt->setPosition({ getScaledContentWidth() - (btnMenu->getScaledContentWidth() + 2.5f), getScaledContentHeight() / 2.f });
@@ -197,8 +199,6 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
             log::debug("Help text added for first time users");
         };
-
-        btnMenu->updateLayout(true);
 
         return true;
     } else {

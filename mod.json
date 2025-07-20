@@ -8,7 +8,7 @@
 	},
 	"id": "cheeseworks.favoritemods",
 	"name": "Favorite Mods",
-	"version": "1.0.6",
+	"version": "1.0.7",
 	"developers": [
 		"Cheeseworks",
 		"ArcticWoof"
@@ -41,13 +41,13 @@
 		"enabled-only": {
 			"type": "bool",
 			"name": "Only List Enabled Mods",
-			"description": "Only load the list with mods that you have <cg>enabled</c> on your client.",
+			"description": "Only load the list with mods that you have <cg>enabled</c> on your Geode client.",
 			"default": true
 		},
-		"lists": {
+		"list": {
 			"type": "title",
-			"name": "Mod Lists",
-			"description": "Display of mod lists."
+			"name": "List",
+			"description": "Display of the mod list."
 		},
 		"minimal": {
 			"type": "bool",

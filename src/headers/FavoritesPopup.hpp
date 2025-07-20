@@ -29,6 +29,7 @@ protected:
     CCLabelBMFont* m_pagesLabel = nullptr;
 
     CCMenu* m_overlayMenu = nullptr;
+
     TextInput* m_searchInput = nullptr;
     CCLabelBMFont* m_noModsLabel = nullptr;
 
@@ -42,6 +43,7 @@ protected:
 
     bool setup() override;
     bool init(float width, float height, bool geodeTheme = false, bool heartIcons = false);
+
     void textChanged(CCTextInputNode* input) override;
 
     void loadModList(std::vector<Mod*> allMods);
