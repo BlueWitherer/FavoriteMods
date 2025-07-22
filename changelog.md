@@ -1,3 +1,5 @@
+# v1.0.8
+
 # v1.0.7
 - Fixed first-time help text positioning
 - Added more help text for pagination

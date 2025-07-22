@@ -1,5 +1,5 @@
-# Support Us :)
-- **[Check out Cheeseworks's YouTube channel!](https://www.youtube.com/@cheese_works/)**
-- [Check out ArcticWoof's Twitch channel!](https://www.twitch.tv/arcticwooflive/)
+# Support Me :)
+**![<3](frame:gj_heartOn_001.png?scale=0.375) [Sponsor me on GitHub](https://www.github.com/sponsors/BlueWitherer/) to further support my open-source work!**
 
-Join the [official Discord community server](https://dsc.gg/cubic) to interact with other viewers!
+### & more!
+- [Check out ArcticWoof's Twitch channel!](https://www.twitch.tv/arcticwooflive/)
