@@ -40,7 +40,7 @@
 	"settings": {
 		"enabled-only": {
 			"type": "bool",
-			"name": "Only List Enabled Mods",
+			"name": "Enabled Mods Only",
 			"description": "Only load the list with mods that you have <cg>enabled</c> on your Geode client.",
 			"default": true
 		},
@@ -52,7 +52,7 @@
 		"minimal": {
 			"type": "bool",
 			"name": "Minimalist List",
-			"description": "Show only important details of a mod in the favorites list.",
+			"description": "Only show the necessary details of each mod in the favorites list.",
 			"default": true
 		},
 		"pages": {
@@ -64,12 +64,12 @@
 		"pages-count": {
 			"type": "int",
 			"name": "Mods Per Page",
-			"description": "How many mods to show at a time in one page.",
+			"description": "Amount of mods to list per page.",
 			"default": 10,
 			"min": 5,
 			"max": 50,
 			"enable-if": "pages",
-			"enable-if-description": "Enable pages to adjust list limits.",
+			"enable-if-description": "Enable pages to adjust limits.",
 			"control": {
 				"input": true,
 				"slider": true,
@@ -106,7 +106,7 @@
 		"hearts": {
 			"type": "bool",
 			"name": "Hearts",
-			"description": "Use heart icons instead of star icons! <3",
+			"description": "Use heart icons! <3",
 			"default": false
 		}
 	},

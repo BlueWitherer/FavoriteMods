@@ -1,6 +1,8 @@
 # v1.0.8
 - Fixed scroll sizing issue in mod list
 - Slightly adjusted positioning of UI in favorites pop-up
+- Renamed toggle setting *`Only List Enabled Mods`* to `Enabled Mods Only`
+- Tweaked some mod setting descriptions
 
 # v1.0.7
 - Fixed first-time help text positioning
