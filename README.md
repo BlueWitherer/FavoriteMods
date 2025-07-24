@@ -35,7 +35,8 @@ To add favorites, simply look for the mod by scrolling or typing its name, descr
 ![preview](previews/preview-2.png)
 ![preview](previews/preview-3.png)
 ![preview](previews/preview-4.png)
-![preview](previews/preview-5.png) 
+![preview](previews/preview-5.png)
+![preview](previews/preview-6.png)
 
 ---
 
