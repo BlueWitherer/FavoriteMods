@@ -69,9 +69,9 @@ bool FavoritesPopup::setup() {
     m_mainLayer->addChild(m_overlayMenu);
 
     // Create search input
-    m_searchInput = TextInput::create(widthCS - 135.f, "Search Mods", "bigFont.fnt");
+    m_searchInput = TextInput::create(widthCS - 125.f, "Search Mods", "bigFont.fnt");
     m_searchInput->setID("search-box");
-    m_searchInput->setPosition({ widthCS / 2.f - 20.f, heightCS - 50.f });
+    m_searchInput->setPosition({ widthCS / 2.f - 15.f, heightCS - 50.f });
     m_searchInput->setDelegate(this);
     m_searchInput->setMaxCharCount(50);
 
@@ -116,7 +116,7 @@ bool FavoritesPopup::setup() {
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
     m_favoritesOnlyToggle->setID("show-favorites-only");
-    m_favoritesOnlyToggle->setPosition({ widthCS - 70.f, heightCS - 50.f });
+    m_favoritesOnlyToggle->setPosition({ widthCS - 60.f, heightCS - 50.f });
 
     checkboxMenu->addChild(m_favoritesOnlyToggle);
 
@@ -134,7 +134,7 @@ bool FavoritesPopup::setup() {
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
     m_hideFavoritesToggle->setID("hide-all-favorites");
-    m_hideFavoritesToggle->setPosition({ widthCS - 30.f, heightCS - 50.f });
+    m_hideFavoritesToggle->setPosition({ widthCS - 25.f, heightCS - 50.f });
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
@@ -198,7 +198,7 @@ bool FavoritesPopup::setup() {
     auto scrollLayerLayout = ColumnLayout::create()
         ->setAxisAlignment(AxisAlignment::End) // seriously why is this end at top but start at bottom?
         ->setAxisReverse(true) // haha wtf is top reverse but bottom isnt LMAO
-        ->setAutoGrowAxis(0.f)
+        ->setAutoGrowAxis(scrollSize.height - 12.5f)
         ->setGrowCrossAxis(false)
         ->setGap(5.f);
 

@@ -15,7 +15,7 @@ Find your absolute favorite mods even quicker than ever.
 ---
 
 ## About
-The *Favorite Mods* mod focuses on creating a dedicated interface with a list of mods the player deems their favorites. This allows the player to save time when looking for specific mods they enjoy or need the most.
+This mod focuses on creating a dedicated interface with a list of installed mods, which prioritizes the mods the player chose to be their favorites. It allows the player to save time when looking for specific mods they enjoy or need the most.
 
 ---
 

@@ -2,4 +2,4 @@
 **![<3](frame:gj_heartOn_001.png?scale=0.375) [Sponsor me on GitHub](https://www.github.com/sponsors/BlueWitherer/) to further support my open-source work!**
 
 ### & more!
-- [Check out ArcticWoof's Twitch channel!](https://www.twitch.tv/arcticwooflive/)
+- *[Check out ArcticWoof's Twitch channel!](https://www.twitch.tv/arcticwooflive/)*

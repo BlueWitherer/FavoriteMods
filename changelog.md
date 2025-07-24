@@ -1,4 +1,6 @@
 # v1.0.8
+- Fixed scroll sizing issue in mod list
+- Slightly adjusted positioning of UI in favorites pop-up
 
 # v1.0.7
 - Fixed first-time help text positioning
