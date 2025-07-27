@@ -7,8 +7,6 @@ Add installed Geode mods as your favorites!
 >  
 > [<img alt="Downloads" src="https://img.shields.io/github/downloads/BlueWitherer/FavoriteMods/total?style=for-the-badge&logo=geode&logoColor=ffffff&label=Downloads">](https://www.geode-sdk.org/mods/cheeseworks.favoritemods)
 
-Find your absolute favorite mods even quicker than ever.
-
 > [!TIP]
 > *This mod has settings you can utilize to customize your experience.*
 

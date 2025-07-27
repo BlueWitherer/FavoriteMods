@@ -1,3 +1,6 @@
+# v1.0.9
+- Bumped Geode loader support to `v4.7.0`
+
 # v1.0.8
 - Fixed scroll sizing issue in mod list
 - Slightly adjusted positioning of UI in favorites pop-up
