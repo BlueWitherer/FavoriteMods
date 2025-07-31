@@ -2,6 +2,8 @@
 
 #include "../FavoritesPopup.hpp"
 
+#include <fmt/core.h>
+
 #include <Geode/ui/GeodeUI.hpp>
 
 #include <Geode/utils/ColorProvider.hpp>
@@ -14,13 +16,15 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
-    m_favorite = m_thisMod->getSavedValue<bool>(m_mod->getID(), false);
+    auto modId = m_mod->getID();
+
+    m_favorite = m_thisMod->getSavedValue<bool>(modId);
 
     if (CCNode::init()) {
         // node background theme color
         ccColor4B bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
 
-        setID(m_mod->getID());
+        setID(modId);
         setAnchorPoint({ 0, 1 });
         setContentSize(size);
 
@@ -61,6 +65,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         auto viewBtnSprite = ButtonSprite::create(
             "View",
             "bigFont.fnt",
+            // @geode-ignore(unknown-resource)
             m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
             0.75f
         );
@@ -149,6 +154,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
             // sprite for description button
             auto descBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+                // @geode-ignore(unknown-resource)
                 "geode.loader/message.png",
                 0.875f,
                 m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
@@ -166,6 +172,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
             btnMenu->addChild(descBtn);
 
+            // @geode-ignore(unknown-resource)
             auto issueBtnSprite = CCSprite::createWithSpriteFrameName("geode.loader/info-warning.png");
             issueBtnSprite->setScale(0.5f);
 
@@ -180,7 +187,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         };
 
         // ID label
-        auto idLabel = CCLabelBMFont::create(m_mod->getID().c_str(), "bigFont.fnt");
+        auto idLabel = CCLabelBMFont::create(modId.c_str(), "bigFont.fnt");
         idLabel->setID("mod-id");
         idLabel->setPosition({ 37.5f + idLabelOffset, 15.f });
         idLabel->setScale(0.25f);
@@ -211,11 +218,11 @@ void ModItem::onViewMod(CCObject*) {
 };
 
 void ModItem::onModDesc(CCObject*) {
-    FLAlertLayer::create(
+    if (auto alert = FLAlertLayer::create(
         m_mod->getName().c_str(),
-        m_mod->getDescription().value_or("<cr>No description available.</c>").c_str(),
+        m_mod->getDescription().value_or("<cr>No description available.</c>"),
         "OK"
-    )->show();
+    )) alert->show();
 };
 
 void ModItem::onModIssues(CCObject*) {
@@ -237,6 +244,8 @@ void ModItem::onFavorite(CCObject*) {
 };
 
 void ModItem::updateFavoriteIcon() {
+    auto modId = m_mod->getID();
+
     if (m_favButton) { // Make sure the favorite button has already been created
         auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
         auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
@@ -245,16 +254,16 @@ void ModItem::updateFavoriteIcon() {
         newSprite->setScale(m_heartIcons ? 0.625f : 0.875f);
 
         m_favButton->setNormalImage(newSprite);
-        log::info("Updated state for {} to {}", m_mod->getID(), m_favorite ? "favorite" : "non-favorite");
+        log::info("Updated state for {} to {}", modId, m_favorite ? "favorite" : "non-favorite");
     } else {
-        log::error("Favorite button not found for {}", m_mod->getID());
+        log::error("Favorite button not found for {}", modId);
     };
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {
     // check if mod loaded before
     if (m_thisMod->getSavedValue<bool>("already-loaded", false)
-        || !m_thisMod->getSavedValue<bool>(m_thisMod->getID(), false)
+        || m_thisMod->getSavedValue<bool>(m_thisMod->getID())
         || !m_thisMod->getSettingValue<bool>("minimal")) {
         return nullptr;
     } else if (m_mod->getID().compare(m_thisMod->getID()) == 0) { // create the help text if loaded for the first time

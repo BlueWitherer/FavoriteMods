@@ -1,5 +1,8 @@
 # v1.0.9
 - Bumped Geode loader support to `v4.7.0`
+- Save data will no longer be created for mods that were never favorited
+- Updated mod metadata
+- Other tweaks
 
 # v1.0.8
 - Fixed scroll sizing issue in mod list

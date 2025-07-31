@@ -21,14 +21,9 @@ class $nodeModify(MyModsLayer, ModsLayer) {
     };
 
     void modify() {
-        log::info("Hooked ModsLayer...");
-
-        // geode mod loader
-        auto loader = Loader::get();
-
-        // get the geode mod
-        if (auto geodeMod = loader->getLoadedMod("geode.loader")) {
-            log::debug("Geode mod found: {}", geodeMod->getName());
+        // get geode's mod
+        if (auto geodeMod = Loader::get()->getLoadedMod("geode.loader")) {
+            log::debug("Geode found!");
             m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
             log::debug("Geode theme enabled: {}", m_fields->m_isGeodeTheme);
         } else {
@@ -83,8 +78,8 @@ class $nodeModify(MyModsLayer, ModsLayer) {
 
         // create and show the favorites pop-up
         if (auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons)) {
-            popup->show();
             log::info("Favorites popup created successfully");
+            popup->show();
         } else {
             Notification::create("An error occurred, please re-open this page and try again", NotificationIcon::Error, 1.25f)->show();
             log::error("Failed to create favorites popup!");

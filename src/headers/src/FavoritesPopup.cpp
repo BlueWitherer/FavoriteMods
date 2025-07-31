@@ -27,9 +27,11 @@ bool FavoritesPopup::init(float width, float height, bool geodeTheme, bool heart
 
     p_itemsPerPage = as<int>(m_thisMod->getSettingValue<int64_t>("pages-count"));
 
+    // @geode-ignore(unknown-resource)
     if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
         setCloseButtonSpr(
             CircleButtonSprite::createWithSpriteFrameName(
+                // @geode-ignore(unknown-resource)
                 "geode.loader/close.png",
                 0.875f,
                 m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
@@ -219,6 +221,7 @@ bool FavoritesPopup::setup() {
     if (m_thisMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+            // @geode-ignore(unknown-resource)
             "geode.loader/settings.png",
             1.f,
             m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
@@ -243,6 +246,7 @@ bool FavoritesPopup::setup() {
     auto clearAllBtnSprite = ButtonSprite::create(
         "Clear",
         "bigFont.fnt",
+        // @geode-ignore(unknown-resource)
         m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
         0.875f
     );
@@ -262,6 +266,7 @@ bool FavoritesPopup::setup() {
 
     // favorites stats button sprite
     auto statsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+        // @geode-ignore(unknown-resource)
         "geode.loader/changelog.png",
         0.875f,
         m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
@@ -358,13 +363,15 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     std::vector<Mod*> filteredMods;
 
     for (Mod* mod : allMods) {
+        auto modId = mod->getID();
+
         // if the player only wants to show enabled mods
         bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
-        m_searchText.empty() ? list = mod->getID() != std::string("geode.loader") : list; // if search text is empty, don't show geode loader mod
+        m_searchText.empty() ? list = modId != std::string("geode.loader") : list; // if search text is empty, don't show geode loader mod
 
         if (list) {
             auto empty = std::string::npos; // dry code xd
-            bool isFavorited = m_thisMod->getSavedValue<bool>(mod->getID(), false);
+            bool isFavorited = m_thisMod->getSavedValue<bool>(modId);
 
             // evil bool >:3
             bool matchesSearch = m_searchText.empty() // show all mods if search text is empty
@@ -381,14 +388,14 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
                 if (matchesSearch) filteredMods.push_back(mod);
             };
         } else { // if geode or disabled skip it
-            log::warn("Skipping listing mod {}", mod->getID());
+            log::warn("Skipping listing mod {}", modId);
         };
     };
 
     // Sort if favorited or otherwise in alphabetical order
     std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
-        auto aFav = m_thisMod->getSavedValue<bool>(a->getID(), false); // Check if mod A is favorited
-        auto bFav = m_thisMod->getSavedValue<bool>(b->getID(), false); // Check if mod B is favorited
+        auto aFav = m_thisMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
+        auto bFav = m_thisMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
@@ -523,11 +530,11 @@ void FavoritesPopup::onInfoButton(CCObject*) {
         ) : ""
     );
 
-    FLAlertLayer::create(
+    if (auto alert = FLAlertLayer::create(
         "Help",
         body.c_str(),
         "OK"
-    )->show();
+    )) alert->show();
 };
 
 void FavoritesPopup::onPromptClearAll(CCObject*) {
@@ -551,7 +558,9 @@ void FavoritesPopup::onGetStats(CCObject*) {
     for (Mod* mod : loader->getAllMods()) { // gotta count 'em all!
         total++;
 
-        if (m_thisMod->getSavedValue<bool>(mod->getID())) favorite++;
+        auto modId = mod->getID();
+
+        if (m_thisMod->getSavedValue<bool>(modId)) favorite++;
         if (mod->isEnabled()) enabled++;
     };
 
@@ -561,11 +570,11 @@ void FavoritesPopup::onGetStats(CCObject*) {
 
     auto body = fmt::format("{}\n\n{}\n{}", faveCount, enableCount, totalCount);
 
-    FLAlertLayer::create(
+    if (auto alert = FLAlertLayer::create(
         "Statistics",
         body.c_str(),
         "OK"
-    )->show();
+    )) alert->show();
 };
 
 void FavoritesPopup::onClearAll() {
@@ -575,7 +584,7 @@ void FavoritesPopup::onClearAll() {
     // Turn off favorite from every mod
     for (Mod* mod : allMods) {
         auto modId = mod->getID(); // get the mod id
-        if (m_thisMod->getSavedValue<bool>(modId, false)) m_thisMod->setSavedValue(modId, false); // prevent creating more saves
+        if (m_thisMod->hasSavedValue(modId)) m_thisMod->setSavedValue(modId, false); // prevent creating more saves
     };
 
     refreshModList(true);
