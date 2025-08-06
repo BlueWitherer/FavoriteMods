@@ -94,102 +94,109 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
     };
 
     void modify() {
-        // check for the mod url button
-        if (auto modPageBtn = getChildByIDRecursive("mod-online-page-button")) {
-            log::debug("Mod page button found");
+        if (getThisMod->getSettingValue<bool>("geode-popup")) {
+            log::info("Creating favorite button on Geode mod popup");
 
-            // get the url from the user object
-            if (auto url = static_cast<CCString*>(modPageBtn->getUserObject("url"))) {
-                log::debug("URL string object found in mod page button");
+            // check for the mod url button
+            if (auto modPageBtn = getChildByIDRecursive("mod-online-page-button")) {
+                log::debug("Mod page button found");
 
-                std::string urlStr(url->getCString());
-                std::string urlGeode("https://geode-sdk.org/mods/");
+                // get the url from the user object
+                if (auto url = static_cast<CCString*>(modPageBtn->getUserObject("url"))) {
+                    log::debug("URL string object found in mod page button");
 
-                if (urlStr.find(urlGeode) == 0) {
-                    log::debug("URL found, creating favorites UI");
+                    std::string urlStr(url->getCString());
+                    std::string urlGeode("https://geode-sdk.org/mods/");
 
-                    // extract mod id from url
-                    auto thisModID = urlStr.erase(0, urlGeode.length());
+                    if (urlStr.find(urlGeode) == 0) {
+                        log::debug("URL found, creating favorites UI");
 
-                    auto favMenuLayout = RowLayout::create()
-                        ->setAxisAlignment(AxisAlignment::Start)
-                        ->setAutoScale(false)
-                        ->setAutoGrowAxis(0.f)
-                        ->setGap(2.5f);
+                        // extract mod id from url
+                        auto thisModID = urlStr.erase(0, urlGeode.length());
 
-                    auto favMenu = CCMenu::create();
-                    favMenu->setID("favorites-menu"_spr);
-                    favMenu->setPosition({ 0, -0.75f });
-                    favMenu->ignoreAnchorPointForPosition(false);
-                    favMenu->setAnchorPoint({ 0, 1 });
+                        auto favMenuLayout = RowLayout::create()
+                            ->setAxisAlignment(AxisAlignment::Start)
+                            ->setAutoScale(false)
+                            ->setAutoGrowAxis(0.f)
+                            ->setGap(2.5f);
 
-                    favMenu->setLayout(favMenuLayout);
+                        auto favMenu = CCMenu::create();
+                        favMenu->setID("favorites-menu"_spr);
+                        favMenu->setPosition({ 0, -0.75f });
+                        favMenu->ignoreAnchorPointForPosition(false);
+                        favMenu->setAnchorPoint({ 0, 1 });
 
-                    if (auto mod = getGeodeLoader->getInstalledMod(thisModID)) {
-                        m_fields->m_modID = mod->getID();
+                        favMenu->setLayout(favMenuLayout);
 
-                        auto isFavorite = getThisMod->getSavedValue<bool>(m_fields->m_modID);
-                        log::debug("Creating favorites menu for mod {}, {} favorites", m_fields->m_modID, isFavorite ? "already in" : "not added to");
+                        if (auto mod = getGeodeLoader->getInstalledMod(thisModID)) {
+                            m_fields->m_modID = mod->getID();
 
-                        auto heartIcons = getThisMod->getSettingValue<bool>("hearts");
+                            auto isFavorite = getThisMod->getSavedValue<bool>(m_fields->m_modID);
+                            log::debug("Creating favorites menu for mod {}, {} favorites", m_fields->m_modID, isFavorite ? "already in" : "not added to");
 
-                        auto off = heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
-                        auto on = heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+                            auto heartIcons = getThisMod->getSettingValue<bool>("hearts");
 
-                        auto favButtonOnSpr = CCSprite::createWithSpriteFrameName(on);
-                        favButtonOnSpr->setScale(heartIcons ? 0.375f : 0.5f);
+                            auto off = heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+                            auto on = heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
 
-                        auto favButtonOffSpr = CCSprite::createWithSpriteFrameName(off);
-                        favButtonOffSpr->setScale(heartIcons ? 0.375f : 0.5f);
+                            auto favButtonOnSpr = CCSprite::createWithSpriteFrameName(on);
+                            favButtonOnSpr->setScale(heartIcons ? 0.375f : 0.5f);
 
-                        // Favorite button here :)
-                        m_fields->m_favButton = CCMenuItemToggler::create(
-                            favButtonOnSpr,
-                            favButtonOffSpr,
-                            this,
-                            menu_selector(FavoritesModPopup::onFavorite)
-                        );
-                        m_fields->m_favButton->setID("favorite"_spr);
+                            auto favButtonOffSpr = CCSprite::createWithSpriteFrameName(off);
+                            favButtonOffSpr->setScale(heartIcons ? 0.375f : 0.5f);
 
-                        m_fields->m_favButton->toggle(!isFavorite); // this for some reason
+                            // Favorite button here :)
+                            m_fields->m_favButton = CCMenuItemToggler::create(
+                                favButtonOnSpr,
+                                favButtonOffSpr,
+                                this,
+                                menu_selector(FavoritesModPopup::onFavorite)
+                            );
+                            m_fields->m_favButton->setID("favorite"_spr);
 
-                        favMenu->addChild(m_fields->m_favButton);
+                            m_fields->m_favButton->toggle(!isFavorite); // this for some reason
 
-                        auto favLabel = CCLabelBMFont::create("Favorite", "bigFont.fnt");
-                        favLabel->setID("favorite-label"_spr);
-                        favLabel->setOpacity(200);
-                        favLabel->setColor({ 200, 200, 200 });
-                        favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
-                        favLabel->setAnchorPoint({ 0, 0.5 });
-                        favLabel->setScale(0.375f);
+                            favMenu->addChild(m_fields->m_favButton);
 
-                        favMenu->addChild(favLabel);
+                            auto favLabel = CCLabelBMFont::create("Favorite", "bigFont.fnt");
+                            favLabel->setID("favorite-label"_spr);
+                            favLabel->setOpacity(200);
+                            favLabel->setColor({ 200, 200, 200 });
+                            favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+                            favLabel->setAnchorPoint({ 0, 0.5 });
+                            favLabel->setScale(0.375f);
+
+                            favMenu->addChild(favLabel);
+                        } else {
+                            log::error("Mod must be installed to be favorited");
+
+                            auto favLabel = CCLabelBMFont::create("Install this mod to add it to your favorites!", "bigFont.fnt");
+                            favLabel->setID("favorite-label"_spr);
+                            favLabel->setOpacity(125);
+                            favLabel->setColor({ 125, 125, 125 });
+                            favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+                            favLabel->setAnchorPoint({ 0, 0.5 });
+                            favLabel->setScale(0.25f);
+
+                            favMenu->addChild(favLabel);
+                        };
+
+                        favMenu->updateLayout(true);
+
+                        // try to get the actual popup layer
+                        FLAlertLayer* popup = reinterpret_cast<FLAlertLayer*>(this);
+                        if (popup->m_mainLayer) popup->m_mainLayer->addChild(favMenu);
                     } else {
-                        log::error("Mod must be installed to be favorited");
-
-                        auto favLabel = CCLabelBMFont::create("Install this mod to add it to your favorites!", "bigFont.fnt");
-                        favLabel->setID("favorite-label"_spr);
-                        favLabel->setOpacity(125);
-                        favLabel->setColor({ 125, 125, 125 });
-                        favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
-                        favLabel->setAnchorPoint({ 0, 0.5 });
-                        favLabel->setScale(0.25f);
-
-                        favMenu->addChild(favLabel);
+                        log::error("Couldn't find Geode mod URL");
                     };
-
-                    favMenu->updateLayout(true);
-
-                    FLAlertLayer* popup = reinterpret_cast<FLAlertLayer*>(this);
-                    if (popup->m_mainLayer) popup->m_mainLayer->addChild(favMenu);
                 } else {
-                    log::error("Couldn't find Geode mod URL");
+                    log::error("Couldn't find Geode mod URL string object");
                 };
             } else {
-                log::error("Couldn't find Geode mod URL string object");
+                log::error("Couldn't find Geode mod URL button");
             };
         } else {
-            log::error("Couldn't find Geode mod URL button");
+            log::warn("Favorite button on Geode mod popup is disabled");
         };
     };
 

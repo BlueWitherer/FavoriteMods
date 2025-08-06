@@ -8,7 +8,7 @@
 	},
 	"id": "cheeseworks.favoritemods",
 	"name": "Favorite Mods",
-	"version": "1.1.0",
+	"version": "1.1.1",
 	"developers": [
 		"Cheeseworks",
 		"ArcticWoof"
@@ -84,6 +84,12 @@
 			"type": "title",
 			"name": "Interface",
 			"description": "Additional UI elements and functions."
+		},
+		"geode-popup": {
+			"type": "bool",
+			"name": "Geode Mod Pop-up",
+			"description": "Create a quickly accessible favorite button on Geode's mod pop-up.",
+			"default": true
 		},
 		"settings-btn": {
 			"type": "bool",
