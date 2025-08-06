@@ -140,14 +140,17 @@ bool FavoritesPopup::setup() {
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
+    auto fOn = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
+    auto fOff = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
+
     // Create icon above favorites only toggle
-    auto starOnIcon = CCSprite::createWithSpriteFrameName(m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png");
+    auto starOnIcon = CCSprite::createWithSpriteFrameName(fOn);
     starOnIcon->setID("favorites-icon");
     starOnIcon->setPosition({ m_favoritesOnlyToggle->getPositionX(), m_favoritesOnlyToggle->getPositionY() + 20.f });
     starOnIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
 
     // Create icon above hide favorites toggle
-    auto starOffIcon = CCSprite::createWithSpriteFrameName(m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png");
+    auto starOffIcon = CCSprite::createWithSpriteFrameName(fOff);
     starOffIcon->setID("non-favorites-icon");
     starOffIcon->setPosition({ m_hideFavoritesToggle->getPositionX(), m_hideFavoritesToggle->getPositionY() + 20.f });
     starOffIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
@@ -364,16 +367,16 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     for (Mod* mod : allMods) {
         auto modID = mod->getID();
+        bool isFavorited = m_thisMod->getSavedValue<bool>(modID);
 
         // if the player only wants to show enabled mods or just everything
         bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
-        m_searchText.empty() ? list = modID != std::string("geode.loader") : list; // if search text is empty, don't show geode loader mod
+        if (m_searchText.empty()) list = isFavorited || (modID != std::string("geode.loader")); // if search text is empty, don't show geode loader mod unless its favorited
 
         if (list) {
             auto empty = std::string::npos; // dry code xd
-            bool isFavorited = m_thisMod->getSavedValue<bool>(modID);
 
-            log::debug("{} {} in favorites", modID, isFavorited ? "is" : "is not");
+            log::debug("{} {} a favorite", modID, isFavorited ? "is" : "is not");
 
             // evil bool >:3
             bool matchesSearch = m_searchText.empty() // show all mods if search text is empty

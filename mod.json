@@ -109,6 +109,11 @@
 			"description": "Clear the search box when filtering the mod list.",
 			"default": false
 		},
+		"accessibility": {
+			"type": "title",
+			"name": "Accessibility",
+			"description": "Features to improve accessibility."
+		},
 		"hearts": {
 			"type": "bool",
 			"name": "Hearts",

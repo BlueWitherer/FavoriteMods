@@ -78,10 +78,10 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         );
         viewBtn->setID("view-button");
 
-        auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+        auto fOn = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
+        auto fOff = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
 
-        auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
+        auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_favorite ? fOn : fOff);
         favBtnSprite->setScale(m_heartIcons ? 0.75f : 1.f);
 
         // Favorite button here :)
@@ -237,6 +237,7 @@ void ModItem::onFavorite(CCObject*) {
 
     // Save the favorite status
     m_thisMod->setSavedValue(m_mod->getID(), m_favorite);
+    log::debug("Setting {} to {}", m_mod->getID(), m_thisMod->getSavedValue<bool>(m_mod->getID(), m_favorite) ? "favorite" : "non-favorite");
 
     // Update the icon
     updateFavoriteIcon();
@@ -249,10 +250,10 @@ void ModItem::updateFavoriteIcon() {
     auto modID = m_mod->getID();
 
     if (m_favButton) { // Make sure the favorite button has already been created
-        auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto off = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+        auto fOn = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto fOff = m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
-        auto newSprite = CCSprite::createWithSpriteFrameName(m_favorite ? on : off);
+        auto newSprite = CCSprite::createWithSpriteFrameName(m_favorite ? fOn : fOff);
         newSprite->setScale(m_heartIcons ? 0.625f : 0.875f);
 
         m_favButton->setNormalImage(newSprite);
