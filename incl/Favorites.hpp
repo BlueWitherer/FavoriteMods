@@ -3,7 +3,7 @@
 using namespace geode::prelude;
 
 namespace favorites {
-    extern Mod* m_thisMod = Mod::get(); // Favorite Mods
+    Mod* m_thisMod = Mod::get(); // Favorite Mods
 
     /**
      * Check to see if a mod is included in the user's favorites
