@@ -205,6 +205,8 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             addChild(helpTxt);
 
             log::debug("Help text added for first time users");
+        } else {
+            btnMenu->updateLayout(true);
         };
 
         return true;

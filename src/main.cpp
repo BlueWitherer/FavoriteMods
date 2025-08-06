@@ -121,8 +121,8 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                             ->setGap(2.5f);
 
                         auto favMenu = CCMenu::create();
-                        favMenu->setID("favorites-menu"_spr);
-                        favMenu->setPosition({ 0, -0.75f });
+                        favMenu->setID("menu"_spr);
+                        favMenu->setPosition({ 0, -1.f });
                         favMenu->ignoreAnchorPointForPosition(false);
                         favMenu->setAnchorPoint({ 0, 1 });
 
@@ -152,16 +152,14 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                                 this,
                                 menu_selector(FavoritesModPopup::onFavorite)
                             );
-                            m_fields->m_favButton->setID("favorite"_spr);
+                            m_fields->m_favButton->setID("favorite");
 
                             m_fields->m_favButton->toggle(!isFavorite); // this for some reason
 
                             favMenu->addChild(m_fields->m_favButton);
 
                             auto favLabel = CCLabelBMFont::create("Favorite", "bigFont.fnt");
-                            favLabel->setID("favorite-label"_spr);
-                            favLabel->setOpacity(200);
-                            favLabel->setColor({ 200, 200, 200 });
+                            favLabel->setID("favorite-label");
                             favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
                             favLabel->setAnchorPoint({ 0, 0.5 });
                             favLabel->setScale(0.375f);
@@ -171,9 +169,9 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                             log::error("Mod must be installed to be favorited");
 
                             auto favLabel = CCLabelBMFont::create("Install this mod to add it to your favorites!", "bigFont.fnt");
-                            favLabel->setID("favorite-label"_spr);
-                            favLabel->setOpacity(125);
-                            favLabel->setColor({ 125, 125, 125 });
+                            favLabel->setID("favorite-label");
+                            favLabel->setOpacity(200);
+                            favLabel->setColor({ 200, 200, 200 });
                             favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
                             favLabel->setAnchorPoint({ 0, 0.5 });
                             favLabel->setScale(0.25f);

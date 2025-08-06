@@ -88,7 +88,7 @@
 		"geode-popup": {
 			"type": "bool",
 			"name": "Geode Mod Pop-up",
-			"description": "Create a quickly accessible favorite button on Geode's mod pop-up.",
+			"description": "Create a quickly accessible favorite button under Geode's mod pop-up for mods you have installed.",
 			"default": true
 		},
 		"settings-btn": {

@@ -1,5 +1,6 @@
 # v1.1.1
 - Added toggle setting `Geode Mod Pop-up`
+- Tweaked favorites UI on Geode mod pop-up
 
 # v1.1.0
 - Added favorite button to Geode mod pop-up for all mods
