@@ -365,13 +365,15 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     for (Mod* mod : allMods) {
         auto modID = mod->getID();
 
-        // if the player only wants to show enabled mods
+        // if the player only wants to show enabled mods or just everything
         bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
         m_searchText.empty() ? list = modID != std::string("geode.loader") : list; // if search text is empty, don't show geode loader mod
 
         if (list) {
             auto empty = std::string::npos; // dry code xd
             bool isFavorited = m_thisMod->getSavedValue<bool>(modID);
+
+            log::debug("{} {} in favorites", modID, isFavorited ? "is" : "is not");
 
             // evil bool >:3
             bool matchesSearch = m_searchText.empty() // show all mods if search text is empty

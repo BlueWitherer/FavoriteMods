@@ -126,7 +126,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                     favMenu->setLayout(favMenuLayout);
 
                     if (auto mod = getGeodeLoader->getInstalledMod(thisModID)) {
-                        m_fields->m_modID = urlStr.erase(0, urlGeode.length());
+                        m_fields->m_modID = mod->getID();
 
                         auto isFavorite = getThisMod->getSavedValue<bool>(m_fields->m_modID);
                         log::debug("Creating favorites menu for mod {}, {} favorites", m_fields->m_modID, isFavorite ? "already in" : "not added to");
