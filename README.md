@@ -22,6 +22,8 @@ A button will appear on the left-hand side of the Geode mods page that creates a
 
 To add a mod to your favorites, simply look for it by scrolling or typing its name, description, or ID in the search box. Then, press the star icon to the right, and it should add it as a favorite mod! You can also press the star again to un-favorite the mod. Favorite mods will always be listed at the top-most part in the first-most page of the list.
 
+You can also quickly add favorites on Geode's mod pop-ups! Just look for the favorite button at the bottom left of the pop-up.
+
 ---
 
 ### Credits
@@ -35,6 +37,8 @@ To add a mod to your favorites, simply look for it by scrolling or typing its na
 ![preview](previews/preview-4.png)
 ![preview](previews/preview-5.png)
 ![preview](previews/preview-6.png)
+![preview](previews/preview-7.png)
+![preview](previews/preview-8.png)
 
 ---
 
