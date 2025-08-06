@@ -1,3 +1,6 @@
+# v1.1.2
+- Removed API
+
 # v1.1.1
 - Added toggle setting `Geode Mod Pop-up`
 - Fixed Geode loader mod not appearing in favorites list if added to favorites

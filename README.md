@@ -49,7 +49,3 @@ You can also quickly add favorites through Geode's mod pop-ups! Just look for th
 ### Issues
 ###### What's wrong?!
 **[⚠️ Report a problem with the mod](../../issues/)**
-
-### Development
-###### Work with the mod directly.
-**[⌨️ Check the API out](./incl/)**
