@@ -16,15 +16,15 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
-    auto modId = m_mod->getID();
+    auto modID = m_mod->getID();
 
-    m_favorite = m_thisMod->getSavedValue<bool>(modId);
+    m_favorite = m_thisMod->getSavedValue<bool>(modID);
 
     if (CCNode::init()) {
         // node background theme color
         ccColor4B bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
 
-        setID(modId);
+        setID(modID);
         setAnchorPoint({ 0, 1 });
         setContentSize(size);
 
@@ -126,7 +126,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         } else {
             auto devs = m_mod->getDevelopers();
             auto devLabelText = devs[0];
-            int andMore = as<int>(devs.size()) - 1;
+            int andMore = static_cast<int>(devs.size()) - 1;
 
             if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
 
@@ -187,7 +187,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         };
 
         // ID label
-        auto idLabel = CCLabelBMFont::create(modId.c_str(), "bigFont.fnt");
+        auto idLabel = CCLabelBMFont::create(modID.c_str(), "bigFont.fnt");
         idLabel->setID("mod-id");
         idLabel->setPosition({ 37.5f + idLabelOffset, 15.f });
         idLabel->setScale(0.25f);
@@ -234,7 +234,7 @@ void ModItem::onFavorite(CCObject*) {
     m_favorite = !m_favorite;
 
     // Save the favorite status
-    m_thisMod->setSavedValue<bool>(m_mod->getID(), m_favorite);
+    m_thisMod->setSavedValue(m_mod->getID(), m_favorite);
 
     // Update the icon
     updateFavoriteIcon();
@@ -244,7 +244,7 @@ void ModItem::onFavorite(CCObject*) {
 };
 
 void ModItem::updateFavoriteIcon() {
-    auto modId = m_mod->getID();
+    auto modID = m_mod->getID();
 
     if (m_favButton) { // Make sure the favorite button has already been created
         auto on = m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
@@ -254,9 +254,9 @@ void ModItem::updateFavoriteIcon() {
         newSprite->setScale(m_heartIcons ? 0.625f : 0.875f);
 
         m_favButton->setNormalImage(newSprite);
-        log::info("Updated state for {} to {}", modId, m_favorite ? "favorite" : "non-favorite");
+        log::info("Updated state for {} to {}", modID, m_favorite ? "favorite" : "non-favorite");
     } else {
-        log::error("Favorite button not found for {}", modId);
+        log::error("Favorite button not found for {}", modID);
     };
 };
 
@@ -286,11 +286,11 @@ CCLabelBMFont* ModItem::firstTimeText() {
 ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme, bool heartIcons) {
     auto ret = new ModItem();
 
-    if (!ret || !ret->init(mod, size, parentPopup, geodeTheme, heartIcons)) {
-        CC_SAFE_DELETE(ret);
-        return nullptr;
+    if (ret && ret->init(mod, size, parentPopup, geodeTheme, heartIcons)) {
+        ret->autorelease();
+        return ret;
     };
 
-    ret->autorelease();
-    return ret;
+    CC_SAFE_DELETE(ret);
+    return nullptr;
 };

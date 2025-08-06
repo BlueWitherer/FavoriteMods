@@ -7,7 +7,7 @@
 using namespace geode::prelude;
 
 namespace favorites {
-    Mod* m_thisMod = getMod();
+    Mod* m_thisMod = Mod::get();
 
     bool isFavorite(std::string modId) {
         return m_thisMod->getSavedValue<bool>(modId);

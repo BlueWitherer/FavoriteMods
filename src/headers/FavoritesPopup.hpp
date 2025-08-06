@@ -2,8 +2,6 @@
 
 #include <Geode/Geode.hpp>
 
-#include <Geode/utils/terminate.hpp>
-
 using namespace geode::prelude;
 
 class FavoritesPopup : public Popup<>, public TextInputDelegate {
@@ -12,7 +10,7 @@ protected:
     bool m_heartIcons = false; // Heart UI mode
     bool m_usePages = false; // Use the list page system
 
-    Mod* m_thisMod = getMod(); // Get this mod
+    Mod* m_thisMod = Mod::get(); // Get this mod
 
     ScrollLayer* m_scrollLayer = nullptr;
 

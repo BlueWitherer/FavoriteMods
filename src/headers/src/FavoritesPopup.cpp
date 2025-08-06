@@ -25,7 +25,7 @@ bool FavoritesPopup::init(float width, float height, bool geodeTheme, bool heart
 
     p_page = 1;
 
-    p_itemsPerPage = as<int>(m_thisMod->getSettingValue<int64_t>("pages-count"));
+    p_itemsPerPage = static_cast<int>(m_thisMod->getSettingValue<int64_t>("pages-count"));
 
     // @geode-ignore(unknown-resource)
     if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
@@ -363,15 +363,15 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     std::vector<Mod*> filteredMods;
 
     for (Mod* mod : allMods) {
-        auto modId = mod->getID();
+        auto modID = mod->getID();
 
         // if the player only wants to show enabled mods
         bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
-        m_searchText.empty() ? list = modId != std::string("geode.loader") : list; // if search text is empty, don't show geode loader mod
+        m_searchText.empty() ? list = modID != std::string("geode.loader") : list; // if search text is empty, don't show geode loader mod
 
         if (list) {
             auto empty = std::string::npos; // dry code xd
-            bool isFavorited = m_thisMod->getSavedValue<bool>(modId);
+            bool isFavorited = m_thisMod->getSavedValue<bool>(modID);
 
             // evil bool >:3
             bool matchesSearch = m_searchText.empty() // show all mods if search text is empty
@@ -388,7 +388,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
                 if (matchesSearch) filteredMods.push_back(mod);
             };
         } else { // if geode or disabled skip it
-            log::warn("Skipping listing mod {}", modId);
+            log::warn("Skipping listing mod {}", modID);
         };
     };
 
@@ -403,8 +403,8 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
               });
 
     if (m_usePages) { // load every set amount of mods in separate pages
-        p_totalItems = as<int>(filteredMods.size());
-        p_totalPages = as<int>(std::ceil(as<float>(p_totalItems) / as<float>(p_itemsPerPage)));
+        p_totalItems = static_cast<int>(filteredMods.size());
+        p_totalPages = static_cast<int>(std::ceil(static_cast<float>(p_totalItems) / static_cast<float>(p_itemsPerPage)));
 
         log::info("Loading page {} of {}", p_page, p_totalPages);
 
@@ -558,9 +558,9 @@ void FavoritesPopup::onGetStats(CCObject*) {
     for (Mod* mod : loader->getAllMods()) { // gotta count 'em all!
         total++;
 
-        auto modId = mod->getID();
+        auto modID = mod->getID();
 
-        if (m_thisMod->getSavedValue<bool>(modId)) favorite++;
+        if (m_thisMod->getSavedValue<bool>(modID)) favorite++;
         if (mod->isEnabled()) enabled++;
     };
 
@@ -583,8 +583,8 @@ void FavoritesPopup::onClearAll() {
 
     // Turn off favorite from every mod
     for (Mod* mod : allMods) {
-        auto modId = mod->getID(); // get the mod id
-        if (m_thisMod->hasSavedValue(modId)) m_thisMod->setSavedValue(modId, false); // prevent creating more saves
+        auto modID = mod->getID(); // get the mod id
+        if (m_thisMod->hasSavedValue(modID)) m_thisMod->setSavedValue(modID, false); // prevent creating more saves
     };
 
     refreshModList(true);

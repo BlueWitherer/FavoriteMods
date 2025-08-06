@@ -2,8 +2,6 @@
 
 #include <Geode/Geode.hpp>
 
-#include <Geode/utils/terminate.hpp>
-
 using namespace geode::prelude;
 
 class FavoritesPopup; // Forward declaration
@@ -16,7 +14,7 @@ protected:
     bool m_heartIcons = false; // Hearts UI mode
 
     Mod* m_mod; // Fetched mod
-    Mod* m_thisMod = getMod(); // Get this mod
+    Mod* m_thisMod = Mod::get(); // Get this mod
 
     CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
 

@@ -1,3 +1,7 @@
+# v1.1.0
+- Added favorite button to Geode mod pop-up for all mods
+- Other tweaks
+
 # v1.0.9
 - Bumped Geode loader support to `v4.7.0`
 - Save data will no longer be created for mods that were never favorited
