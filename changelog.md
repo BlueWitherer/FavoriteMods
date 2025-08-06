@@ -1,6 +1,7 @@
 # v1.1.1
 - Added toggle setting `Geode Mod Pop-up`
 - Fixed Geode loader mod not appearing in favorites list if added to favorites
+- Moved toggle setting *`Hearts`* under *`Accessibility`* category in mod settings
 - Tweaked favorites UI on Geode mod pop-up
 
 # v1.1.0

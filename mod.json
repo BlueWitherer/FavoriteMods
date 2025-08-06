@@ -80,10 +80,21 @@
 				"big-arrow-step": 10
 			}
 		},
+		"accessibility": {
+			"type": "title",
+			"name": "Accessibility",
+			"description": "Features to improve accessibility."
+		},
+		"hearts": {
+			"type": "bool",
+			"name": "Hearts",
+			"description": "Use heart icons! <3",
+			"default": false
+		},
 		"ui": {
 			"type": "title",
 			"name": "Interface",
-			"description": "Additional UI elements and functions."
+			"description": "Appearance and functionality of UI elements."
 		},
 		"geode-popup": {
 			"type": "bool",
@@ -107,17 +118,6 @@
 			"type": "bool",
 			"name": "Clear Search on Refresh",
 			"description": "Clear the search box when filtering the mod list.",
-			"default": false
-		},
-		"accessibility": {
-			"type": "title",
-			"name": "Accessibility",
-			"description": "Features to improve accessibility."
-		},
-		"hearts": {
-			"type": "bool",
-			"name": "Hearts",
-			"description": "Use heart icons! <3",
 			"default": false
 		}
 	},
