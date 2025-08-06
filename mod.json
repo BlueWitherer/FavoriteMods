@@ -88,13 +88,13 @@
 		"hearts": {
 			"type": "bool",
 			"name": "Hearts",
-			"description": "Use heart icons! <3",
+			"description": "Use heart icons! <cr>**<3**</c>",
 			"default": false
 		},
 		"ui": {
 			"type": "title",
 			"name": "Interface",
-			"description": "Appearance and functionality of UI elements."
+			"description": "Appearance and functionality of the interface."
 		},
 		"geode-popup": {
 			"type": "bool",
@@ -108,17 +108,17 @@
 			"description": "Create a quickly accessible mod settings button in the favorites pop-up.",
 			"default": false
 		},
-		"auto-scroll": {
-			"type": "bool",
-			"name": "Automatically Scroll Up",
-			"description": "Snap the scroll area to the top when changing favorites.",
-			"default": true
-		},
 		"refresh-clear-search": {
 			"type": "bool",
 			"name": "Clear Search on Refresh",
-			"description": "Clear the search box when filtering the mod list.",
+			"description": "Clear the search box when changing filters on the mod list.",
 			"default": false
+		},
+		"auto-scroll": {
+			"type": "bool",
+			"name": "Automatically Scroll Up",
+			"description": "Snap the mod list to the top when changing favorites.",
+			"default": true
 		}
 	},
 	"api": {
