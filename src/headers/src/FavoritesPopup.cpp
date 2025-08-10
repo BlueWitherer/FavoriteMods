@@ -17,7 +17,12 @@ std::string toLowercase(std::string s) {
     return str;
 };
 
-bool FavoritesPopup::init(float width, float height, bool geodeTheme, bool heartIcons) {
+bool FavoritesPopup::init(
+    float width,
+    float height,
+    bool geodeTheme,
+    bool heartIcons
+) {
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
@@ -53,8 +58,7 @@ bool FavoritesPopup::setup() {
     auto loader = Loader::get();
 
     // Create main content area
-    auto contentSize = m_mainLayer->getContentSize();
-    auto [widthCS, heightCS] = contentSize;
+    auto [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
 
     // Create scroll size
     auto scrollSize = CCSize{ widthCS - 17.5f, heightCS - 80.f };
@@ -346,7 +350,7 @@ bool FavoritesPopup::setup() {
 
 void FavoritesPopup::loadModList(std::vector<Mod*> allMods) {
     for (Mod* mod : allMods) { // Add all mod items to scrolllayer
-        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 40.f }, this, m_geodeTheme, m_heartIcons));
+        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 37.5f }, this, m_geodeTheme, m_heartIcons));
         log::debug("Processed list item for mod {}", mod->getID());
     };
 };
@@ -603,7 +607,10 @@ void FavoritesPopup::onModFavoriteChanged() {
     refreshModList(false);
 };
 
-FavoritesPopup* FavoritesPopup::create(bool geodeTheme, bool heartIcons) {
+FavoritesPopup* FavoritesPopup::create(
+    bool geodeTheme,
+    bool heartIcons
+) {
     auto ret = new FavoritesPopup();
 
     if (ret && ret->init(400.f, 280.f, geodeTheme, heartIcons)) {

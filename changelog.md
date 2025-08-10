@@ -1,4 +1,7 @@
 # v1.1.2
+- Optimized favorites pop-up & mod list UI
+- Tweaked mod logo loader in mod list
+  - Fixed Geode loader mod logo failing to load
 - Removed API
 
 # v1.1.1

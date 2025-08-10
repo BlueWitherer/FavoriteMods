@@ -40,7 +40,12 @@ protected:
     bool m_hideFavorites = false;
 
     bool setup() override;
-    bool init(float width, float height, bool geodeTheme = false, bool heartIcons = false);
+    bool init(
+        float width,
+        float height,
+        bool geodeTheme = false,
+        bool heartIcons = false
+    );
 
     void textChanged(CCTextInputNode* input) override;
 
@@ -58,8 +63,12 @@ protected:
     void onInfoButton(CCObject*);
     void onGetStats(CCObject*);
     void onModSettings(CCObject*);
+
 public:
-    static FavoritesPopup* create(bool geodeTheme = false, bool heartIcons = false);
+    static FavoritesPopup* create(
+        bool geodeTheme = false,
+        bool heartIcons = false
+    );
 
     void onModFavoriteChanged(); // New method for ModItem to call
 };

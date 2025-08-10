@@ -4,13 +4,21 @@
 
 #include <fmt/core.h>
 
+#include <Geode/Geode.hpp>
+
 #include <Geode/ui/GeodeUI.hpp>
 
 #include <Geode/utils/ColorProvider.hpp>
 
 using namespace geode::prelude;
 
-bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme, bool heartIcons) {
+bool ModItem::init(
+    Mod* mod,
+    CCSize const& size,
+    FavoritesPopup* parentPopup,
+    bool geodeTheme,
+    bool heartIcons
+) {
     m_mod = mod;
     m_parentPopup = parentPopup;
     m_geodeTheme = geodeTheme;
@@ -39,13 +47,16 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         m_backgroundSprite->setColor(to3B(bgColor));
         m_backgroundSprite->setOpacity(bgColor.a);
 
+        // Create main content area
+        auto [widthCS, heightCS] = getScaledContentSize();
+
         addChild(m_backgroundSprite);
 
         // Mod icon sprite
-        auto modIcon = geode::createModLogo(m_mod->getPackagePath());
+        auto modIcon = geode::createModLogo(m_mod);
         modIcon->setID("mod-icon");
         modIcon->setScale(0.5f);
-        modIcon->setPosition({ 20.f, getScaledContentHeight() / 2.f });
+        modIcon->setPosition({ 20.f, heightCS / 2.f });
         modIcon->ignoreAnchorPointForPosition(false);
         modIcon->setAnchorPoint({ 0.5, 0.5 });
 
@@ -54,7 +65,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         // Mod name label
         auto nameLabel = CCLabelBMFont::create(m_mod->getName().c_str(), "bigFont.fnt");
         nameLabel->setID("mod-name");
-        nameLabel->setPosition({ 37.5f, 25.f });
+        nameLabel->setPosition({ 37.5f, (heightCS / 2.f) + 5.f });
         nameLabel->setScale(0.4f);
         nameLabel->setAnchorPoint({ 0, 0.5 });
         nameLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
@@ -92,7 +103,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         );
         m_favButton->setID("favorite");
 
-        // Layout to automatically position buttons on button menu
+        // Layout to automatically position buttons on right-side button menu
         auto btnMenuLayout = RowLayout::create()
             ->setDefaultScaleLimits(0.625f, 0.875f)
             ->setAxisAlignment(AxisAlignment::End)
@@ -107,8 +118,8 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         auto btnMenu = CCMenu::create();
         btnMenu->setID("button-menu");
         btnMenu->setAnchorPoint({ 1, 0.5 });
-        btnMenu->setPosition({ getScaledContentWidth() - 10.f, getScaledContentHeight() / 2.f });
-        btnMenu->setScaledContentSize({ getScaledContentWidth() * 0.375f, getScaledContentHeight() - 10.f });
+        btnMenu->setPosition({ widthCS - 10.f, heightCS / 2.f });
+        btnMenu->setScaledContentSize({ widthCS * 0.375f, heightCS - 10.f });
         btnMenu->setLayout(btnMenuLayout);
 
         // add the previous buttons
@@ -133,7 +144,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             // Developers label
             auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
             devLabel->setID("mod-developers");
-            devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, 25.f });
+            devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, (heightCS / 2.f) + 5.f });
             devLabel->setScale(0.25f);
             devLabel->setAnchorPoint({ 0, 0.5 });
             devLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
@@ -143,7 +154,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
             // Version label
             auto versionLabel = CCLabelBMFont::create(m_mod->getVersion().toVString().c_str(), "goldFont.fnt");
             versionLabel->setID("mod-version");
-            versionLabel->setPosition({ 37.5f, 15.f });
+            versionLabel->setPosition({ 37.5f, (heightCS / 2.f) - 5.f });
             versionLabel->setScale(0.3f);
             versionLabel->setAnchorPoint({ 0, 0.5 });
             versionLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
@@ -189,7 +200,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
         // ID label
         auto idLabel = CCLabelBMFont::create(modID.c_str(), "bigFont.fnt");
         idLabel->setID("mod-id");
-        idLabel->setPosition({ 37.5f + idLabelOffset, 15.f });
+        idLabel->setPosition({ 37.5f + idLabelOffset, (heightCS / 2.f) - 5.f });
         idLabel->setScale(0.25f);
         idLabel->setAnchorPoint({ 0, 0.5 });
         idLabel->setOpacity(125);
@@ -201,7 +212,7 @@ bool ModItem::init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bo
 
         // for first time users of favorites
         if (auto helpTxt = firstTimeText()) {
-            helpTxt->setPosition({ getScaledContentWidth() - (btnMenu->getScaledContentWidth() + 2.5f), getScaledContentHeight() / 2.f });
+            helpTxt->setPosition({ widthCS - (btnMenu->getScaledContentWidth() + 2.5f), heightCS / 2.f });
             addChild(helpTxt);
 
             log::debug("Help text added for first time users");
@@ -286,7 +297,13 @@ CCLabelBMFont* ModItem::firstTimeText() {
     return nullptr;
 };
 
-ModItem* ModItem::create(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme, bool heartIcons) {
+ModItem* ModItem::create(
+    Mod* mod,
+    CCSize const& size,
+    FavoritesPopup* parentPopup,
+    bool geodeTheme,
+    bool heartIcons
+) {
     auto ret = new ModItem();
 
     if (ret && ret->init(mod, size, parentPopup, geodeTheme, heartIcons)) {
