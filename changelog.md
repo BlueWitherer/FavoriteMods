@@ -1,3 +1,5 @@
+# v1.1.3
+
 # v1.1.2
 - Optimized favorites pop-up & mod list UI
 - Tweaked mod logo loader in mod list

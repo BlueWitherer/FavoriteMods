@@ -1,4 +1,4 @@
-#include "./headers/FavoritesPopup.hpp"
+#include "./ui/FavoritesPopup.hpp"
 
 #include <Geode/Geode.hpp>
 

@@ -4,6 +4,7 @@
 
 using namespace geode::prelude;
 
+// Favorites menu
 class FavoritesPopup : public Popup<>, public TextInputDelegate {
 protected:
     bool m_geodeTheme = false; // Make sure visuals go with geode theme

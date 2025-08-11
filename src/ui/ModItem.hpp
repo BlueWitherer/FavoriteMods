@@ -6,6 +6,7 @@ using namespace geode::prelude;
 
 class FavoritesPopup; // Forward declaration
 
+// Mod list item
 class ModItem : public CCNode {
 protected:
     bool m_favorite = false; // If the mod is favorite
@@ -13,7 +14,7 @@ protected:
     bool m_geodeTheme = false; // Make sure visuals go with Geode theme
     bool m_heartIcons = false; // Hearts UI mode
 
-    Mod* m_mod; // Fetched mod
+    Mod* m_mod = nullptr; // Fetched mod
     Mod* m_thisMod = Mod::get(); // Get this mod
 
     CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
