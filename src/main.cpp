@@ -61,7 +61,7 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
                 this,
                 menu_selector(FavoritesModsLayer::onFavoritesBtn)
             );
-            favBtn->setID("favorites"_spr);
+            favBtn->setID("favorites-button"_spr);
 
             actionsMenu->addChild(favBtn);
             actionsMenu->updateLayout(true);
@@ -152,7 +152,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                                 this,
                                 menu_selector(FavoritesModPopup::onFavorite)
                             );
-                            m_fields->m_favButton->setID("favorite");
+                            m_fields->m_favButton->setID("favorite-button");
 
                             m_fields->m_favButton->toggle(!isFavorite); // this for some reason
 

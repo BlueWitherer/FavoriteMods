@@ -15,7 +15,6 @@ protected:
     bool m_heartIcons = false; // Hearts UI mode
 
     Mod* m_mod = nullptr; // Fetched mod
-    Mod* m_thisMod = Mod::get(); // Get this mod
 
     CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
 

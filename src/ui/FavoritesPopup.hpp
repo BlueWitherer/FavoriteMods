@@ -11,8 +11,6 @@ protected:
     bool m_heartIcons = false; // Heart UI mode
     bool m_usePages = false; // Use the list page system
 
-    Mod* m_thisMod = Mod::get(); // Get this mod
-
     ScrollLayer* m_scrollLayer = nullptr;
 
     int p_page = 1;
@@ -22,8 +20,8 @@ protected:
     int p_totalItems = 0;
     int p_totalPages = 0;
 
-    CCMenuItemSpriteExtra* m_pageForwardBtn = nullptr;
-    CCMenuItemSpriteExtra* m_pageBackwardBtn = nullptr;
+    CCMenuItemSpriteExtra* m_pageNextBtn = nullptr;
+    CCMenuItemSpriteExtra* m_pagePreviousBtn = nullptr;
 
     CCLabelBMFont* m_pagesLabel = nullptr;
 
@@ -54,8 +52,8 @@ protected:
     void refreshModList(bool clearSearch = false);
     void onClearAll(); // Clear all favorites
 
-    void onPageForward(CCObject*);
-    void onPageBackward(CCObject*);
+    void onPageNext(CCObject*);
+    void onPagePrevious(CCObject*);
 
     void onClearSearch(CCObject*);
     void onPromptClearAll(CCObject*);

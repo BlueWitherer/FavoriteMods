@@ -12,6 +12,8 @@
 
 using namespace geode::prelude;
 
+static Mod* favoritesMod = Mod::get(); // Get this mod
+
 bool ModItem::init(
     Mod* mod,
     CCSize const& size,
@@ -26,7 +28,7 @@ bool ModItem::init(
 
     auto modID = m_mod->getID();
 
-    m_favorite = m_thisMod->getSavedValue<bool>(modID);
+    m_favorite = favoritesMod->getSavedValue<bool>(modID);
 
     if (CCNode::init()) {
         // node background theme color
@@ -35,6 +37,10 @@ bool ModItem::init(
         setID(modID);
         setAnchorPoint({ 0, 1 });
         setContentSize(size);
+
+        // if tooltips mod is loaded
+        auto useTooltips = Loader::get()->isModLoaded("alphalaneous.tooltips");
+        auto ttId = "alphalaneous.tooltips/tooltip"; // id for all tooltips
 
         // Background for mod item
         m_backgroundSprite = CCScale9Sprite::create("square02b_001.png");
@@ -101,7 +107,9 @@ bool ModItem::init(
             this,
             menu_selector(ModItem::onFavorite)
         );
-        m_favButton->setID("favorite");
+        m_favButton->setID("favorite-button");
+
+        if (useTooltips) m_favButton->setUserObject(ttId, CCString::create("Favorite"));
 
         // Layout to automatically position buttons on right-side button menu
         auto btnMenuLayout = RowLayout::create()
@@ -132,7 +140,7 @@ bool ModItem::init(
         auto idLabelOffset = 0.f;
 
         // Avoid showing more details if minimalist setting is on
-        if (m_thisMod->getSettingValue<bool>("minimal")) {
+        if (favoritesMod->getSettingValue<bool>("minimal")) {
             idLabelOffset = 0.f; // make sure its 0 lul
         } else {
             auto devs = m_mod->getDevelopers();
@@ -181,6 +189,8 @@ bool ModItem::init(
             );
             descBtn->setID("mod-description-button");
 
+            if (useTooltips) descBtn->setUserObject(ttId, CCString::create("View Short Description"));
+
             btnMenu->addChild(descBtn);
 
             // @geode-ignore(unknown-resource)
@@ -193,6 +203,8 @@ bool ModItem::init(
                 menu_selector(ModItem::onModIssues)
             );
             issueBtn->setID("mod-issues-button");
+
+            if (useTooltips) issueBtn->setUserObject(ttId, CCString::create("Report An Issue"));
 
             btnMenu->addChild(issueBtn);
         };
@@ -247,8 +259,8 @@ void ModItem::onFavorite(CCObject*) {
     m_favorite = !m_favorite;
 
     // Save the favorite status
-    m_thisMod->setSavedValue(m_mod->getID(), m_favorite);
-    log::debug("Setting {} to {}", m_mod->getID(), m_thisMod->getSavedValue<bool>(m_mod->getID(), m_favorite) ? "favorite" : "non-favorite");
+    favoritesMod->setSavedValue(m_mod->getID(), m_favorite);
+    log::debug("Setting {} to {}", m_mod->getID(), favoritesMod->getSavedValue<bool>(m_mod->getID(), m_favorite) ? "favorite" : "non-favorite");
 
     // Update the icon
     updateFavoriteIcon();
@@ -276,11 +288,11 @@ void ModItem::updateFavoriteIcon() {
 
 CCLabelBMFont* ModItem::firstTimeText() {
     // check if mod loaded before
-    if (m_thisMod->getSavedValue<bool>("already-loaded", false)
-        || m_thisMod->getSavedValue<bool>(m_thisMod->getID())
-        || !m_thisMod->getSettingValue<bool>("minimal")) {
+    if (favoritesMod->getSavedValue<bool>("already-loaded", false)
+        || favoritesMod->getSavedValue<bool>(favoritesMod->getID())
+        || !favoritesMod->getSettingValue<bool>("minimal")) {
         return nullptr;
-    } else if (m_mod->getID().compare(m_thisMod->getID()) == 0) { // create the help text if loaded for the first time
+    } else if (m_mod->getID().compare(favoritesMod->getID()) == 0) { // create the help text if loaded for the first time
         log::info("Mod loaded for the first time, creating help text...");
 
         // Help text for first-time users

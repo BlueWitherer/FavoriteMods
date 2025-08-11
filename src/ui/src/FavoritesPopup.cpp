@@ -10,6 +10,8 @@
 
 using namespace geode::prelude;
 
+static Mod* favoritesMod = Mod::get(); // Get this mod
+
 std::string toLowercase(std::string s) {
     std::string str = s;
     for (auto& c : str) c = tolower(c);
@@ -26,11 +28,11 @@ bool FavoritesPopup::init(
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
-    m_usePages = m_thisMod->getSettingValue<bool>("pages");
+    m_usePages = favoritesMod->getSettingValue<bool>("pages");
 
     p_page = 1;
 
-    p_itemsPerPage = static_cast<int>(m_thisMod->getSettingValue<int64_t>("pages-count"));
+    p_itemsPerPage = static_cast<int>(favoritesMod->getSettingValue<int64_t>("pages-count"));
 
     // @geode-ignore(unknown-resource)
     if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
@@ -56,6 +58,10 @@ bool FavoritesPopup::setup() {
 
     // geode mod loader
     auto loader = Loader::get();
+
+    // if tooltips mod is loaded
+    auto useTooltips = loader->isModLoaded("alphalaneous.tooltips");
+    auto ttId = "alphalaneous.tooltips/tooltip"; // id for all tooltips
 
     // Create main content area
     auto [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
@@ -98,6 +104,8 @@ bool FavoritesPopup::setup() {
     searchClearBtn->ignoreAnchorPointForPosition(false);
     searchClearBtn->setPosition({ 26.5f, m_searchInput->getPositionY() });
 
+    if (useTooltips) searchClearBtn->setUserObject(ttId, CCString::create("Clear Search Box"));
+
     m_overlayMenu->addChild(searchClearBtn);
 
     // Menu for checkboxes
@@ -121,8 +129,10 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
-    m_favoritesOnlyToggle->setID("show-favorites-only");
+    m_favoritesOnlyToggle->setID("show-favorites-only-toggler");
     m_favoritesOnlyToggle->setPosition({ widthCS - 60.f, heightCS - 50.f });
+
+    if (useTooltips) m_favoritesOnlyToggle->setUserObject(ttId, CCString::create("Show Favorites"));
 
     checkboxMenu->addChild(m_favoritesOnlyToggle);
 
@@ -139,8 +149,10 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
-    m_hideFavoritesToggle->setID("hide-all-favorites");
+    m_hideFavoritesToggle->setID("hide-all-favorites-toggler");
     m_hideFavoritesToggle->setPosition({ widthCS - 25.f, heightCS - 50.f });
+
+    if (useTooltips) m_hideFavoritesToggle->setUserObject(ttId, CCString::create("Hide Favorites"));
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
@@ -162,26 +174,6 @@ bool FavoritesPopup::setup() {
     m_mainLayer->addChild(starOnIcon);
     m_mainLayer->addChild(starOffIcon);
 
-    // Create info button
-    auto infoBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    infoBtnSprite->setScale(0.75f);
-
-    auto infoBtn = CCMenuItemSpriteExtra::create(
-        infoBtnSprite,
-        this,
-        menu_selector(FavoritesPopup::onInfoButton)
-    );
-    infoBtn->setID("info-button");
-    infoBtn->setPosition({ widthCS - 15.f, heightCS - 15.f });
-
-    auto infoMenu = CCMenu::create();
-    infoMenu->setID("info-menu");
-    infoMenu->setPosition(CCPointZero);
-    infoMenu->setTouchPriority(-503);
-
-    infoMenu->addChild(infoBtn);
-    m_mainLayer->addChild(infoMenu);
-
     // Create "No mods found" label (initially hidden)
     m_noModsLabel = CCLabelBMFont::create("No mods found :(", "bigFont.fnt");
     m_noModsLabel->setID("no-mods-label");
@@ -192,7 +184,7 @@ bool FavoritesPopup::setup() {
 
     m_mainLayer->addChild(m_noModsLabel);
 
-    // Background for scroll layer
+    // Previousground for scroll layer
     auto scrollBG = CCScale9Sprite::create("square02b_001.png");
     scrollBG->setContentSize(scrollSize);
     scrollBG->setAnchorPoint({ 0.5, 0.5 });
@@ -225,7 +217,7 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->m_contentLayer->updateLayout(true);
     m_scrollLayer->scrollToTop();
 
-    if (m_thisMod->getSettingValue<bool>("settings-btn")) {
+    if (favoritesMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
             // @geode-ignore(unknown-resource)
@@ -243,6 +235,8 @@ bool FavoritesPopup::setup() {
         );
         modSettingsBtn->setID("mod-settings-button");
         modSettingsBtn->setPosition({ 2.5f, 2.5f });
+
+        if (useTooltips) modSettingsBtn->setUserObject(ttId, CCString::create("Options"));
 
         m_overlayMenu->addChild(modSettingsBtn);
     } else {
@@ -291,47 +285,49 @@ bool FavoritesPopup::setup() {
     statsBtn->setPosition({ widthCS - 1.25f, 1.25f });
     statsBtn->setZOrder(3);
 
+    if (useTooltips) statsBtn->setUserObject(ttId, CCString::create("Statistics"));
+
     m_overlayMenu->addChild(statsBtn);
 
     if (m_usePages) { // if the player has pages enabled
         auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
 
-        auto pageForwardBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
-        pageForwardBtnSprite->setScale(0.875f);
-        pageForwardBtnSprite->setFlipX(true);
+        auto pageNextBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
+        pageNextBtnSprite->setScale(0.875f);
+        pageNextBtnSprite->setFlipX(true);
 
-        // create go forward page button
-        m_pageForwardBtn = CCMenuItemSpriteExtra::create(
-            pageForwardBtnSprite,
+        // create go next page button
+        m_pageNextBtn = CCMenuItemSpriteExtra::create(
+            pageNextBtnSprite,
             this,
-            menu_selector(FavoritesPopup::onPageForward)
+            menu_selector(FavoritesPopup::onPageNext)
         );
-        m_pageForwardBtn->setID("page-forward-button");
-        m_pageForwardBtn->setPosition({ widthCS + 17.5f , m_scrollLayer->getPositionY() });
-        m_pageForwardBtn->setVisible(true);
+        m_pageNextBtn->setID("page-next-button");
+        m_pageNextBtn->setPosition({ widthCS + 17.5f , m_scrollLayer->getPositionY() });
+        m_pageNextBtn->setVisible(true);
 
-        auto pageBackwardBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
-        pageBackwardBtnSprite->setScale(0.875f);
-        pageBackwardBtnSprite->setFlipX(false);
+        auto pagePreviousBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
+        pagePreviousBtnSprite->setScale(0.875f);
+        pagePreviousBtnSprite->setFlipX(false);
 
-        // create go back page button
-        m_pageBackwardBtn = CCMenuItemSpriteExtra::create(
-            pageBackwardBtnSprite,
+        // create go previous page button
+        m_pagePreviousBtn = CCMenuItemSpriteExtra::create(
+            pagePreviousBtnSprite,
             this,
-            menu_selector(FavoritesPopup::onPageBackward)
+            menu_selector(FavoritesPopup::onPagePrevious)
         );
-        m_pageBackwardBtn->setID("page-backward-button");
-        m_pageBackwardBtn->setPosition({ -17.5f , m_scrollLayer->getPositionY() });
-        m_pageBackwardBtn->setVisible(false);
+        m_pagePreviousBtn->setID("page-previous-button");
+        m_pagePreviousBtn->setPosition({ -17.5f , m_scrollLayer->getPositionY() });
+        m_pagePreviousBtn->setVisible(false);
 
-        m_overlayMenu->addChild(m_pageForwardBtn);
-        m_overlayMenu->addChild(m_pageBackwardBtn);
+        m_overlayMenu->addChild(m_pageNextBtn);
+        m_overlayMenu->addChild(m_pagePreviousBtn);
 
         // create pages label
         m_pagesLabel = CCLabelBMFont::create("Loading pages...", "goldFont.fnt");
         m_pagesLabel->setID("pages-label");
         m_pagesLabel->setAnchorPoint({ 0, 1 });
-        m_pagesLabel->setPosition({ m_thisMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f });
+        m_pagesLabel->setPosition({ favoritesMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f });
         m_pagesLabel->setScale(0.375f);
 
         m_mainLayer->addChild(m_pagesLabel);
@@ -341,9 +337,23 @@ bool FavoritesPopup::setup() {
         log::warn("Skipping page buttons");
     };
 
+    // Create info button
+    auto infoBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+    infoBtnSprite->setScale(0.75f);
+
+    auto infoBtn = CCMenuItemSpriteExtra::create(
+        infoBtnSprite,
+        this,
+        menu_selector(FavoritesPopup::onInfoButton)
+    );
+    infoBtn->setID("info-button");
+    infoBtn->setPosition({ widthCS - 15.f, heightCS - 15.f });
+
+    m_overlayMenu->addChild(infoBtn);
+
     refreshModList(true);
 
-    m_thisMod->setSavedValue("already-loaded", true);
+    favoritesMod->setSavedValue("already-loaded", true);
 
     return true;
 };
@@ -359,7 +369,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     // Clear and recreate scroll content
     m_scrollLayer->m_contentLayer->removeAllChildren();
 
-    if (clearSearch && m_thisMod->getSettingValue<bool>("refresh-clear-search")) m_searchText = "";
+    if (clearSearch && favoritesMod->getSettingValue<bool>("refresh-clear-search")) m_searchText = "";
 
     m_searchInput->setString(m_searchText, false);
 
@@ -371,10 +381,10 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     for (Mod* mod : allMods) {
         auto modID = mod->getID();
-        bool isFavorited = m_thisMod->getSavedValue<bool>(modID);
+        bool isFavorited = favoritesMod->getSavedValue<bool>(modID);
 
         // if the player only wants to show enabled mods or just everything
-        bool list = m_thisMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
+        bool list = favoritesMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
         if (m_searchText.empty()) list = isFavorited || (modID != std::string("geode.loader")); // if search text is empty, don't show geode loader mod unless its favorited
 
         if (list) {
@@ -403,8 +413,8 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     // Sort if favorited or otherwise in alphabetical order
     std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
-        auto aFav = m_thisMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
-        auto bFav = m_thisMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
+        auto aFav = favoritesMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
+        auto bFav = favoritesMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
@@ -422,18 +432,18 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
             p_page = p_totalPages;
 
-            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(false);
-            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
+            if (m_pageNextBtn) m_pageNextBtn->setVisible(false);
+            if (m_pagePreviousBtn) m_pagePreviousBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
         } else if (p_page <= 1) { // if at the first page
             log::debug("Reached first page");
 
             p_page = 1;
 
-            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
-            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(false);
+            if (m_pageNextBtn) m_pageNextBtn->setVisible(p_totalPages > 1); // if there's more than 1 page, show this button
+            if (m_pagePreviousBtn) m_pagePreviousBtn->setVisible(false);
         } else { // if somewhere in the middle
-            if (m_pageForwardBtn) m_pageForwardBtn->setVisible(true);
-            if (m_pageBackwardBtn) m_pageBackwardBtn->setVisible(true);
+            if (m_pageNextBtn) m_pageNextBtn->setVisible(true);
+            if (m_pagePreviousBtn) m_pagePreviousBtn->setVisible(true);
         };
 
         int startIndex = (p_page - 1) * p_itemsPerPage; // show this mod first
@@ -457,7 +467,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     };
 
     m_scrollLayer->m_contentLayer->updateLayout(true);
-    if (m_thisMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
+    if (favoritesMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
 
     // Toggle "No mods found" message
     if (filteredMods.empty()) {
@@ -483,7 +493,7 @@ void FavoritesPopup::onClearSearch(CCObject*) {
 
 void FavoritesPopup::onModSettings(CCObject*) {
     log::debug("Opening mod settings popup");
-    openSettingsPopup(m_thisMod);
+    openSettingsPopup(favoritesMod);
 };
 
 void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
@@ -514,15 +524,15 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
     refreshModList(true);
 };
 
-void FavoritesPopup::onPageForward(CCObject*) {
-    if (p_page < p_totalPages) p_page++; // turn the page forward
+void FavoritesPopup::onPageNext(CCObject*) {
+    if (p_page < p_totalPages) p_page++; // turn the page next
     if (p_page >= p_totalPages) p_page = p_totalPages; // if max pages just stay at 1
 
     refreshModList(true);
 };
 
-void FavoritesPopup::onPageBackward(CCObject*) {
-    if (p_page > 1) p_page--; // turn the page backward
+void FavoritesPopup::onPagePrevious(CCObject*) {
+    if (p_page > 1) p_page--; // turn the page previous
     if (p_page <= 1) p_page = 1; // if max pages just stay at 1
 
     refreshModList(true);
@@ -569,7 +579,7 @@ void FavoritesPopup::onGetStats(CCObject*) {
 
         auto modID = mod->getID();
 
-        if (m_thisMod->getSavedValue<bool>(modID)) favorite++;
+        if (favoritesMod->getSavedValue<bool>(modID)) favorite++;
         if (mod->isEnabled()) enabled++;
     };
 
@@ -593,7 +603,7 @@ void FavoritesPopup::onClearAll() {
     // Turn off favorite from every mod
     for (Mod* mod : allMods) {
         auto modID = mod->getID(); // get the mod id
-        if (m_thisMod->hasSavedValue(modID)) m_thisMod->setSavedValue(modID, false); // prevent creating more saves
+        if (favoritesMod->hasSavedValue(modID)) favoritesMod->setSavedValue(modID, false); // prevent creating more saves
     };
 
     refreshModList(true);
