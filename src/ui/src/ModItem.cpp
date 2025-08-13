@@ -139,14 +139,14 @@ bool ModItem::init(
         } else {
             auto devs = m_mod->getDevelopers();
             auto devLabelText = devs[0];
-            int andMore = static_cast<int>(devs.size()) - 1;
+            auto andMore = static_cast<int>(devs.size()) - 1;
 
             if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
 
             // Developers label
             auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
             devLabel->setID("mod-developers");
-            devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, (heightCS / 2.f) + 5.f });
+            devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, nameLabel->getPositionY() });
             devLabel->setScale(0.25f);
             devLabel->setAnchorPoint({ 0, 0.5 });
             devLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
@@ -171,7 +171,7 @@ bool ModItem::init(
                 "geode.loader/message.png",
                 0.875f,
                 m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
-                CircleBaseSize::Medium
+                CircleBaseSize::Small
             );
             descBtnSprite->setScale(0.375f);
 
@@ -181,7 +181,7 @@ bool ModItem::init(
                 this,
                 menu_selector(ModItem::onModDesc)
             );
-            descBtn->setID("mod-description-button");
+            descBtn->setID("short-description-button");
 
             btnMenu->addChild(descBtn);
 
@@ -194,7 +194,7 @@ bool ModItem::init(
                 this,
                 menu_selector(ModItem::onModIssues)
             );
-            issueBtn->setID("mod-issue-reports-button");
+            issueBtn->setID("issue-reports-button");
 
             btnMenu->addChild(issueBtn);
         };
