@@ -12,7 +12,7 @@
 
 using namespace geode::prelude;
 
-static Mod* favoritesMod = Mod::get(); // Get this mod
+static auto favoritesMod = Mod::get(); // Get this mod
 
 bool ModItem::init(
     Mod* mod,
@@ -26,21 +26,17 @@ bool ModItem::init(
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
-    auto modID = m_mod->getID();
+    auto modID = mod->getID();
 
     m_favorite = favoritesMod->getSavedValue<bool>(modID);
 
     if (CCNode::init()) {
         // node background theme color
-        ccColor4B bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
+        auto bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
 
         setID(modID);
         setAnchorPoint({ 0, 1 });
         setContentSize(size);
-
-        // if tooltips mod is loaded
-        auto useTooltips = Loader::get()->isModLoaded("alphalaneous.tooltips");
-        auto ttId = "alphalaneous.tooltips/tooltip"; // id for all tooltips
 
         // Background for mod item
         m_backgroundSprite = CCScale9Sprite::create("square02b_001.png");
@@ -108,8 +104,6 @@ bool ModItem::init(
             menu_selector(ModItem::onFavorite)
         );
         m_favButton->setID("favorite-button");
-
-        if (useTooltips) m_favButton->setUserObject(ttId, CCString::create("Favorite"));
 
         // Layout to automatically position buttons on right-side button menu
         auto btnMenuLayout = RowLayout::create()
@@ -189,8 +183,6 @@ bool ModItem::init(
             );
             descBtn->setID("mod-description-button");
 
-            if (useTooltips) descBtn->setUserObject(ttId, CCString::create("View Short Description"));
-
             btnMenu->addChild(descBtn);
 
             // @geode-ignore(unknown-resource)
@@ -202,9 +194,7 @@ bool ModItem::init(
                 this,
                 menu_selector(ModItem::onModIssues)
             );
-            issueBtn->setID("mod-issues-button");
-
-            if (useTooltips) issueBtn->setUserObject(ttId, CCString::create("Report An Issue"));
+            issueBtn->setID("mod-issue-reports-button");
 
             btnMenu->addChild(issueBtn);
         };

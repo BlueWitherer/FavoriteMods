@@ -9,15 +9,10 @@
 #include <Geode/ui/GeodeUI.hpp>
 
 using namespace geode::prelude;
+using namespace geode::utils;
 
-static Mod* favoritesMod = Mod::get(); // Get this mod
-
-std::string toLowercase(std::string s) {
-    std::string str = s;
-    for (auto& c : str) c = tolower(c);
-
-    return str;
-};
+static auto favoritesMod = Mod::get(); // Get this mod
+static auto loader = Loader::get();
 
 bool FavoritesPopup::init(
     float width,
@@ -55,13 +50,6 @@ bool FavoritesPopup::init(
 bool FavoritesPopup::setup() {
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
-
-    // geode mod loader
-    auto loader = Loader::get();
-
-    // if tooltips mod is loaded
-    auto useTooltips = loader->isModLoaded("alphalaneous.tooltips");
-    auto ttId = "alphalaneous.tooltips/tooltip"; // id for all tooltips
 
     // Create main content area
     auto [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
@@ -104,8 +92,6 @@ bool FavoritesPopup::setup() {
     searchClearBtn->ignoreAnchorPointForPosition(false);
     searchClearBtn->setPosition({ 26.5f, m_searchInput->getPositionY() });
 
-    if (useTooltips) searchClearBtn->setUserObject(ttId, CCString::create("Clear Search Box"));
-
     m_overlayMenu->addChild(searchClearBtn);
 
     // Menu for checkboxes
@@ -129,10 +115,8 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
-    m_favoritesOnlyToggle->setID("show-favorites-only-toggler");
+    m_favoritesOnlyToggle->setID("show-favorites-button");
     m_favoritesOnlyToggle->setPosition({ widthCS - 60.f, heightCS - 50.f });
-
-    if (useTooltips) m_favoritesOnlyToggle->setUserObject(ttId, CCString::create("Show Favorites"));
 
     checkboxMenu->addChild(m_favoritesOnlyToggle);
 
@@ -149,10 +133,8 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
-    m_hideFavoritesToggle->setID("hide-all-favorites-toggler");
+    m_hideFavoritesToggle->setID("hide-favorites-button");
     m_hideFavoritesToggle->setPosition({ widthCS - 25.f, heightCS - 50.f });
-
-    if (useTooltips) m_hideFavoritesToggle->setUserObject(ttId, CCString::create("Hide Favorites"));
 
     checkboxMenu->addChild(m_hideFavoritesToggle);
 
@@ -161,13 +143,13 @@ bool FavoritesPopup::setup() {
 
     // Create icon above favorites only toggle
     auto starOnIcon = CCSprite::createWithSpriteFrameName(fOn);
-    starOnIcon->setID("favorites-icon");
+    starOnIcon->setID("show-favorites-icon");
     starOnIcon->setPosition({ m_favoritesOnlyToggle->getPositionX(), m_favoritesOnlyToggle->getPositionY() + 20.f });
     starOnIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
 
     // Create icon above hide favorites toggle
     auto starOffIcon = CCSprite::createWithSpriteFrameName(fOff);
-    starOffIcon->setID("non-favorites-icon");
+    starOffIcon->setID("hide-favorites-icon");
     starOffIcon->setPosition({ m_hideFavoritesToggle->getPositionX(), m_hideFavoritesToggle->getPositionY() + 20.f });
     starOffIcon->setScale(m_heartIcons ? 0.375f : 0.625f);
 
@@ -175,7 +157,7 @@ bool FavoritesPopup::setup() {
     m_mainLayer->addChild(starOffIcon);
 
     // Create "No mods found" label (initially hidden)
-    m_noModsLabel = CCLabelBMFont::create("No mods found :(", "bigFont.fnt");
+    m_noModsLabel = CCLabelBMFont::create("No mods found! :(", "bigFont.fnt");
     m_noModsLabel->setID("no-mods-label");
     m_noModsLabel->setPosition({ widthCS / 2.f, heightCS / 2.f - 30.f });
     m_noModsLabel->setScale(0.5f);
@@ -233,10 +215,8 @@ bool FavoritesPopup::setup() {
             this,
             menu_selector(FavoritesPopup::onModSettings)
         );
-        modSettingsBtn->setID("mod-settings-button");
+        modSettingsBtn->setID("options-button");
         modSettingsBtn->setPosition({ 2.5f, 2.5f });
-
-        if (useTooltips) modSettingsBtn->setUserObject(ttId, CCString::create("Options"));
 
         m_overlayMenu->addChild(modSettingsBtn);
     } else {
@@ -269,9 +249,9 @@ bool FavoritesPopup::setup() {
     auto statsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
         // @geode-ignore(unknown-resource)
         "geode.loader/changelog.png",
-        0.875f,
+        0.75f,
         m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
-        CircleBaseSize::Medium
+        CircleBaseSize::Small
     );
     statsBtnSprite->setScale(0.5f);
 
@@ -281,11 +261,9 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onGetStats)
     );
-    statsBtn->setID("favorites-stats-button");
+    statsBtn->setID("statistics-button");
     statsBtn->setPosition({ widthCS - 1.25f, 1.25f });
     statsBtn->setZOrder(3);
-
-    if (useTooltips) statsBtn->setUserObject(ttId, CCString::create("Statistics"));
 
     m_overlayMenu->addChild(statsBtn);
 
@@ -373,7 +351,6 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     m_searchInput->setString(m_searchText, false);
 
-    auto loader = Loader::get();
     auto allMods = loader->getAllMods();
 
     // Filtered mods based on search text and toggle settings
@@ -394,9 +371,9 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
             // evil bool >:3
             bool matchesSearch = m_searchText.empty() // show all mods if search text is empty
-                || toLowercase(mod->getName()).find(toLowercase(m_searchText)) != empty // search via name
-                || toLowercase(mod->getDescription().value_or(mod->getName())).find(toLowercase(m_searchText)) != empty // search via description
-                || toLowercase(mod->getID()).find(toLowercase(m_searchText)) != empty; // search via id
+                || string::toLower(mod->getName()).find(string::toLower(m_searchText)) != empty // search via name
+                || string::toLower(mod->getDescription().value_or(mod->getName())).find(string::toLower(m_searchText)) != empty // search via description
+                || string::toLower(mod->getID()).find(string::toLower(m_searchText)) != empty; // search via id
 
             // If favorites-only is enabled, only show favorited mods
             if (m_showFavoritesOnly) {
@@ -418,7 +395,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
-        return toLowercase(a->getName()) < toLowercase(b->getName()); // Alphabetical order
+        return string::toLower(a->getName()) < string::toLower(b->getName()); // Alphabetical order
               });
 
     if (m_usePages) { // load every set amount of mods in separate pages
@@ -572,8 +549,6 @@ void FavoritesPopup::onGetStats(CCObject*) {
     int enabled = 0; // all enabled mods
     int total = 0; // all installed mods
 
-    auto loader = Loader::get();
-
     for (Mod* mod : loader->getAllMods()) { // gotta count 'em all!
         total++;
 
@@ -584,10 +559,10 @@ void FavoritesPopup::onGetStats(CCObject*) {
     };
 
     auto faveCount = fmt::format("<cy>{}</c> Favorites", favorite);
-    auto enableCount = fmt::format("<cg>{}</c> Mods Enabled, <cr>{}</c> Disabled", enabled, total - enabled);
-    auto totalCount = fmt::format("<cj>{}</c> Mods Installed", total);
+    auto enableCount = fmt::format("<cg>{}</c> Enabled, <cr>{}</c> Disabled", enabled, total - enabled);
+    auto totalCount = fmt::format("<cj>{}</c> Installed", total);
 
-    auto body = fmt::format("{}\n\n{}\n{}", faveCount, enableCount, totalCount);
+    auto body = fmt::format("{}\n\nYour Mods\n{}\n{}", faveCount, enableCount, totalCount);
 
     if (auto alert = FLAlertLayer::create(
         "Statistics",
@@ -597,7 +572,6 @@ void FavoritesPopup::onGetStats(CCObject*) {
 };
 
 void FavoritesPopup::onClearAll() {
-    auto loader = Loader::get();
     auto allMods = loader->getAllMods();
 
     // Turn off favorite from every mod

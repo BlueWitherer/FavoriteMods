@@ -1,6 +1,5 @@
 # v1.1.3
-- Added tooltips to buttons using *[Tooltips](mod:alphalaneous.tooltips)* mod
-- Other tweaks
+- Internal tweaks
 
 # v1.1.2
 - Optimized favorites pop-up & mod list UI
