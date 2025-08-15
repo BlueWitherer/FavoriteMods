@@ -12,7 +12,7 @@
 
 using namespace geode::prelude;
 
-static auto favoritesMod = Mod::get(); // Get this mod
+static auto favMod = Mod::get(); // Get this mod
 
 bool ModItem::init(
     Mod* mod,
@@ -28,7 +28,7 @@ bool ModItem::init(
 
     auto modID = mod->getID();
 
-    m_favorite = favoritesMod->getSavedValue<bool>(modID);
+    m_favorite = favMod->getSavedValue<bool>(modID);
 
     if (CCNode::init()) {
         // node background theme color
@@ -134,7 +134,7 @@ bool ModItem::init(
         auto idLabelOffset = 0.f;
 
         // Avoid showing more details if minimalist setting is on
-        if (favoritesMod->getSettingValue<bool>("minimal")) {
+        if (favMod->getSettingValue<bool>("minimal")) {
             idLabelOffset = 0.f; // make sure its 0 lul
         } else {
             auto devs = m_mod->getDevelopers();
@@ -249,8 +249,8 @@ void ModItem::onFavorite(CCObject*) {
     m_favorite = !m_favorite;
 
     // Save the favorite status
-    favoritesMod->setSavedValue(m_mod->getID(), m_favorite);
-    log::debug("Setting {} to {}", m_mod->getID(), favoritesMod->getSavedValue<bool>(m_mod->getID(), m_favorite) ? "favorite" : "non-favorite");
+    favMod->setSavedValue(m_mod->getID(), m_favorite);
+    log::debug("Setting {} to {}", m_mod->getID(), favMod->getSavedValue<bool>(m_mod->getID(), m_favorite) ? "favorite" : "non-favorite");
 
     // Update the icon
     updateFavoriteIcon();
@@ -278,11 +278,11 @@ void ModItem::updateFavoriteIcon() {
 
 CCLabelBMFont* ModItem::firstTimeText() {
     // check if mod loaded before
-    if (favoritesMod->getSavedValue<bool>("already-loaded", false)
-        || favoritesMod->getSavedValue<bool>(favoritesMod->getID())
-        || !favoritesMod->getSettingValue<bool>("minimal")) {
+    if (favMod->getSavedValue<bool>("already-loaded", false)
+        || favMod->getSavedValue<bool>(favMod->getID())
+        || !favMod->getSettingValue<bool>("minimal")) {
         return nullptr;
-    } else if (m_mod->getID().compare(favoritesMod->getID()) == 0) { // create the help text if loaded for the first time
+    } else if (m_mod->getID().compare(favMod->getID()) == 0) { // create the help text if loaded for the first time
         log::info("Mod loaded for the first time, creating help text...");
 
         // Help text for first-time users

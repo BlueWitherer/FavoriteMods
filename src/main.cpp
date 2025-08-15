@@ -2,14 +2,12 @@
 
 #include <Geode/Geode.hpp>
 
-#include <Geode/ui/GeodeUI.hpp>
-
 #include <alphalaneous.alphas_geode_utils/include/NodeModding.h>
 
 using namespace geode::prelude;
 
 // it's modding time :3
-static auto mod = Mod::get();
+static auto favMod = Mod::get();
 static auto loader = Loader::get();
 
 // use alpha's geode utils to modify layer
@@ -30,16 +28,16 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
         };
 
         // check if the player wants hearts instead
-        m_fields->m_isHeartIcons = mod->getSettingValue<bool>("hearts");
+        m_fields->m_isHeartIcons = favMod->getSettingValue<bool>("hearts");
 
         // showcase itself when the player loads for the first time
-        if (mod->hasSavedValue("already-loaded")) {
+        if (favMod->hasSavedValue("already-loaded")) {
             log::debug("User has loaded the mod before");
         } else {
             log::info("User has loaded this mod for the first time!");
 
-            mod->setSavedValue("already-loaded", false);
-            mod->setSavedValue(mod->getID(), true);
+            favMod->setSavedValue("already-loaded", false);
+            favMod->setSavedValue(favMod->getID(), true);
         };
 
         // get the actions menu
@@ -94,7 +92,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
     };
 
     void modify() {
-        if (mod->getSettingValue<bool>("geode-popup")) {
+        if (favMod->getSettingValue<bool>("geode-popup")) {
             log::info("Creating favorite button on Geode mod popup");
 
             // check for the mod url button
@@ -129,12 +127,12 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                         favMenu->setLayout(favMenuLayout);
 
                         if (auto mod = loader->getInstalledMod(thisModID)) {
-                            m_fields->m_modID = mod->getID();
+                            m_fields->m_modID = favMod->getID();
 
-                            auto isFavorite = mod->getSavedValue<bool>(m_fields->m_modID);
+                            auto isFavorite = favMod->getSavedValue<bool>(m_fields->m_modID);
                             log::debug("Creating favorites menu for mod {}, {} favorites", m_fields->m_modID, isFavorite ? "already in" : "not added to");
 
-                            auto heartIcons = mod->getSettingValue<bool>("hearts");
+                            auto heartIcons = favMod->getSettingValue<bool>("hearts");
 
                             auto on = heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
                             auto off = heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
@@ -166,7 +164,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
 
                             favMenu->addChild(favLabel);
                         } else {
-                            log::error("Mod must be installed to be favorited");
+                            log::error("'{}' must be installed to be favorited", thisModID);
 
                             auto favLabel = CCLabelBMFont::create("Install this mod to add it to your favorites!", "bigFont.fnt");
                             favLabel->setID("favorite-label");
@@ -204,8 +202,8 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
             log::debug("({}) {} favorites", m_fields->m_modID, toFavorite ? "Adding to" : "Removing from");
 
             // Save the favorite status
-            mod->setSavedValue(m_fields->m_modID, toFavorite);
-            log::info("{} now {} favorites", m_fields->m_modID, mod->getSavedValue<bool>(m_fields->m_modID) ? "on" : "off");
+            favMod->setSavedValue(m_fields->m_modID, toFavorite);
+            log::info("{} now {} favorites", m_fields->m_modID, favMod->getSavedValue<bool>(m_fields->m_modID) ? "on" : "off");
         } else {
             log::error("Couldn't get favorite button");
         };

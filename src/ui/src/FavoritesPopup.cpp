@@ -11,7 +11,7 @@
 using namespace geode::prelude;
 using namespace geode::utils;
 
-static auto favoritesMod = Mod::get(); // Get this mod
+static auto favMod = Mod::get(); // Get this mod
 static auto loader = Loader::get();
 
 bool FavoritesPopup::init(
@@ -23,11 +23,11 @@ bool FavoritesPopup::init(
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
-    m_usePages = favoritesMod->getSettingValue<bool>("pages");
+    m_usePages = favMod->getSettingValue<bool>("pages");
 
     p_page = 1;
 
-    p_itemsPerPage = static_cast<int>(favoritesMod->getSettingValue<int64_t>("pages-count"));
+    p_itemsPerPage = static_cast<int>(favMod->getSettingValue<int64_t>("pages-count"));
 
     // @geode-ignore(unknown-resource)
     if (Popup<>::initAnchored(width, height, m_geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) {
@@ -199,7 +199,7 @@ bool FavoritesPopup::setup() {
     m_scrollLayer->m_contentLayer->updateLayout(true);
     m_scrollLayer->scrollToTop();
 
-    if (favoritesMod->getSettingValue<bool>("settings-btn")) {
+    if (favMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
             // @geode-ignore(unknown-resource)
@@ -305,7 +305,7 @@ bool FavoritesPopup::setup() {
         m_pagesLabel = CCLabelBMFont::create("Loading pages...", "goldFont.fnt");
         m_pagesLabel->setID("pages-label");
         m_pagesLabel->setAnchorPoint({ 0, 1 });
-        m_pagesLabel->setPosition({ favoritesMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f });
+        m_pagesLabel->setPosition({ favMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f });
         m_pagesLabel->setScale(0.375f);
 
         m_mainLayer->addChild(m_pagesLabel);
@@ -331,7 +331,7 @@ bool FavoritesPopup::setup() {
 
     refreshModList(true);
 
-    favoritesMod->setSavedValue("already-loaded", true);
+    favMod->setSavedValue("already-loaded", true);
 
     return true;
 };
@@ -347,7 +347,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     // Clear and recreate scroll content
     m_scrollLayer->m_contentLayer->removeAllChildren();
 
-    if (clearSearch && favoritesMod->getSettingValue<bool>("refresh-clear-search")) m_searchText = "";
+    if (clearSearch && favMod->getSettingValue<bool>("refresh-clear-search")) m_searchText = "";
 
     m_searchInput->setString(m_searchText, false);
 
@@ -358,10 +358,10 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     for (Mod* mod : allMods) {
         auto modID = mod->getID();
-        bool isFavorited = favoritesMod->getSavedValue<bool>(modID);
+        bool isFavorited = favMod->getSavedValue<bool>(modID);
 
         // if the player only wants to show enabled mods or just everything
-        bool list = favoritesMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
+        bool list = favMod->getSettingValue<bool>("enabled-only") ? mod->isOrWillBeEnabled() : true;
         if (m_searchText.empty()) list = isFavorited || (modID != std::string("geode.loader")); // if search text is empty, don't show geode loader mod unless its favorited
 
         if (list) {
@@ -390,8 +390,8 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
 
     // Sort if favorited or otherwise in alphabetical order
     std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
-        auto aFav = favoritesMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
-        auto bFav = favoritesMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
+        auto aFav = favMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
+        auto bFav = favMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
 
         if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
@@ -444,7 +444,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     };
 
     m_scrollLayer->m_contentLayer->updateLayout(true);
-    if (favoritesMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
+    if (favMod->getSettingValue<bool>("auto-scroll")) m_scrollLayer->scrollToTop();
 
     // Toggle "No mods found" message
     if (filteredMods.empty()) {
@@ -470,7 +470,7 @@ void FavoritesPopup::onClearSearch(CCObject*) {
 
 void FavoritesPopup::onModSettings(CCObject*) {
     log::debug("Opening mod settings popup");
-    openSettingsPopup(favoritesMod);
+    openSettingsPopup(favMod);
 };
 
 void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
@@ -554,7 +554,7 @@ void FavoritesPopup::onGetStats(CCObject*) {
 
         auto modID = mod->getID();
 
-        if (favoritesMod->getSavedValue<bool>(modID)) favorite++;
+        if (favMod->getSavedValue<bool>(modID)) favorite++;
         if (mod->isEnabled()) enabled++;
     };
 
@@ -577,7 +577,7 @@ void FavoritesPopup::onClearAll() {
     // Turn off favorite from every mod
     for (Mod* mod : allMods) {
         auto modID = mod->getID(); // get the mod id
-        if (favoritesMod->hasSavedValue(modID)) favoritesMod->setSavedValue(modID, false); // prevent creating more saves
+        if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false); // prevent creating more saves
     };
 
     refreshModList(true);
