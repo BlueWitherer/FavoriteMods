@@ -1,4 +1,5 @@
 # v1.1.3
+- Bumped Geode loader support to `v4.8.0`
 - Internal tweaks
 
 # v1.1.2
