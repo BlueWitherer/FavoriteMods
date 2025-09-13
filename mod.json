@@ -8,7 +8,7 @@
 	},
 	"id": "cheeseworks.favoritemods",
 	"name": "Favorite Mods",
-	"version": "1.1.3",
+	"version": "1.2.0",
 	"developers": [
 		"Cheeseworks",
 		"ArcticWoof"
@@ -118,6 +118,29 @@
 			"type": "bool",
 			"name": "Automatically Scroll Up",
 			"description": "Snap the mod list to the top when changing favorites.",
+			"default": true
+		},
+		"indicators": {
+			"type": "title",
+			"name": "Indicators",
+			"description": "See the state of a mod directly on the mod list."
+		},
+		"indicate-disabled": {
+			"type": "bool",
+			"name": "Mod Disabled",
+			"description": "Show an indicator if a mod is disabled.",
+			"default": true
+		},
+		"indicate-update": {
+			"type": "bool",
+			"name": "Update Pending",
+			"description": "Show an indicator for a pending update for a mod. <cr>Only works if the mod is enabled.</c>",
+			"default": true
+		},
+		"indicate-outdated": {
+			"type": "bool",
+			"name": "Outdated Game Version",
+			"description": "Show an indicator for a mod that targets a different Geometry Dash version.",
 			"default": true
 		}
 	},

@@ -31,8 +31,10 @@ bool ModItem::init(
     m_favorite = favMod->getSavedValue<bool>(modID);
 
     if (CCNode::init()) {
+        auto colProvider = ColorProvider::get();
+
         // node background theme color
-        auto bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
+        auto bgColor = colProvider->color("geode.loader/mod-developer-item-bg");
 
         setID(modID);
         setAnchorPoint({ 0, 1 });
@@ -55,7 +57,7 @@ bool ModItem::init(
         addChild(m_backgroundSprite);
 
         // Mod icon sprite
-        auto modIcon = geode::createModLogo(m_mod);
+        auto modIcon = createModLogo(m_mod);
         modIcon->setID("mod-icon");
         modIcon->setScale(0.5f);
         modIcon->setPosition({ 20.f, heightCS / 2.f });
@@ -67,10 +69,10 @@ bool ModItem::init(
         // Mod name label
         auto nameLabel = CCLabelBMFont::create(m_mod->getName().c_str(), "bigFont.fnt");
         nameLabel->setID("mod-name");
-        nameLabel->setPosition({ 37.5f, (heightCS / 2.f) + 5.f });
         nameLabel->setScale(0.4f);
-        nameLabel->setAnchorPoint({ 0, 0.5 });
+        nameLabel->setPosition({ 37.5f, (heightCS / 2.f) + 5.f });
         nameLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+        nameLabel->setAnchorPoint({ 0, 0.5 });
 
         addChild(nameLabel);
 
@@ -220,6 +222,48 @@ bool ModItem::init(
             log::debug("Help text added for first time users");
         } else {
             btnMenu->updateLayout(true);
+        };
+
+        if (m_mod->targetsOutdatedVersion()) {
+            if (favMod->getSettingValue<bool>("indicate-outdated")) {
+                auto modOutdated = CCLabelBMFont::create("Disabled", "bigFont.fnt");
+                modOutdated->setID("outdated-indicator");
+                modOutdated->setScale(0.2f);
+                modOutdated->setOpacity(200);
+                modOutdated->setAnchorPoint({ 0, 0.5 });
+                modOutdated->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
+                modOutdated->setColor(colProvider->color3b("geode.loader/mod-list-outdated-label"));
+
+                log::info("Mod {} is outdated", m_mod->getID());
+                addChild(modOutdated);
+            };
+        } else if (m_mod->isEnabled()) {
+            if (favMod->getSettingValue<bool>("indicate-update")) {
+                auto update = m_mod->checkUpdates().getFinishedValue();
+                if (update->unwrapOrDefault().has_value()) {
+                    // @geode-ignore(unknown-resource)
+                    auto pendingUpdate = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
+                    pendingUpdate->setID("pending-update-indicator");
+                    pendingUpdate->setScale(0.375f);
+                    pendingUpdate->setPosition({ btnMenu->getPositionX(), btnMenu->getPositionY() + (btnMenu->getScaledContentHeight() / 2.f) });
+
+                    log::info("Mod {} has new update of version {} available", m_mod->getID(), update->unwrapOrDefault());
+                    addChild(pendingUpdate);
+                } else {
+                    log::debug("Mod {} up-to-date", m_mod->getID());
+                };
+            };
+        } else if (favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
+            auto modDisabled = CCLabelBMFont::create("Disabled", "bigFont.fnt");
+            modDisabled->setID("disabled-indicator");
+            modDisabled->setScale(0.2f);
+            modDisabled->setOpacity(200);
+            modDisabled->setAnchorPoint({ 0, 0.5 });
+            modDisabled->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
+            modDisabled->setColor({ 255, 65, 65 });
+
+            log::info("Mod {} is disabled", m_mod->getID());
+            addChild(modDisabled);
         };
 
         return true;
