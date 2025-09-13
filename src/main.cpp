@@ -1,4 +1,5 @@
 #include "./ui/FavoritesPopup.hpp"
+#include "./events/OnFavoriteEvent.hpp"
 
 #include <Geode/Geode.hpp>
 
@@ -148,7 +149,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                                 favButtonOnSpr,
                                 favButtonOffSpr,
                                 this,
-                                menu_selector(FavoritesModPopup::onFavorite)
+                                menu_selector(FavoritesModPopup::onToggleFavorite)
                             );
                             m_fields->m_favButton->setID("favorite-button");
 
@@ -196,7 +197,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
         };
     };
 
-    void onFavorite(CCObject*) {
+    void onToggleFavorite(CCObject*) {
         if (m_fields->m_favButton) {
             auto toFavorite = m_fields->m_favButton->isToggled();
             log::debug("({}) {} favorites", m_fields->m_modID, toFavorite ? "Adding to" : "Removing from");
@@ -204,6 +205,8 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
             // Save the favorite status
             favMod->setSavedValue(m_fields->m_modID, toFavorite);
             log::info("{} now {} favorites", m_fields->m_modID, favMod->getSavedValue<bool>(m_fields->m_modID) ? "on" : "off");
+
+            OnFavoriteEvent().post();
         } else {
             log::error("Couldn't get favorite button");
         };

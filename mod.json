@@ -128,7 +128,7 @@
 		"indicate-disabled": {
 			"type": "bool",
 			"name": "Mod Disabled",
-			"description": "Show an indicator if a mod is disabled.",
+			"description": "Show an indicator for a mod that is disabled.",
 			"default": true
 		},
 		"indicate-update": {

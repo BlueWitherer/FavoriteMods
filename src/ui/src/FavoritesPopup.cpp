@@ -2,6 +2,8 @@
 
 #include "../ModItem.hpp"
 
+#include "../../events/OnFavoriteEvent.hpp"
+
 #include <fmt/core.h>
 
 #include <Geode/Geode.hpp>
@@ -338,9 +340,14 @@ bool FavoritesPopup::setup() {
 
 void FavoritesPopup::loadModList(std::vector<Mod*> allMods) {
     for (Mod* mod : allMods) { // Add all mod items to scrolllayer
-        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 37.5f }, this, m_geodeTheme, m_heartIcons));
+        m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_scrollLayer->getScaledContentWidth(), 37.5f }, m_geodeTheme, m_heartIcons));
         log::debug("Processed list item for mod {}", mod->getID());
     };
+};
+
+ListenerResult FavoritesPopup::OnFavoritesChanged() {
+    refreshModList(false);
+    return ListenerResult::Propagate;
 };
 
 void FavoritesPopup::refreshModList(bool clearSearch) {

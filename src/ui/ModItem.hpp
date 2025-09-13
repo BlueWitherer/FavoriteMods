@@ -29,13 +29,12 @@ protected:
     CCLabelBMFont* firstTimeText();
     void updateFavoriteIcon();
 
-    bool init(Mod* mod, CCSize const& size, FavoritesPopup* parentPopup, bool geodeTheme = false, bool heartIcons = false);
+    bool init(Mod* mod, CCSize const& size, bool geodeTheme = false, bool heartIcons = false);
 
 public:
     static ModItem* create(
         Mod* mod,
         CCSize const& size,
-        FavoritesPopup* parentPopup,
         bool geodeTheme = false,
         bool heartIcons = false
     );

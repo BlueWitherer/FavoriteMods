@@ -2,6 +2,8 @@
 
 #include "../FavoritesPopup.hpp"
 
+#include "../../events/OnFavoriteEvent.hpp"
+
 #include <fmt/core.h>
 
 #include <Geode/Geode.hpp>
@@ -17,12 +19,10 @@ static auto favMod = Mod::get(); // Get this mod
 bool ModItem::init(
     Mod* mod,
     CCSize const& size,
-    FavoritesPopup* parentPopup,
     bool geodeTheme,
     bool heartIcons
 ) {
     m_mod = mod;
-    m_parentPopup = parentPopup;
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
@@ -224,43 +224,51 @@ bool ModItem::init(
             btnMenu->updateLayout(true);
         };
 
-        if (m_mod->targetsOutdatedVersion()) {
-            if (favMod->getSettingValue<bool>("indicate-outdated")) {
-                auto modOutdated = CCLabelBMFont::create("Disabled", "bigFont.fnt");
+        auto loadProblem = m_mod->targetsOutdatedVersion();
+        if (loadProblem.has_value()) {
+            if (loadProblem->isOutdated() && favMod->getSettingValue<bool>("indicate-outdated")) {
+                auto gdVer = m_mod->getMetadata().getGameVersion();
+                auto reason = fmt::format("Outdated ({})", gdVer.value_or("Any"));
+
+                auto modOutdated = CCLabelBMFont::create(reason.c_str(), "bigFont.fnt");
                 modOutdated->setID("outdated-indicator");
                 modOutdated->setScale(0.2f);
                 modOutdated->setOpacity(200);
                 modOutdated->setAnchorPoint({ 0, 0.5 });
+                modOutdated->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
                 modOutdated->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
                 modOutdated->setColor(colProvider->color3b("geode.loader/mod-list-outdated-label"));
 
-                log::info("Mod {} is outdated", m_mod->getID());
+                nameLabel->setOpacity(200);
+
+                log::info("Mod {} is outdated, uses game version {}", m_mod->getID(), gdVer);
                 addChild(modOutdated);
             };
-        } else if (m_mod->isEnabled()) {
-            if (favMod->getSettingValue<bool>("indicate-update")) {
-                auto update = m_mod->checkUpdates().getFinishedValue();
-                if (update->unwrapOrDefault().has_value()) {
-                    // @geode-ignore(unknown-resource)
-                    auto pendingUpdate = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
-                    pendingUpdate->setID("pending-update-indicator");
-                    pendingUpdate->setScale(0.375f);
-                    pendingUpdate->setPosition({ btnMenu->getPositionX(), btnMenu->getPositionY() + (btnMenu->getScaledContentHeight() / 2.f) });
+        } else if (m_mod->isEnabled() && favMod->getSettingValue<bool>("indicate-update")) {
+            auto update = m_mod->checkUpdates().getFinishedValue();
+            if (update->unwrapOrDefault().has_value()) {
+                // @geode-ignore(unknown-resource)
+                auto pendingUpdate = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
+                pendingUpdate->setID("pending-update-indicator");
+                pendingUpdate->setScale(0.375f);
+                pendingUpdate->setPosition({ btnMenu->getPositionX(), btnMenu->getPositionY() + (btnMenu->getScaledContentHeight() / 2.f) });
 
-                    log::info("Mod {} has new update of version {} available", m_mod->getID(), update->unwrapOrDefault());
-                    addChild(pendingUpdate);
-                } else {
-                    log::debug("Mod {} up-to-date", m_mod->getID());
-                };
+                log::info("Mod {} has new update of version {} available", m_mod->getID(), update->unwrapOrDefault().value().toVString());
+                addChild(pendingUpdate);
+            } else {
+                log::debug("Mod {} up-to-date", m_mod->getID());
             };
-        } else if (favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
+        } else if (!m_mod->isEnabled() && favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
             auto modDisabled = CCLabelBMFont::create("Disabled", "bigFont.fnt");
             modDisabled->setID("disabled-indicator");
             modDisabled->setScale(0.2f);
             modDisabled->setOpacity(200);
             modDisabled->setAnchorPoint({ 0, 0.5 });
+            modDisabled->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
             modDisabled->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
             modDisabled->setColor({ 255, 65, 65 });
+
+            nameLabel->setOpacity(200);
 
             log::info("Mod {} is disabled", m_mod->getID());
             addChild(modDisabled);
@@ -299,8 +307,8 @@ void ModItem::onFavorite(CCObject*) {
     // Update the icon
     updateFavoriteIcon();
 
-    // Notify parent popup to refresh
-    if (m_parentPopup) m_parentPopup->onModFavoriteChanged();
+    // Send event to refresh list
+    OnFavoriteEvent().post();
 };
 
 void ModItem::updateFavoriteIcon() {
@@ -346,13 +354,12 @@ CCLabelBMFont* ModItem::firstTimeText() {
 ModItem* ModItem::create(
     Mod* mod,
     CCSize const& size,
-    FavoritesPopup* parentPopup,
     bool geodeTheme,
     bool heartIcons
 ) {
     auto ret = new ModItem();
 
-    if (ret && ret->init(mod, size, parentPopup, geodeTheme, heartIcons)) {
+    if (ret && ret->init(mod, size, geodeTheme, heartIcons)) {
         ret->autorelease();
         return ret;
     };

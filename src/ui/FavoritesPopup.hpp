@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../events/OnFavoriteEvent.hpp"
+#include "../events/OnFavoriteEventFilter.hpp"
+
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
@@ -12,6 +15,11 @@ protected:
     bool m_usePages = false; // Use the list page system
 
     ScrollLayer* m_scrollLayer = nullptr;
+
+    EventListener<OnFavoriteEventFilter> m_listener = {
+        [this]() { return this->OnFavoritesChanged(); },
+        OnFavoriteEventFilter()
+    };
 
     int p_page = 1;
 
@@ -48,8 +56,10 @@ protected:
 
     void textChanged(CCTextInputNode* input) override;
 
-    void loadModList(std::vector<Mod*> allMods);
+    ListenerResult OnFavoritesChanged();
     void refreshModList(bool clearSearch = false);
+
+    void loadModList(std::vector<Mod*> allMods);
     void onClearAll(); // Clear all favorites
 
     void onPageNext(CCObject*);

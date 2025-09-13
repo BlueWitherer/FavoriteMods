@@ -1,6 +1,10 @@
 # v1.2.0
 - Bumped Geode loader support to `v4.8.0`
 - Mod cells will now show if that mod is disabled, has an update, or targets an outdated Geometry Dash version
+  - Added toggle setting `Mod Disabled`
+  - Added toggle setting `Update Pending`
+  - Added toggle setting `Outdated Game Version`
+- Switched to event-based updates for refreshing mod list when toggling favorites
 - Internal tweaks
 
 # v1.1.2
