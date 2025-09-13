@@ -2,7 +2,7 @@
 
 #include "../ModItem.hpp"
 
-#include "../../events/OnFavoriteEvent.hpp"
+#include "../../Events.hpp"
 
 #include <fmt/core.h>
 

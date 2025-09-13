@@ -4,8 +4,6 @@
 
 using namespace geode::prelude;
 
-class FavoritesPopup; // Forward declaration
-
 // Mod list item
 class ModItem : public CCNode {
 protected:
@@ -18,7 +16,6 @@ protected:
 
     CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
 
-    FavoritesPopup* m_parentPopup = nullptr; // To access parent methods
     CCScale9Sprite* m_backgroundSprite = nullptr; // Background theme
 
     void onViewMod(CCObject*);

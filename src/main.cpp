@@ -1,5 +1,5 @@
 #include "./ui/FavoritesPopup.hpp"
-#include "./events/OnFavoriteEvent.hpp"
+#include "./Events.hpp"
 
 #include <Geode/Geode.hpp>
 

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../events/OnFavoriteEvent.hpp"
-#include "../events/OnFavoriteEventFilter.hpp"
+#include "../Events.hpp"
 
 #include <Geode/Geode.hpp>
 
