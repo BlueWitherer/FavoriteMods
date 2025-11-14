@@ -352,7 +352,7 @@ ListenerResult FavoritesPopup::OnFavoritesChanged() {
 
 void FavoritesPopup::refreshModList(bool clearSearch) {
     // Clear and recreate scroll content
-    m_scrollLayer->m_contentLayer->removeAllChildren();
+    m_scrollLayer->m_contentLayer->removeAllChildrenWithCleanup(true);
 
     if (clearSearch && favMod->getSettingValue<bool>("refresh-clear-search")) m_searchText = "";
 

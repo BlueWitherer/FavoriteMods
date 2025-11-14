@@ -32,7 +32,7 @@ protected:
 
     CCLabelBMFont* m_pagesLabel = nullptr;
 
-    Ref<CCMenu> m_overlayMenu = nullptr;
+    CCMenu* m_overlayMenu = nullptr;
 
     Ref<TextInput> m_searchInput = nullptr;
     CCLabelBMFont* m_noModsLabel = nullptr;
