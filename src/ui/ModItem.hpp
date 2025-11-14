@@ -14,7 +14,7 @@ protected:
 
     Mod* m_mod = nullptr; // Fetched mod
 
-    CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
+    Ref<CCMenuItemSpriteExtra> m_favButton = nullptr; // Favorite button
 
     CCScale9Sprite* m_backgroundSprite = nullptr; // Background theme
 

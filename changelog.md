@@ -1,5 +1,6 @@
 # v1.2.1
 - Bumped Geode loader support to `v4.9.0`
+- Internal fixes
 
 # v1.2.0
 - Bumped Geode loader support to `v4.8.0`

@@ -13,7 +13,7 @@ protected:
     bool m_heartIcons = false; // Heart UI mode
     bool m_usePages = false; // Use the list page system
 
-    ScrollLayer* m_scrollLayer = nullptr;
+    Ref<ScrollLayer> m_scrollLayer = nullptr;
 
     EventListener<OnFavoriteEventFilter> m_listener = {
         [this]() { return this->OnFavoritesChanged(); },
@@ -27,20 +27,20 @@ protected:
     int p_totalItems = 0;
     int p_totalPages = 0;
 
-    CCMenuItemSpriteExtra* m_pageNextBtn = nullptr;
-    CCMenuItemSpriteExtra* m_pagePreviousBtn = nullptr;
+    Ref<CCMenuItemSpriteExtra> m_pageNextBtn = nullptr;
+    Ref<CCMenuItemSpriteExtra> m_pagePreviousBtn = nullptr;
 
     CCLabelBMFont* m_pagesLabel = nullptr;
 
-    CCMenu* m_overlayMenu = nullptr;
+    Ref<CCMenu> m_overlayMenu = nullptr;
 
-    TextInput* m_searchInput = nullptr;
+    Ref<TextInput> m_searchInput = nullptr;
     CCLabelBMFont* m_noModsLabel = nullptr;
 
     std::string m_searchText = "";
 
-    CCMenuItemToggler* m_favoritesOnlyToggle = nullptr;
-    CCMenuItemToggler* m_hideFavoritesToggle = nullptr;
+    Ref<CCMenuItemToggler> m_favoritesOnlyToggle = nullptr;
+    Ref<CCMenuItemToggler> m_hideFavoritesToggle = nullptr;
 
     bool m_showFavoritesOnly = false;
     bool m_hideFavorites = false;
