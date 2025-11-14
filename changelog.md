@@ -1,3 +1,6 @@
+# v1.2.1
+- Bumped Geode loader support to `v4.9.0`
+
 # v1.2.0
 - Bumped Geode loader support to `v4.8.0`
 - Mod cells will now show if that mod is disabled, has an update, or targets an outdated Geometry Dash version
