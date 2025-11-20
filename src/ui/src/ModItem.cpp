@@ -26,6 +26,11 @@ bool ModItem::init(
     m_geodeTheme = geodeTheme;
     m_heartIcons = heartIcons;
 
+    if (!m_mod) {
+        log::error("ModItem init function called with null mod");
+        return false;
+    };
+
     auto modID = mod->getID();
 
     m_favorite = favMod->getSavedValue<bool>(modID);
@@ -281,10 +286,12 @@ bool ModItem::init(
 };
 
 void ModItem::onViewMod(CCObject*) {
-    openInfoPopup(m_mod);
+    if (m_mod) openInfoPopup(m_mod);
 };
 
 void ModItem::onModDesc(CCObject*) {
+    if (!m_mod) return;
+
     if (auto alert = FLAlertLayer::create(
         m_mod->getName().c_str(),
         m_mod->getDescription().value_or("<cr>No description available.</c>"),
@@ -293,10 +300,12 @@ void ModItem::onModDesc(CCObject*) {
 };
 
 void ModItem::onModIssues(CCObject*) {
-    openIssueReportPopup(m_mod);
+    if (m_mod) openIssueReportPopup(m_mod);
 };
 
 void ModItem::onFavorite(CCObject*) {
+    if (!m_mod) return;
+
     // Toggle favorite status
     m_favorite = !m_favorite;
 
@@ -312,6 +321,7 @@ void ModItem::onFavorite(CCObject*) {
 };
 
 void ModItem::updateFavoriteIcon() {
+    if (!m_mod) return;
     auto modID = m_mod->getID();
 
     if (m_favButton) { // Make sure the favorite button has already been created
@@ -329,6 +339,8 @@ void ModItem::updateFavoriteIcon() {
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {
+    if (!m_mod) return;
+
     // check if mod loaded before
     if (favMod->getSavedValue<bool>("already-loaded", false)
         || favMod->getSavedValue<bool>(favMod->getID())
