@@ -16,7 +16,7 @@ protected:
     Ref<ScrollLayer> m_scrollLayer = nullptr;
 
     EventListener<OnFavoriteEventFilter> m_listener = {
-        [this]() { return this->OnFavoritesChanged(); },
+        [this]() { return OnFavoritesChanged(); },
         OnFavoriteEventFilter()
     };
 

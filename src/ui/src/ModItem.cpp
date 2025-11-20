@@ -339,7 +339,7 @@ void ModItem::updateFavoriteIcon() {
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {
-    if (!m_mod) return;
+    if (!m_mod) return nullptr;
 
     // check if mod loaded before
     if (favMod->getSavedValue<bool>("already-loaded", false)
