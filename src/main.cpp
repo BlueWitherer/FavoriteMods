@@ -11,7 +11,6 @@ using namespace geode::prelude;
 static auto favMod = Mod::get();
 static auto loader = Loader::get();
 
-// use alpha's geode utils to modify layer
 class $nodeModify(FavoritesModsLayer, ModsLayer) {
     struct Fields {
         bool m_isGeodeTheme = false; // setting for geode theme
@@ -85,11 +84,11 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
     };
 };
 
-// use alpha's geode utils to modify popup
 class $nodeModify(FavoritesModPopup, ModPopup) {
     struct Fields {
         std::string m_modID;
-        CCMenuItemToggler* m_favButton = nullptr;
+
+        Ref<CCMenuItemToggler> m_favButton = nullptr;
     };
 
     void modify() {
@@ -127,6 +126,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
 
                         favMenu->setLayout(favMenuLayout);
 
+                        // find this mod if it's installed
                         if (auto mod = loader->getInstalledMod(thisModID)) {
                             m_fields->m_modID = mod->getID();
 
