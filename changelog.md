@@ -1,3 +1,6 @@
+# v1.2.3
+- Minor improvements
+
 # v1.2.2
 - Bumped Geode loader support to `v4.10.0`
 - Fixed crash caused by mod update checker

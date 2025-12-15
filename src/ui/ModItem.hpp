@@ -24,10 +24,5 @@ protected:
     bool init(Mod* mod, CCSize const& size, bool geodeTheme = false, bool heartIcons = false);
 
 public:
-    static ModItem* create(
-        Mod* mod,
-        CCSize const& size,
-        bool geodeTheme = false,
-        bool heartIcons = false
-    );
+    static ModItem* create(Mod* mod, CCSize const& size, bool geodeTheme = false, bool heartIcons = false);
 };

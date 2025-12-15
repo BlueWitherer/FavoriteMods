@@ -33,7 +33,7 @@ protected:
     ListenerResult OnFavoritesChanged();
     void refreshModList(bool clearSearch = false);
 
-    void loadModList(std::vector<Mod*> allMods);
+    void loadModList(std::vector<Mod*> const& allMods);
     void onClearAll(); // Clear all favorites
 
     void onPageNext(CCObject*);

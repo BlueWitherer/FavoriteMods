@@ -34,7 +34,7 @@ public:
 
     CCLabelBMFont* m_pagesLabel = nullptr;
 
-    CCMenu* m_overlayMenu = nullptr;
+    Ref<CCMenu> m_overlayMenu = nullptr;
 
     Ref<TextInput> m_searchInput = nullptr;
     CCLabelBMFont* m_noModsLabel = nullptr;
@@ -376,7 +376,7 @@ bool FavoritesPopup::setup() {
     return true;
 };
 
-void FavoritesPopup::loadModList(std::vector<Mod*> allMods) {
+void FavoritesPopup::loadModList(std::vector<Mod*> const& allMods) {
     for (Mod* mod : allMods) { // Add all mod items to scrolllayer
         m_impl->m_scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_impl->m_scrollLayer->getScaledContentWidth(), 37.5f }, m_impl->m_geodeTheme, m_impl->m_heartIcons));
         log::debug("Processed list item for mod {}", mod->getID());
@@ -641,8 +641,7 @@ FavoritesPopup* FavoritesPopup::create(
     bool heartIcons
 ) {
     auto ret = new FavoritesPopup();
-
-    if (ret && ret->init(400.f, 280.f, geodeTheme, heartIcons)) {
+    if (ret->init(400.f, 280.f, geodeTheme, heartIcons)) {
         ret->autorelease();
         return ret;
     };

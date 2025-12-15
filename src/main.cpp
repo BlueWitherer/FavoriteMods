@@ -1,5 +1,5 @@
-#include "./ui/FavoritesPopup.hpp"
-#include "./Events.hpp"
+#include "ui/FavoritesPopup.hpp"
+#include "Events.hpp"
 
 #include <Geode/Geode.hpp>
 
@@ -24,7 +24,7 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
             m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
             log::debug("Geode theme enabled: {}", m_fields->m_isGeodeTheme);
         } else {
-            log::error("Failed to get Geode loader");
+            log::error("Failed to get Geode loader mod");
         };
 
         // check if the player wants hearts instead
@@ -104,9 +104,9 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                     log::debug("URL string object found in mod page button");
 
                     std::string urlStr(url->getCString());
-                    std::string urlGeode("https://geode-sdk.org/mods/");
+                    const std::string urlGeode("https://geode-sdk.org/mods/");
 
-                    if (urlStr.find(urlGeode) == 0) {
+                    if (utils::string::startsWith(urlStr, urlGeode)) {
                         log::debug("URL found, creating favorites UI");
 
                         // extract mod id from url

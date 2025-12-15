@@ -389,8 +389,7 @@ ModItem* ModItem::create(
     bool heartIcons
 ) {
     auto ret = new ModItem();
-
-    if (ret && ret->init(mod, size, geodeTheme, heartIcons)) {
+    if (ret->init(mod, size, geodeTheme, heartIcons)) {
         ret->autorelease();
         return ret;
     };
