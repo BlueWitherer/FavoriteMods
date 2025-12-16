@@ -6,10 +6,11 @@ using namespace geode::prelude;
 
 // Mod list item
 class ModItem : public CCNode {
-protected:
+private:
     class Impl;
     std::unique_ptr<Impl> m_impl;
 
+protected:
     ModItem();
     virtual ~ModItem();
 
@@ -21,7 +22,7 @@ protected:
     CCLabelBMFont* firstTimeText();
     void updateFavoriteIcon();
 
-    bool init(Mod* mod, CCSize const& size, bool geodeTheme = false, bool heartIcons = false);
+    bool init(Mod* mod, CCSize const& size, bool geodeTheme, bool heartIcons);
 
 public:
     static ModItem* create(Mod* mod, CCSize const& size, bool geodeTheme = false, bool heartIcons = false);

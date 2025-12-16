@@ -37,7 +37,7 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
             log::info("User has loaded this mod for the first time!");
 
             favMod->setSavedValue("already-loaded", false);
-            favMod->setSavedValue(favMod->getID(), true);
+            favMod->setSavedValue(GEODE_MOD_ID, true);
         };
 
         // get the actions menu

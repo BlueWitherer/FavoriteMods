@@ -1,7 +1,6 @@
 #include "../ModItem.hpp"
 
 #include "../FavoritesPopup.hpp"
-
 #include "../../Events.hpp"
 
 #include <Geode/Geode.hpp>
@@ -44,12 +43,12 @@ bool ModItem::init(
     m_impl->m_geodeTheme = geodeTheme;
     m_impl->m_heartIcons = heartIcons;
 
-    if (!m_impl->m_mod) {
+    if (!mod) {
         log::error("ModItem init function called with null mod");
         return false;
     };
 
-    auto modID = mod->getID();
+    auto const modID = mod->getID();
 
     m_impl->m_favorite = favMod->getSavedValue<bool>(modID);
 
@@ -58,7 +57,7 @@ bool ModItem::init(
     auto colProvider = ColorProvider::get();
 
     // node background theme color
-    auto bgColor = colProvider->color("geode.loader/mod-developer-item-bg");
+    auto const bgColor = colProvider->color("geode.loader/mod-developer-item-bg");
 
     setID(modID);
     setAnchorPoint({ 0, 1 });
@@ -76,7 +75,7 @@ bool ModItem::init(
     m_impl->m_backgroundSprite->setOpacity(bgColor.a);
 
     // Create main content area
-    auto [widthCS, heightCS] = getScaledContentSize();
+    auto const [widthCS, heightCS] = getScaledContentSize();
 
     addChild(m_impl->m_backgroundSprite);
 
@@ -104,7 +103,6 @@ bool ModItem::init(
     auto viewBtnSprite = ButtonSprite::create(
         "View",
         "bigFont.fnt",
-        // @geode-ignore(unknown-resource)
         m_impl->m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
         0.75f
     );
@@ -117,8 +115,8 @@ bool ModItem::init(
     );
     viewBtn->setID("view-button");
 
-    auto fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
-    auto fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
+    auto const fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
+    auto const fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
 
     auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_impl->m_favorite ? fOn : fOff);
     favBtnSprite->setScale(m_impl->m_heartIcons ? 0.75f : 1.f);
@@ -163,11 +161,12 @@ bool ModItem::init(
     if (favMod->getSettingValue<bool>("minimal")) {
         idLabelOffset = 0.f; // make sure its 0 lul
     } else {
-        auto devs = m_impl->m_mod->getDevelopers();
-        auto devLabelText = devs[0];
-        auto andMore = static_cast<int>(devs.size()) - 1;
+        auto const devs = m_impl->m_mod->getDevelopers();
+        auto const andMore = static_cast<int>(devs.size()) - 1;
 
-        if (andMore > 0) devLabelText += " & " + std::to_string(andMore) + " more";
+        auto devLabelText = devs[0];
+
+        if (andMore > 0) devLabelText = fmt::format("{} & {} more", devLabelText, andMore);
 
         // Developers label
         auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
@@ -193,7 +192,6 @@ bool ModItem::init(
 
         // sprite for description button
         auto descBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
-            // @geode-ignore(unknown-resource)
             "geode.loader/message.png",
             0.875f,
             m_impl->m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
@@ -211,7 +209,6 @@ bool ModItem::init(
 
         btnMenu->addChild(descBtn);
 
-        // @geode-ignore(unknown-resource)
         auto issueBtnSprite = CCSprite::createWithSpriteFrameName("geode.loader/info-warning.png");
         issueBtnSprite->setScale(0.5f);
 
@@ -248,11 +245,11 @@ bool ModItem::init(
         btnMenu->updateLayout(true);
     };
 
-    auto loadProblem = m_impl->m_mod->targetsOutdatedVersion();
+    auto const loadProblem = m_impl->m_mod->targetsOutdatedVersion();
     if (loadProblem.has_value()) {
         if (loadProblem->isOutdated() && favMod->getSettingValue<bool>("indicate-outdated")) {
-            auto gdVer = m_impl->m_mod->getMetadata().getGameVersion();
-            auto reason = fmt::format("Outdated ({})", gdVer.value_or("Any"));
+            auto const gdVer = m_impl->m_mod->getMetadata().getGameVersion();
+            auto const reason = fmt::format("Outdated ({})", gdVer.value_or("Any"));
 
             auto modOutdated = CCLabelBMFont::create(reason.c_str(), "bigFont.fnt");
             modOutdated->setID("outdated-indicator");
@@ -271,7 +268,6 @@ bool ModItem::init(
     } else if (m_impl->m_mod->isEnabled() && favMod->getSettingValue<bool>("indicate-update")) {
         if (auto update = m_impl->m_mod->checkUpdates().getFinishedValue()) {
             if (update->unwrapOrDefault().has_value()) {
-                // @geode-ignore(unknown-resource)
                 auto pendingUpdate = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
                 pendingUpdate->setID("pending-update-indicator");
                 pendingUpdate->setScale(0.375f);
@@ -341,11 +337,12 @@ void ModItem::onFavorite(CCObject*) {
 
 void ModItem::updateFavoriteIcon() {
     if (!m_impl->m_mod) return;
-    auto modID = m_impl->m_mod->getID();
+
+    auto const modID = m_impl->m_mod->getID();
 
     if (m_impl->m_favButton) { // Make sure the favorite button has already been created
-        auto fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+        auto const fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto const fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
         auto newSprite = CCSprite::createWithSpriteFrameName(m_impl->m_favorite ? fOn : fOff);
         newSprite->setScale(m_impl->m_heartIcons ? 0.625f : 0.875f);
@@ -362,11 +359,11 @@ CCLabelBMFont* ModItem::firstTimeText() {
 
     // check if mod loaded before
     if (favMod->getSavedValue<bool>("already-loaded", false)
-        || favMod->getSavedValue<bool>(favMod->getID())
+        || favMod->getSavedValue<bool>(GEODE_MOD_ID)
         || !favMod->getSettingValue<bool>("minimal")) {
         return nullptr;
-    } else if (m_impl->m_mod->getID().compare(favMod->getID()) == 0) { // create the help text if loaded for the first time
-        log::info("Mod loaded for the first time, creating help text...");
+    } else if (m_impl->m_mod->getID() == GEODE_MOD_ID) { // create the help text if loaded for the first time
+        log::info("Mod loaded for the first time!");
 
         // Help text for first-time users
         auto help = CCLabelBMFont::create("Press to Toggle ->", "chatFont.fnt");
