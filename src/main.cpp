@@ -88,7 +88,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
     struct Fields {
         std::string m_modID;
 
-        Ref<CCMenuItemToggler> m_favButton = nullptr;
+        CCMenuItemToggler* m_favButton = nullptr;
     };
 
     void modify() {
@@ -110,7 +110,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                         log::debug("URL found, creating favorites UI");
 
                         // extract mod id from url
-                        auto thisModID = urlStr.erase(0, urlGeode.length());
+                        auto const thisModID = urlStr.erase(0, urlGeode.length());
 
                         auto favMenuLayout = RowLayout::create()
                             ->setAxisAlignment(AxisAlignment::Start)
@@ -121,7 +121,6 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                         auto favMenu = CCMenu::create();
                         favMenu->setID("menu"_spr);
                         favMenu->setPosition({ 0, -1.f });
-                        favMenu->ignoreAnchorPointForPosition(false);
                         favMenu->setAnchorPoint({ 0, 1 });
 
                         favMenu->setLayout(favMenuLayout);
@@ -159,7 +158,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
 
                             auto favLabel = CCLabelBMFont::create("Favorite", "bigFont.fnt");
                             favLabel->setID("favorite-label");
-                            favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+                            favLabel->setAlignment(kCCTextAlignmentLeft);
                             favLabel->setAnchorPoint({ 0, 0.5 });
                             favLabel->setScale(0.375f);
 
@@ -171,7 +170,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                             favLabel->setID("favorite-label");
                             favLabel->setOpacity(200);
                             favLabel->setColor({ 200, 200, 200 });
-                            favLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+                            favLabel->setAlignment(kCCTextAlignmentLeft);
                             favLabel->setAnchorPoint({ 0, 0.5 });
                             favLabel->setScale(0.25f);
 
@@ -181,7 +180,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                         favMenu->updateLayout(true);
 
                         // try to get the actual popup layer
-                        FLAlertLayer* popup = reinterpret_cast<FLAlertLayer*>(this);
+                        auto popup = reinterpret_cast<FLAlertLayer*>(this);
                         if (popup->m_mainLayer) popup->m_mainLayer->addChild(favMenu);
                     } else {
                         log::error("Couldn't find Geode mod URL");

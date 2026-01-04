@@ -1,6 +1,7 @@
 #include "../ModItem.hpp"
 
 #include "../FavoritesPopup.hpp"
+
 #include "../../Events.hpp"
 
 #include <Geode/Geode.hpp>
@@ -22,7 +23,7 @@ public:
     bool m_geodeTheme = false; // Make sure visuals go with Geode theme
     bool m_heartIcons = false; // Hearts UI mode
 
-    Ref<CCMenuItemSpriteExtra> m_favButton = nullptr; // Favorite button
+    CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
 
     CCScale9Sprite* m_backgroundSprite = nullptr; // Background theme
 };
@@ -69,7 +70,6 @@ bool ModItem::init(
     m_impl->m_backgroundSprite->setScale(0.5f);
     m_impl->m_backgroundSprite->setContentSize({ size.width * 2.f, size.height * 2.f });
     m_impl->m_backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
-    m_impl->m_backgroundSprite->ignoreAnchorPointForPosition(false);
     m_impl->m_backgroundSprite->setPosition({ getScaledContentWidth() / 2.f, getScaledContentHeight() / 2.f });
     m_impl->m_backgroundSprite->setColor(to3B(bgColor));
     m_impl->m_backgroundSprite->setOpacity(bgColor.a);
@@ -84,7 +84,6 @@ bool ModItem::init(
     modIcon->setID("mod-icon");
     modIcon->setScale(0.5f);
     modIcon->setPosition({ 20.f, heightCS / 2.f });
-    modIcon->ignoreAnchorPointForPosition(false);
     modIcon->setAnchorPoint({ 0.5, 0.5 });
 
     addChild(modIcon);
@@ -94,7 +93,7 @@ bool ModItem::init(
     nameLabel->setID("mod-name");
     nameLabel->setScale(0.4f);
     nameLabel->setPosition({ 37.5f, (heightCS / 2.f) + 5.f });
-    nameLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+    nameLabel->setAlignment(kCCTextAlignmentLeft);
     nameLabel->setAnchorPoint({ 0, 0.5 });
 
     addChild(nameLabel);
@@ -158,14 +157,11 @@ bool ModItem::init(
     auto idLabelOffset = 0.f;
 
     // Avoid showing more details if minimalist setting is on
-    if (favMod->getSettingValue<bool>("minimal")) {
-        idLabelOffset = 0.f; // make sure its 0 lul
-    } else {
+    if (!favMod->getSettingValue<bool>("minimal")) {
         auto const devs = m_impl->m_mod->getDevelopers();
         auto const andMore = static_cast<int>(devs.size()) - 1;
 
         auto devLabelText = devs[0];
-
         if (andMore > 0) devLabelText = fmt::format("{} & {} more", devLabelText, andMore);
 
         // Developers label
@@ -174,7 +170,7 @@ bool ModItem::init(
         devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, nameLabel->getPositionY() });
         devLabel->setScale(0.25f);
         devLabel->setAnchorPoint({ 0, 0.5 });
-        devLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+        devLabel->setAlignment(kCCTextAlignmentLeft);
 
         addChild(devLabel);
 
@@ -184,7 +180,7 @@ bool ModItem::init(
         versionLabel->setPosition({ 37.5f, (heightCS / 2.f) - 5.f });
         versionLabel->setScale(0.3f);
         versionLabel->setAnchorPoint({ 0, 0.5 });
-        versionLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+        versionLabel->setAlignment(kCCTextAlignmentLeft);
 
         idLabelOffset += 2.5f + versionLabel->getScaledContentWidth();
 
@@ -229,7 +225,7 @@ bool ModItem::init(
     idLabel->setScale(0.25f);
     idLabel->setAnchorPoint({ 0, 0.5 });
     idLabel->setOpacity(125);
-    idLabel->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+    idLabel->setAlignment(kCCTextAlignmentLeft);
 
     addChild(idLabel);
 
@@ -256,7 +252,7 @@ bool ModItem::init(
             modOutdated->setScale(0.2f);
             modOutdated->setOpacity(200);
             modOutdated->setAnchorPoint({ 0, 0.5 });
-            modOutdated->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+            modOutdated->setAlignment(kCCTextAlignmentLeft);
             modOutdated->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
             modOutdated->setColor(colProvider->color3b("geode.loader/mod-list-outdated-label"));
 
@@ -287,7 +283,7 @@ bool ModItem::init(
         modDisabled->setScale(0.2f);
         modDisabled->setOpacity(200);
         modDisabled->setAnchorPoint({ 0, 0.5 });
-        modDisabled->setAlignment(CCTextAlignment::kCCTextAlignmentLeft);
+        modDisabled->setAlignment(kCCTextAlignmentLeft);
         modDisabled->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
         modDisabled->setColor({ 255, 65, 65 });
 

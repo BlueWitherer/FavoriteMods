@@ -30,17 +30,20 @@ protected:
     void refreshModList(bool clearSearch = false);
 
     void loadModList(std::vector<Mod*> const& allMods);
-    void onClearAll(); // Clear all favorites
 
     void onPageNext(CCObject*);
     void onPagePrevious(CCObject*);
 
+    void onClearAll();
     void onClearSearch(CCObject*);
     void onPromptClearAll(CCObject*);
+
     void onFavoritesOnlyToggle(CCObject*);
     void onHideFavoritesToggle(CCObject*);
+
     void onInfoButton(CCObject*);
     void onGetStats(CCObject*);
+
     void onModSettings(CCObject*);
 
 public:
@@ -48,6 +51,4 @@ public:
         bool geodeTheme = false,
         bool heartIcons = false
     );
-
-    void onModFavoriteChanged(); // New method for ModItem to call
 };

@@ -29,20 +29,18 @@ public:
     int p_totalItems = 0;
     int p_totalPages = 0;
 
-    Ref<CCMenuItemSpriteExtra> m_pageNextBtn = nullptr;
-    Ref<CCMenuItemSpriteExtra> m_pagePreviousBtn = nullptr;
+    CCMenuItemSpriteExtra* m_pageNextBtn = nullptr;
+    CCMenuItemSpriteExtra* m_pagePreviousBtn = nullptr;
 
     CCLabelBMFont* m_pagesLabel = nullptr;
 
-    Ref<CCMenu> m_overlayMenu = nullptr;
-
-    Ref<TextInput> m_searchInput = nullptr;
+    TextInput* m_searchInput = nullptr;
     CCLabelBMFont* m_noModsLabel = nullptr;
 
     std::string m_searchText = "";
 
-    Ref<CCMenuItemToggler> m_favoritesOnlyToggle = nullptr;
-    Ref<CCMenuItemToggler> m_hideFavoritesToggle = nullptr;
+    CCMenuItemToggler* m_favoritesOnlyToggle = nullptr;
+    CCMenuItemToggler* m_hideFavoritesToggle = nullptr;
 
     bool m_showFavoritesOnly = false;
     bool m_hideFavorites = false;
@@ -92,17 +90,6 @@ bool FavoritesPopup::setup() {
     // Create scroll size
     auto const scrollSize = CCSize{ widthCS - 17.5f, heightCS - 80.f };
 
-    // for buttons to work
-    m_impl->m_overlayMenu = CCMenu::create();
-    m_impl->m_overlayMenu->setID("overlay-menu");
-    m_impl->m_overlayMenu->ignoreAnchorPointForPosition(false);
-    m_impl->m_overlayMenu->setPosition({ widthCS / 2.f, heightCS / 2.f });
-    m_impl->m_overlayMenu->setScaledContentSize(m_mainLayer->getScaledContentSize());
-    m_impl->m_overlayMenu->setTouchPriority(-505);
-    m_impl->m_overlayMenu->setZOrder(10);
-
-    m_mainLayer->addChild(m_impl->m_overlayMenu);
-
     // Create search input
     m_impl->m_searchInput = TextInput::create(widthCS - 125.f, "Search Mods", "bigFont.fnt");
     m_impl->m_searchInput->setID("search-box");
@@ -124,10 +111,9 @@ bool FavoritesPopup::setup() {
     );
     searchClearBtn->setID("clear-search-button");
     searchClearBtn->setAnchorPoint({ 0.5, 0.5 });
-    searchClearBtn->ignoreAnchorPointForPosition(false);
     searchClearBtn->setPosition({ 26.5f, m_impl->m_searchInput->getPositionY() });
 
-    m_impl->m_overlayMenu->addChild(searchClearBtn);
+    m_buttonMenu->addChild(searchClearBtn);
 
     // Menu for checkboxes
     auto checkboxMenu = CCMenu::create();
@@ -205,7 +191,6 @@ bool FavoritesPopup::setup() {
     auto scrollBG = CCScale9Sprite::create("square02b_001.png");
     scrollBG->setContentSize(scrollSize);
     scrollBG->setAnchorPoint({ 0.5, 0.5 });
-    scrollBG->ignoreAnchorPointForPosition(false);
     scrollBG->setPosition({ widthCS / 2.f, (heightCS / 2.f) - 30.f });
     scrollBG->setColor({ 0, 0, 0 });
     scrollBG->setOpacity(100);
@@ -224,7 +209,6 @@ bool FavoritesPopup::setup() {
     m_impl->m_scrollLayer = ScrollLayer::create({ scrollSize.width - 12.5f, scrollSize.height - 12.5f });
     m_impl->m_scrollLayer->setID("mod-list");
     m_impl->m_scrollLayer->setAnchorPoint({ 0.5, 0.5 });
-    m_impl->m_scrollLayer->ignoreAnchorPointForPosition(false);
     m_impl->m_scrollLayer->setPosition(scrollBG->getPosition());
 
     m_impl->m_scrollLayer->m_contentLayer->setLayout(scrollLayerLayout);
@@ -252,7 +236,7 @@ bool FavoritesPopup::setup() {
         modSettingsBtn->setID("options-button");
         modSettingsBtn->setPosition({ 2.5f, 2.5f });
 
-        m_impl->m_overlayMenu->addChild(modSettingsBtn);
+        m_buttonMenu->addChild(modSettingsBtn);
     } else {
         log::debug("Mod settings button disabled");
     };
@@ -276,7 +260,7 @@ bool FavoritesPopup::setup() {
     clearAllBtn->setPosition({ widthCS / 2.f, 1.25f });
     clearAllBtn->setZOrder(3);
 
-    m_impl->m_overlayMenu->addChild(clearAllBtn);
+    m_buttonMenu->addChild(clearAllBtn);
 
     // favorites stats button sprite
     auto statsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
@@ -297,7 +281,7 @@ bool FavoritesPopup::setup() {
     statsBtn->setPosition({ widthCS - 1.25f, 1.25f });
     statsBtn->setZOrder(3);
 
-    m_impl->m_overlayMenu->addChild(statsBtn);
+    m_buttonMenu->addChild(statsBtn);
 
     if (m_impl->m_usePages) { // if the player has pages enabled
         auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
@@ -330,8 +314,8 @@ bool FavoritesPopup::setup() {
         m_impl->m_pagePreviousBtn->setPosition({ -17.5f , m_impl->m_scrollLayer->getPositionY() });
         m_impl->m_pagePreviousBtn->setVisible(false);
 
-        m_impl->m_overlayMenu->addChild(m_impl->m_pageNextBtn);
-        m_impl->m_overlayMenu->addChild(m_impl->m_pagePreviousBtn);
+        m_buttonMenu->addChild(m_impl->m_pageNextBtn);
+        m_buttonMenu->addChild(m_impl->m_pagePreviousBtn);
 
         // create pages label
         m_impl->m_pagesLabel = CCLabelBMFont::create("Loading pages...", "goldFont.fnt");
@@ -359,7 +343,7 @@ bool FavoritesPopup::setup() {
     infoBtn->setID("info-button");
     infoBtn->setPosition({ widthCS - 15.f, heightCS - 15.f });
 
-    m_impl->m_overlayMenu->addChild(infoBtn);
+    m_buttonMenu->addChild(infoBtn);
 
     refreshModList(true);
 
@@ -616,11 +600,6 @@ void FavoritesPopup::onClearAll() {
 
     Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
     log::info("Cleared all favorite mods");
-};
-
-void FavoritesPopup::onModFavoriteChanged() {
-    // Refresh the mod list to re-sort based on new favorite status
-    refreshModList(false);
 };
 
 FavoritesPopup* FavoritesPopup::create(
