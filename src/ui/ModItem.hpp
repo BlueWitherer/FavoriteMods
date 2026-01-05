@@ -16,7 +16,6 @@ protected:
 
     void onViewMod(CCObject*);
     void onModDesc(CCObject*);
-    void onModIssues(CCObject*);
     void onFavorite(CCObject*);
 
     CCLabelBMFont* firstTimeText();

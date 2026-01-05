@@ -204,18 +204,6 @@ bool ModItem::init(
         descBtn->setID("short-description-button");
 
         btnMenu->addChild(descBtn);
-
-        auto issueBtnSprite = CCSprite::createWithSpriteFrameName("geode.loader/info-warning.png");
-        issueBtnSprite->setScale(0.5f);
-
-        auto issueBtn = CCMenuItemSpriteExtra::create(
-            issueBtnSprite,
-            this,
-            menu_selector(ModItem::onModIssues)
-        );
-        issueBtn->setID("issue-reports-button");
-
-        btnMenu->addChild(issueBtn);
     };
 
     // ID label
@@ -244,8 +232,8 @@ bool ModItem::init(
     auto const loadProblem = m_impl->m_mod->targetsOutdatedVersion();
     if (loadProblem.has_value()) {
         if (loadProblem->isOutdated() && favMod->getSettingValue<bool>("indicate-outdated")) {
-            auto const gdVer = m_impl->m_mod->getMetadata().getGameVersion();
-            auto const reason = fmt::format("Outdated ({})", gdVer.value_or("Any"));
+            auto const gdVer = m_impl->m_mod->getMetadataRef().getGameVersion();
+            auto const reason = fmt::format("Outdated ({})", gdVer.value_or("Unknown"));
 
             auto modOutdated = CCLabelBMFont::create(reason.c_str(), "bigFont.fnt");
             modOutdated->setID("outdated-indicator");
@@ -263,6 +251,8 @@ bool ModItem::init(
         };
     } else if (m_impl->m_mod->isEnabled() && favMod->getSettingValue<bool>("indicate-update")) {
         if (auto update = m_impl->m_mod->checkUpdates().getFinishedValue()) {
+            log::debug("Checked for updates for mod of ID {}", m_impl->m_mod->getID());
+
             if (update->unwrapOrDefault().has_value()) {
                 auto pendingUpdate = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
                 pendingUpdate->setID("pending-update-indicator");
@@ -308,10 +298,6 @@ void ModItem::onModDesc(CCObject*) {
         m_impl->m_mod->getDescription().value_or("<cr>No description available.</c>"),
         "OK"
     )) alert->show();
-};
-
-void ModItem::onModIssues(CCObject*) {
-    if (m_impl->m_mod) openIssueReportPopup(m_impl->m_mod);
 };
 
 void ModItem::onFavorite(CCObject*) {

@@ -1,5 +1,5 @@
 # Favorite Mods
-**Add installed Geode mods as your favorites!**
+**A shortcut to your favorite Geode mods!**
 
 *by [Cheeseworks](user:6408873) & more!*
 

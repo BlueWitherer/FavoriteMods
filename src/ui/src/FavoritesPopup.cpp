@@ -159,17 +159,19 @@ bool FavoritesPopup::setup() {
     auto const fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
     auto const fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
 
+    auto fScale = m_impl->m_heartIcons ? 0.375f : 0.625f;
+
     // Create icon above favorites only toggle
     auto starOnIcon = CCSprite::createWithSpriteFrameName(fOn);
     starOnIcon->setID("show-favorites-icon");
     starOnIcon->setPosition({ m_impl->m_favoritesOnlyToggle->getPositionX(), m_impl->m_favoritesOnlyToggle->getPositionY() + 20.f });
-    starOnIcon->setScale(m_impl->m_heartIcons ? 0.375f : 0.625f);
+    starOnIcon->setScale(fScale);
 
     // Create icon above hide favorites toggle
     auto starOffIcon = CCSprite::createWithSpriteFrameName(fOff);
     starOffIcon->setID("hide-favorites-icon");
     starOffIcon->setPosition({ m_impl->m_hideFavoritesToggle->getPositionX(), m_impl->m_hideFavoritesToggle->getPositionY() + 20.f });
-    starOffIcon->setScale(m_impl->m_heartIcons ? 0.375f : 0.625f);
+    starOffIcon->setScale(fScale);
 
     m_mainLayer->addChild(starOnIcon);
     m_mainLayer->addChild(starOffIcon);
@@ -296,7 +298,7 @@ bool FavoritesPopup::setup() {
             menu_selector(FavoritesPopup::onPageNext)
         );
         m_impl->m_pageNextBtn->setID("page-next-button");
-        m_impl->m_pageNextBtn->setPosition({ widthCS + 17.5f , m_impl->m_scrollLayer->getPositionY() });
+        m_impl->m_pageNextBtn->setPosition({ widthCS + 17.5f , scrollBG->getPositionY() });
         m_impl->m_pageNextBtn->setVisible(true);
 
         auto pagePreviousBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
@@ -310,7 +312,7 @@ bool FavoritesPopup::setup() {
             menu_selector(FavoritesPopup::onPagePrevious)
         );
         m_impl->m_pagePreviousBtn->setID("page-previous-button");
-        m_impl->m_pagePreviousBtn->setPosition({ -17.5f , m_impl->m_scrollLayer->getPositionY() });
+        m_impl->m_pagePreviousBtn->setPosition({ -17.5f , scrollBG->getPositionY() });
         m_impl->m_pagePreviousBtn->setVisible(false);
 
         m_buttonMenu->addChild(m_impl->m_pageNextBtn);

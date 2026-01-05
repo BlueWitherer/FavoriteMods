@@ -13,7 +13,7 @@
         "Cheeseworks",
         "ArcticWoof"
     ],
-    "description": "Add installed Geode mods as your favorites!",
+    "description": "A shortcut to your favorite Geode mods!",
     "tags": [
         "offline",
         "enhancement"
@@ -32,10 +32,6 @@
         "source": "https://github.com/BlueWitherer/FavoriteMods",
         "homepage": "https://www.cheeseworks.gay/",
         "community": "https://www.dsc.gg/cheeseworks"
-    },
-    "issues": {
-        "info": "Report any issues to our repository!",
-        "url": "https://www.github.com/BlueWitherer/FavoriteMods/issues/"
     },
     "settings": {
         "enabled-only": {
