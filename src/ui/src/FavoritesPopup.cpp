@@ -87,9 +87,6 @@ bool FavoritesPopup::setup() {
     // Create main content area
     auto const [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
 
-    // Create scroll size
-    auto const scrollSize = CCSize{ widthCS - 17.5f, heightCS - 80.f };
-
     // Create search input
     m_impl->m_searchInput = TextInput::create(widthCS - 125.f, "Search Mods", "bigFont.fnt");
     m_impl->m_searchInput->setID("search-box");
@@ -177,7 +174,6 @@ bool FavoritesPopup::setup() {
     m_mainLayer->addChild(starOnIcon);
     m_mainLayer->addChild(starOffIcon);
 
-    // Create "No mods found" label (initially hidden)
     m_impl->m_noModsLabel = CCLabelBMFont::create("No mods found! :(", "bigFont.fnt");
     m_impl->m_noModsLabel->setID("no-mods-label");
     m_impl->m_noModsLabel->setPosition({ widthCS / 2.f, heightCS / 2.f - 30.f });
@@ -187,7 +183,10 @@ bool FavoritesPopup::setup() {
 
     m_mainLayer->addChild(m_impl->m_noModsLabel);
 
-    // Previousground for scroll layer
+    // Create scroll size
+    auto const scrollSize = CCSize{ widthCS - 17.5f, heightCS - 80.f };
+
+    // bg for scroll layer
     auto scrollBG = CCScale9Sprite::create("square02b_001.png");
     scrollBG->setContentSize(scrollSize);
     scrollBG->setAnchorPoint({ 0.5, 0.5 });
@@ -206,10 +205,10 @@ bool FavoritesPopup::setup() {
         ->setGap(5.f);
 
     // Create scroll layer
-    m_impl->m_scrollLayer = ScrollLayer::create({ scrollSize.width - 12.5f, scrollSize.height - 12.5f });
+    m_impl->m_scrollLayer = ScrollLayer::create({ scrollSize.width - 10.f, scrollSize.height - 10.f });
     m_impl->m_scrollLayer->setID("mod-list");
     m_impl->m_scrollLayer->setAnchorPoint({ 0.5, 0.5 });
-    m_impl->m_scrollLayer->setPosition(scrollBG->getPosition());
+    m_impl->m_scrollLayer->setPosition({ 13.5f, 15.f }); // ???
 
     m_impl->m_scrollLayer->m_contentLayer->setLayout(scrollLayerLayout);
 
@@ -226,7 +225,7 @@ bool FavoritesPopup::setup() {
             m_impl->m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
             CircleBaseSize::Medium
         );
-        modSettingsBtnSprite->setScale(0.75f);
+        modSettingsBtnSprite->setScale(0.625f);
 
         auto modSettingsBtn = CCMenuItemSpriteExtra::create(
             modSettingsBtnSprite,
@@ -284,7 +283,7 @@ bool FavoritesPopup::setup() {
     m_buttonMenu->addChild(statsBtn);
 
     if (m_impl->m_usePages) { // if the player has pages enabled
-        auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
+        constexpr auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
 
         auto pageNextBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
         pageNextBtnSprite->setScale(0.875f);
@@ -560,8 +559,21 @@ void FavoritesPopup::onPromptClearAll(CCObject*) {
         "Cancel", "Yes",
         [this](auto, bool btn2) {
             if (btn2) onClearAll();
-        },
-        true);
+        }, true
+    );
+};
+
+void FavoritesPopup::onClearAll() {
+    // Turn off favorite from every mod
+    for (auto const& mod : loader->getAllMods()) {
+        auto const modID = mod->getID(); // get the mod id
+        if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false); // prevent creating more saves
+    };
+
+    refreshModList(true);
+
+    Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
+    log::info("Cleared all favorite mods");
 };
 
 void FavoritesPopup::onGetStats(CCObject*) {
@@ -576,30 +588,17 @@ void FavoritesPopup::onGetStats(CCObject*) {
         if (mod->isEnabled()) enabled++;
     };
 
-    auto faveCount = fmt::format("<cy>{}</c> Favorites", favorite);
-    auto enableCount = fmt::format("<cg>{}</c> Enabled, <cr>{}</c> Disabled", enabled, total - enabled);
-    auto totalCount = fmt::format("<cj>{}</c> Installed", total);
+    auto const faveCount = fmt::format("<cy>{}</c> Favorites", favorite);
+    auto const enableCount = fmt::format("<cg>{}</c> Enabled, <cr>{}</c> Disabled", enabled, total - enabled);
+    auto const totalCount = fmt::format("<cj>{}</c> Installed", total);
 
-    auto body = fmt::format("{}\n\nYour Mods\n{}\n{}", faveCount, enableCount, totalCount);
+    auto const body = fmt::format("{}\n\nYour Mods\n{}\n{}", faveCount, enableCount, totalCount);
 
     if (auto alert = FLAlertLayer::create(
         "Statistics",
         body.c_str(),
         "OK"
     )) alert->show();
-};
-
-void FavoritesPopup::onClearAll() {
-    // Turn off favorite from every mod
-    for (auto const& mod : loader->getAllMods()) {
-        auto const modID = mod->getID(); // get the mod id
-        if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false); // prevent creating more saves
-    };
-
-    refreshModList(true);
-
-    Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
-    log::info("Cleared all favorite mods");
 };
 
 FavoritesPopup* FavoritesPopup::create(
