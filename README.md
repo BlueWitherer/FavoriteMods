@@ -36,9 +36,6 @@ You can also quickly add favorites through Geode's mod pop-ups! Just look for th
 ![preview](previews/preview-3.png)
 ![preview](previews/preview-4.png)
 ![preview](previews/preview-5.png)
-![preview](previews/preview-6.png)
-![preview](previews/preview-7.png)
-![preview](previews/preview-8.png)
 
 ---
 

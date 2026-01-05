@@ -1,5 +1,5 @@
 # v1.2.3
-- Removed Issues popup in detailed list view
+- Removed Issues pop-up in detailed list view
 - Several minor improvements
 
 # v1.2.2
