@@ -18,17 +18,19 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
     };
 
     void modify() {
+        auto f = m_fields.self();
+
         // get geode's mod
         if (auto geodeMod = loader->getLoadedMod("geode.loader")) {
             log::debug("Geode found!");
-            m_fields->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
-            log::debug("Geode theme enabled: {}", m_fields->m_isGeodeTheme);
+            f->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
+            log::debug("Geode theme enabled: {}", f->m_isGeodeTheme);
         } else {
             log::error("Failed to get Geode loader mod");
         };
 
         // check if the player wants hearts instead
-        m_fields->m_isHeartIcons = favMod->getSettingValue<bool>("hearts");
+        f->m_isHeartIcons = favMod->getSettingValue<bool>("hearts");
 
         // showcase itself when the player loads for the first time
         if (favMod->hasSavedValue("already-loaded")) {
@@ -46,9 +48,9 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
 
             // favorites button sprite
             auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
-                m_fields->m_isHeartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
-                m_fields->m_isHeartIcons ? 1.f : 0.875f,
-                m_fields->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
+                f->m_isHeartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
+                f->m_isHeartIcons ? 1.f : 0.875f,
+                f->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
                 CircleBaseSize::Medium
             );
             favBtnSprite->setScale(0.8f);
@@ -73,8 +75,10 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
     void onFavoritesBtn(CCObject*) {
         log::debug("Favorites button clicked!");
 
+        auto f = m_fields.self();
+
         // create and show the favorites pop-up
-        if (auto popup = FavoritesPopup::create(m_fields->m_isGeodeTheme, m_fields->m_isHeartIcons)) {
+        if (auto popup = FavoritesPopup::create(f->m_isGeodeTheme, f->m_isHeartIcons)) {
             log::info("Favorites popup created successfully");
             popup->show();
         } else {
@@ -127,10 +131,12 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
 
                         // find this mod if it's installed
                         if (auto mod = loader->getInstalledMod(thisModID)) {
-                            m_fields->m_modID = mod->getID();
+                            auto f = m_fields.self();
 
-                            auto isFavorite = favMod->getSavedValue<bool>(m_fields->m_modID);
-                            log::debug("Creating favorites menu for mod {}, {} favorites", m_fields->m_modID, isFavorite ? "already in" : "not added to");
+                            f->m_modID = mod->getID();
+
+                            auto isFavorite = favMod->getSavedValue<bool>(f->m_modID);
+                            log::debug("Creating favorites menu for mod {}, {} favorites", f->m_modID, isFavorite ? "already in" : "not added to");
 
                             auto heartIcons = favMod->getSettingValue<bool>("hearts");
 
@@ -144,17 +150,17 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                             favButtonOffSpr->setScale(heartIcons ? 0.375f : 0.5f);
 
                             // Favorite button here :)
-                            m_fields->m_favButton = CCMenuItemToggler::create(
+                            f->m_favButton = CCMenuItemToggler::create(
                                 favButtonOnSpr,
                                 favButtonOffSpr,
                                 this,
                                 menu_selector(FavoritesModPopup::onToggleFavorite)
                             );
-                            m_fields->m_favButton->setID("favorite-button");
+                            f->m_favButton->setID("favorite-btn");
 
-                            m_fields->m_favButton->toggle(!isFavorite); // works like this for some reason
+                            f->m_favButton->toggle(!isFavorite); // works like this for some reason
 
-                            favMenu->addChild(m_fields->m_favButton);
+                            favMenu->addChild(f->m_favButton);
 
                             auto favLabel = CCLabelBMFont::create("Favorite", "bigFont.fnt");
                             favLabel->setID("favorite-label");
@@ -197,13 +203,15 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
     };
 
     void onToggleFavorite(CCObject*) {
-        if (m_fields->m_favButton) {
-            auto toFavorite = m_fields->m_favButton->isToggled();
-            log::debug("({}) {} favorites", m_fields->m_modID, toFavorite ? "Adding to" : "Removing from");
+        auto f = m_fields.self();
+        
+        if (f->m_favButton) {
+            auto toFavorite = f->m_favButton->isToggled();
+            log::debug("({}) {} favorites", f->m_modID, toFavorite ? "Adding to" : "Removing from");
 
             // Save the favorite status
-            favMod->setSavedValue(m_fields->m_modID, toFavorite);
-            log::info("{} now {} favorites", m_fields->m_modID, favMod->getSavedValue<bool>(m_fields->m_modID) ? "on" : "off");
+            favMod->setSavedValue(f->m_modID, toFavorite);
+            log::info("{} now {} favorites", f->m_modID, favMod->getSavedValue<bool>(f->m_modID) ? "on" : "off");
 
             OnFavoriteEvent().post();
         } else {

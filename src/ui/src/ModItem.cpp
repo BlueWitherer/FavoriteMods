@@ -112,7 +112,7 @@ bool ModItem::init(
         this,
         menu_selector(ModItem::onViewMod)
     );
-    viewBtn->setID("view-button");
+    viewBtn->setID("view-btn");
 
     auto const fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
     auto const fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
@@ -126,7 +126,7 @@ bool ModItem::init(
         this,
         menu_selector(ModItem::onFavorite)
     );
-    m_impl->m_favButton->setID("favorite-button");
+    m_impl->m_favButton->setID("favorite-btn");
 
     // Layout to automatically position buttons on right-side button menu
     auto btnMenuLayout = RowLayout::create()
@@ -201,7 +201,7 @@ bool ModItem::init(
             this,
             menu_selector(ModItem::onModDesc)
         );
-        descBtn->setID("short-description-button");
+        descBtn->setID("short-description-btn");
 
         btnMenu->addChild(descBtn);
     };

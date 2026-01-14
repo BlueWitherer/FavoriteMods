@@ -106,19 +106,11 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onClearSearch)
     );
-    searchClearBtn->setID("clear-search-button");
+    searchClearBtn->setID("clear-search-btn");
     searchClearBtn->setAnchorPoint({ 0.5, 0.5 });
     searchClearBtn->setPosition({ 26.5f, m_impl->m_searchInput->getPositionY() });
 
     m_buttonMenu->addChild(searchClearBtn);
-
-    // Menu for checkboxes
-    auto checkboxMenu = CCMenu::create();
-    checkboxMenu->setID("checkbox-menu");
-    checkboxMenu->setPosition(CCPointZero);
-    checkboxMenu->setTouchPriority(-504);
-
-    m_mainLayer->addChild(checkboxMenu);
 
     auto favOnlyOffSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
     auto favOnlyOnSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
@@ -133,10 +125,10 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
-    m_impl->m_favoritesOnlyToggle->setID("show-favorites-button");
+    m_impl->m_favoritesOnlyToggle->setID("show-favorites-btn");
     m_impl->m_favoritesOnlyToggle->setPosition({ widthCS - 60.f, heightCS - 50.f });
 
-    checkboxMenu->addChild(m_impl->m_favoritesOnlyToggle);
+    m_buttonMenu->addChild(m_impl->m_favoritesOnlyToggle);
 
     auto hideFavOffSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
     auto hideFavOnSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
@@ -151,10 +143,10 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
-    m_impl->m_hideFavoritesToggle->setID("hide-favorites-button");
+    m_impl->m_hideFavoritesToggle->setID("hide-favorites-btn");
     m_impl->m_hideFavoritesToggle->setPosition({ widthCS - 25.f, heightCS - 50.f });
 
-    checkboxMenu->addChild(m_impl->m_hideFavoritesToggle);
+    m_buttonMenu->addChild(m_impl->m_hideFavoritesToggle);
 
     auto const fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
     auto const fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
@@ -234,7 +226,7 @@ bool FavoritesPopup::setup() {
             this,
             menu_selector(FavoritesPopup::onModSettings)
         );
-        modSettingsBtn->setID("options-button");
+        modSettingsBtn->setID("settings-btn");
         modSettingsBtn->setPosition({ 2.5f, 2.5f });
 
         m_buttonMenu->addChild(modSettingsBtn);
@@ -257,7 +249,7 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onPromptClearAll)
     );
-    clearAllBtn->setID("clear-favorites-button");
+    clearAllBtn->setID("clear-favorites-btn");
     clearAllBtn->setPosition({ widthCS / 2.f, 1.25f });
     clearAllBtn->setZOrder(3);
 
@@ -278,7 +270,7 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onGetStats)
     );
-    statsBtn->setID("statistics-button");
+    statsBtn->setID("statistics-btn");
     statsBtn->setPosition({ widthCS - 1.25f, 1.25f });
     statsBtn->setZOrder(3);
 
@@ -297,7 +289,7 @@ bool FavoritesPopup::setup() {
             this,
             menu_selector(FavoritesPopup::onPageNext)
         );
-        m_impl->m_pageNextBtn->setID("page-next-button");
+        m_impl->m_pageNextBtn->setID("page-next-btn");
         m_impl->m_pageNextBtn->setPosition({ widthCS + 17.5f , scrollBG->getPositionY() });
         m_impl->m_pageNextBtn->setVisible(true);
 
@@ -311,7 +303,7 @@ bool FavoritesPopup::setup() {
             this,
             menu_selector(FavoritesPopup::onPagePrevious)
         );
-        m_impl->m_pagePreviousBtn->setID("page-previous-button");
+        m_impl->m_pagePreviousBtn->setID("page-previous-btn");
         m_impl->m_pagePreviousBtn->setPosition({ -17.5f , scrollBG->getPositionY() });
         m_impl->m_pagePreviousBtn->setVisible(false);
 
@@ -341,7 +333,7 @@ bool FavoritesPopup::setup() {
         this,
         menu_selector(FavoritesPopup::onInfoButton)
     );
-    infoBtn->setID("info-button");
+    infoBtn->setID("info-btn");
     infoBtn->setPosition({ widthCS - 15.f, heightCS - 15.f });
 
     m_buttonMenu->addChild(infoBtn);
