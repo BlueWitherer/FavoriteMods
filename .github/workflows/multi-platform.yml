@@ -50,7 +50,7 @@ jobs:
                   build-config: ${{ matrix.config.build-type || 'Release'}}
 
     package:
-        name: Package builds
+        name: Package Builds
         runs-on: ubuntu-latest
         needs: ["build"]
 
@@ -97,8 +97,8 @@ jobs:
               with:
                   webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
                   files: ./artifacts/Build Output/*.geode
-                  embed-title: "Nightly Release"
-                  embed-description: "New development release for commit ${{ github.sha }}"
+                  embed-title: "Nightly Release for ${{ github.repository }}"
+                  embed-description: "Development release for commit **[`${{ github.sha }}`](${{ github.event.repository.html_url}}/commit/${{ github.sha}})**."
                   embed-color: "#ffbaf5"
                   embed-url: ${{ github.event.repository.html_url }}/releases/tag/nightly
                   embed-author: ${{ github.actor }}
