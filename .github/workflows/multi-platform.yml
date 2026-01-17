@@ -10,10 +10,12 @@ jobs:
     build:
         strategy:
             fail-fast: false
+
             matrix:
                 config:
                     - name: Windows
                       os: windows-latest
+                      build-type: RelWithDebInfo
 
                     - name: macOS
                       os: macos-latest
@@ -40,7 +42,9 @@ jobs:
               uses: geode-sdk/build-geode-mod@main
               with:
                   combine: true
+                  export-pdb: true
                   target: ${{ matrix.config.target }}
+                  build-config: ${{ matrix.config.build-type || 'Release'}}
 
     package:
         name: Package builds
@@ -55,3 +59,45 @@ jobs:
               with:
                   name: Build Output
                   path: ${{ steps.build.outputs.build-output }}
+
+    nightly:
+        name: Nightly Release
+        runs-on: ubuntu-latest
+        needs: ["package"]
+
+        steps:
+            - uses: actions/download-artifact@v4
+              with:
+                  path: ./artifacts/
+
+            - name: Publish Nightly release
+              uses: andelf/nightly-release@main
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                  tag_name: nightly
+                  name: "Development Release"
+                  body: |
+                      Development release for commit ${{ github.sha }}.
+                  files: |
+                      ./artifacts/Build Output/*.geode
+                      ./artifacts/Build Output/*.pdb
+
+            - name: Check for webhook URL
+              id: check
+              if: github.ref == 'refs/heads/main'
+              run: echo "has-nightly-webhook=${{ secrets.NIGHTLY_WEBHOOK != '' }}" >> $GITHUB_OUTPUT
+
+            - name: Send Discord webhook
+              if: ${{ steps.check.outputs.has-nightly-webhook == 'true' }}
+              uses: prevter/discord-webhook@main
+              with:
+                  webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
+                  files: ./artifacts/Build Output/*.geode
+                  embed-title: "Nightly Release"
+                  embed-description: "New development release for commit ${{ github.sha }}"
+                  embed-color: "#ffbaf5"
+                  embed-url: ${{ github.event.repository.html_url }}/releases/tag/nightly
+                  embed-author: ${{ github.actor }}
+                  embed-author-icon: "https://avatars.githubusercontent.com/u/${{ github.actor_id }}?v=4"
+                  embed-timestamp: "now"
