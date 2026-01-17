@@ -88,7 +88,7 @@ jobs:
 
             - name: Check for webhook URL
               id: check
-              if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+              if: github.ref == github.event.repository.default_branch
               run: echo "has-nightly-webhook=${{ secrets.NIGHTLY_WEBHOOK != '' }}" >> $GITHUB_OUTPUT
 
             - name: Send Discord webhook
@@ -97,10 +97,11 @@ jobs:
               with:
                   webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
                   files: ./artifacts/Build Output/*.geode
-                  embed-title: "Nightly Release for ${{ github.repository }}"
-                  embed-description: "Development release for commit **[`${{ github.sha }}`](${{ github.event.repository.html_url}}/commit/${{ github.sha}})**."
-                  embed-color: "#ffbaf5"
+                  embed-title: "[${{ github.repository }}] Nightly Release"
+                  embed-description: "Development release for commit **[`${{ github.sha }}`](${{ github.event.repository.html_url}}/commit/${{ github.sha }})**."
+                  embed-color: "#d29922"
                   embed-url: ${{ github.event.repository.html_url }}/releases/tag/nightly
                   embed-author: ${{ github.actor }}
                   embed-author-icon: "https://avatars.githubusercontent.com/u/${{ github.actor_id }}?v=4"
+                  embed-thumbnail: "https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.event.repository.default_branch }}/logo.png"
                   embed-timestamp: "now"
