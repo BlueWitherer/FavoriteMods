@@ -43,7 +43,7 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
         };
 
         // get the actions menu
-        if (auto actionsMenu = static_cast<CCMenu*>(getChildByID("actions-menu"))) {
+        if (auto actionsMenu = typeinfo_cast<CCMenu*>(getChildByID("actions-menu"))) {
             log::debug("Actions menu found successfully!");
 
             // favorites button sprite
@@ -104,7 +104,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                 log::debug("Mod page button found");
 
                 // get the url from the user object
-                if (auto url = static_cast<CCString*>(modPageBtn->getUserObject("url"))) {
+                if (auto url = typeinfo_cast<CCString*>(modPageBtn->getUserObject("url"))) {
                     log::debug("URL string object found in mod page button");
 
                     std::string urlStr(url->getCString());

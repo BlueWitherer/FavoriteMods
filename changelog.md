@@ -1,3 +1,6 @@
+# v1.2.4
+- Tweaks
+
 # v1.2.3
 - Removed Issues pop-up in detailed list view
 - Several minor improvements
