@@ -40,7 +40,7 @@ jobs:
               id: compare
               if: ${{ steps.check-discord.outputs.has-webhook == 'true' }}
               run: |
-                  if [ -n "${{ steps.getrelease.outputs.tag }}"]; then
+                  if [ -n "${{ steps.getrelease.outputs.tag }}" ]; then
                   echo "link=${{ github.event.repository.html_url }}/compare/${{ steps.getrelease.outputs.tag }}...${{ github.ref_name }}" >> $GITHUB_OUTPUT
                   else
                   echo "link=${{ github.event.repository.html_url }}/releases/tag/${{ github.ref_name }}" >> $GITHUB_OUTPUT
