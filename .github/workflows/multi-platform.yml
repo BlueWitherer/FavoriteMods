@@ -74,9 +74,10 @@ jobs:
 
             - name: Get latest release tag
               id: getrelease
-              run: echo "tag=$(curl -s https://api.github.com/repos/${{ github.event.repository.full_name }}/releases/latest | jq -r '.tag_name // "v0.0.0"')" >> $GITHUB_OUTPUT
+              run: echo "tag=$(curl -s https://api.github.com/repos/${{ github.event.repository.full_name }}/releases/latest | jq -r '.tag_name // "${{ github.event.repository.default_branch }}"')" >> $GITHUB_OUTPUT
 
             - name: Publish Nightly release
+              if: ${{ github.ref_name == github.event.repository.default_branch }}
               uses: andelf/nightly-release@main
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

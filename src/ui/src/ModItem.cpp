@@ -1,8 +1,8 @@
 #include "../ModItem.hpp"
 
-#include "../FavoritesPopup.hpp"
-
 #include "../../Events.hpp"
+
+#include "../FavoritesPopup.hpp"
 
 #include <Geode/Geode.hpp>
 
@@ -16,16 +16,16 @@ static auto favMod = Mod::get(); // Get this mod
 
 class ModItem::Impl final {
 public:
-    Mod* m_mod = nullptr; // Fetched mod
+    Mod* mod = nullptr; // Fetched mod
 
-    bool m_favorite = false; // If the mod is favorite
+    bool favorite = false; // If the mod is favorite
 
-    bool m_geodeTheme = false; // Make sure visuals go with Geode theme
-    bool m_heartIcons = false; // Hearts UI mode
+    bool geodeTheme = false; // Make sure visuals go with Geode theme
+    bool heartIcons = false; // Hearts UI mode
 
-    CCMenuItemSpriteExtra* m_favButton = nullptr; // Favorite button
+    CCMenuItemSpriteExtra* favButton = nullptr; // Favorite button
 
-    CCScale9Sprite* m_backgroundSprite = nullptr; // Background theme
+    CCScale9Sprite* backgroundSprite = nullptr; // Background theme
 };
 
 ModItem::ModItem() {
@@ -40,9 +40,9 @@ bool ModItem::init(
     bool geodeTheme,
     bool heartIcons
 ) {
-    m_impl->m_mod = mod;
-    m_impl->m_geodeTheme = geodeTheme;
-    m_impl->m_heartIcons = heartIcons;
+    m_impl->mod = mod;
+    m_impl->geodeTheme = geodeTheme;
+    m_impl->heartIcons = heartIcons;
 
     if (!mod) {
         log::error("ModItem init function called with null mod");
@@ -51,7 +51,7 @@ bool ModItem::init(
 
     auto const modID = mod->getID();
 
-    m_impl->m_favorite = favMod->getSavedValue<bool>(modID);
+    m_impl->favorite = favMod->getSavedValue<bool>(modID);
 
     if (!CCNode::init()) return false;
 
@@ -65,22 +65,22 @@ bool ModItem::init(
     setContentSize(size);
 
     // Background for mod item
-    m_impl->m_backgroundSprite = CCScale9Sprite::create("square02b_001.png");
-    m_impl->m_backgroundSprite->setID("background");
-    m_impl->m_backgroundSprite->setScale(0.5f);
-    m_impl->m_backgroundSprite->setContentSize({ size.width * 2.f, size.height * 2.f });
-    m_impl->m_backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
-    m_impl->m_backgroundSprite->setPosition({ getScaledContentWidth() / 2.f, getScaledContentHeight() / 2.f });
-    m_impl->m_backgroundSprite->setColor(to3B(bgColor));
-    m_impl->m_backgroundSprite->setOpacity(bgColor.a);
+    m_impl->backgroundSprite = CCScale9Sprite::create("square02b_001.png");
+    m_impl->backgroundSprite->setID("background");
+    m_impl->backgroundSprite->setScale(0.5f);
+    m_impl->backgroundSprite->setContentSize({ size.width * 2.f, size.height * 2.f });
+    m_impl->backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
+    m_impl->backgroundSprite->setPosition({ getScaledContentWidth() / 2.f, getScaledContentHeight() / 2.f });
+    m_impl->backgroundSprite->setColor(to3B(bgColor));
+    m_impl->backgroundSprite->setOpacity(bgColor.a);
 
     // Create main content area
     auto const [widthCS, heightCS] = getScaledContentSize();
 
-    addChild(m_impl->m_backgroundSprite);
+    addChild(m_impl->backgroundSprite);
 
     // Mod icon sprite
-    auto modIcon = createModLogo(m_impl->m_mod);
+    auto modIcon = createModLogo(m_impl->mod);
     modIcon->setID("mod-icon");
     modIcon->setScale(0.5f);
     modIcon->setPosition({ 20.f, heightCS / 2.f });
@@ -89,7 +89,7 @@ bool ModItem::init(
     addChild(modIcon);
 
     // Mod name label
-    auto nameLabel = CCLabelBMFont::create(m_impl->m_mod->getName().c_str(), "bigFont.fnt");
+    auto nameLabel = CCLabelBMFont::create(m_impl->mod->getName().c_str(), "bigFont.fnt");
     nameLabel->setID("mod-name");
     nameLabel->setScale(0.4f);
     nameLabel->setPosition({ 37.5f, (heightCS / 2.f) + 5.f });
@@ -102,7 +102,7 @@ bool ModItem::init(
     auto viewBtnSprite = ButtonSprite::create(
         "View",
         "bigFont.fnt",
-        m_impl->m_geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
+        m_impl->geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
         0.75f
     );
     viewBtnSprite->setScale(0.75f);
@@ -114,19 +114,19 @@ bool ModItem::init(
     );
     viewBtn->setID("view-btn");
 
-    auto const fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
-    auto const fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
+    auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
+    auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
 
-    auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_impl->m_favorite ? fOn : fOff);
-    favBtnSprite->setScale(m_impl->m_heartIcons ? 0.75f : 1.f);
+    auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_impl->favorite ? fOn : fOff);
+    favBtnSprite->setScale(m_impl->heartIcons ? 0.75f : 1.f);
 
     // Favorite button here :)
-    m_impl->m_favButton = CCMenuItemSpriteExtra::create(
+    m_impl->favButton = CCMenuItemSpriteExtra::create(
         favBtnSprite,
         this,
         menu_selector(ModItem::onFavorite)
     );
-    m_impl->m_favButton->setID("favorite-btn");
+    m_impl->favButton->setID("favorite-btn");
 
     // Layout to automatically position buttons on right-side button menu
     auto btnMenuLayout = RowLayout::create()
@@ -149,7 +149,7 @@ bool ModItem::init(
 
     // add the previous buttons
     btnMenu->addChild(viewBtn);
-    btnMenu->addChild(m_impl->m_favButton);
+    btnMenu->addChild(m_impl->favButton);
 
     addChild(btnMenu);
 
@@ -158,7 +158,7 @@ bool ModItem::init(
 
     // Avoid showing more details if minimalist setting is on
     if (!favMod->getSettingValue<bool>("minimal")) {
-        auto const devs = m_impl->m_mod->getDevelopers();
+        auto const devs = m_impl->mod->getDevelopers();
         auto const andMore = static_cast<int>(devs.size()) - 1;
 
         auto devLabelText = devs[0];
@@ -175,7 +175,7 @@ bool ModItem::init(
         addChild(devLabel);
 
         // Version label
-        auto versionLabel = CCLabelBMFont::create(m_impl->m_mod->getVersion().toVString().c_str(), "goldFont.fnt");
+        auto versionLabel = CCLabelBMFont::create(m_impl->mod->getVersion().toVString().c_str(), "goldFont.fnt");
         versionLabel->setID("mod-version");
         versionLabel->setPosition({ 37.5f, (heightCS / 2.f) - 5.f });
         versionLabel->setScale(0.3f);
@@ -190,7 +190,7 @@ bool ModItem::init(
         auto descBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
             "geode.loader/message.png",
             0.875f,
-            m_impl->m_geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
+            m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
             CircleBaseSize::Small
         );
         descBtnSprite->setScale(0.375f);
@@ -217,7 +217,7 @@ bool ModItem::init(
 
     addChild(idLabel);
 
-    btnMenu->updateLayout(true);
+    btnMenu->updateLayout();
 
     // for first time users of favorites
     if (auto helpTxt = firstTimeText()) {
@@ -226,13 +226,13 @@ bool ModItem::init(
 
         log::debug("Help text added for first time users");
     } else {
-        btnMenu->updateLayout(true);
+        btnMenu->updateLayout();
     };
 
-    auto const loadProblem = m_impl->m_mod->targetsOutdatedVersion();
+    auto const loadProblem = m_impl->mod->targetsOutdatedVersion();
     if (loadProblem.has_value()) {
         if (loadProblem->isOutdated() && favMod->getSettingValue<bool>("indicate-outdated")) {
-            auto const gdVer = m_impl->m_mod->getMetadataRef().getGameVersion();
+            auto const gdVer = m_impl->mod->getMetadataRef().getGameVersion();
             auto const reason = fmt::format("Outdated ({})", gdVer.value_or("Unknown"));
 
             auto modOutdated = CCLabelBMFont::create(reason.c_str(), "bigFont.fnt");
@@ -246,12 +246,12 @@ bool ModItem::init(
 
             nameLabel->setOpacity(200);
 
-            log::info("Mod {} is outdated, uses game version {}", m_impl->m_mod->getID(), gdVer);
+            log::info("Mod {} is outdated, uses game version {}", m_impl->mod->getID(), gdVer);
             addChild(modOutdated);
         };
-    } else if (m_impl->m_mod->isEnabled() && favMod->getSettingValue<bool>("indicate-update")) {
-        if (auto update = m_impl->m_mod->checkUpdates().getFinishedValue()) {
-            log::debug("Checked for updates for mod of ID {}", m_impl->m_mod->getID());
+    } else if (m_impl->mod->isEnabled() && favMod->getSettingValue<bool>("indicate-update")) {
+        if (auto update = m_impl->mod->checkUpdates().getFinishedValue()) {
+            log::debug("Checked for updates for mod of ID {}", m_impl->mod->getID());
 
             if (update->unwrapOrDefault().has_value()) {
                 auto pendingUpdate = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
@@ -259,15 +259,15 @@ bool ModItem::init(
                 pendingUpdate->setScale(0.375f);
                 pendingUpdate->setPosition({ btnMenu->getPositionX(), btnMenu->getPositionY() + (btnMenu->getScaledContentHeight() / 2.f) });
 
-                log::info("Mod {} has new update of version {} available", m_impl->m_mod->getID(), update->unwrapOrDefault().value().toVString());
+                log::info("Mod {} has new update of version {} available", m_impl->mod->getID(), update->unwrapOrDefault().value().toVString());
                 addChild(pendingUpdate);
             } else {
-                log::debug("Mod {} up-to-date", m_impl->m_mod->getID());
+                log::debug("Mod {} up-to-date", m_impl->mod->getID());
             };
         } else {
-            log::error("Unknown error when fetching update for {}", m_impl->m_mod->getID());
+            log::error("Unknown error when fetching update for {}", m_impl->mod->getID());
         };
-    } else if (!m_impl->m_mod->isEnabled() && favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
+    } else if (!m_impl->mod->isEnabled() && favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
         auto modDisabled = CCLabelBMFont::create("Disabled", "bigFont.fnt");
         modDisabled->setID("disabled-indicator");
         modDisabled->setScale(0.2f);
@@ -279,7 +279,7 @@ bool ModItem::init(
 
         nameLabel->setOpacity(200);
 
-        log::info("Mod {} is disabled", m_impl->m_mod->getID());
+        log::info("Mod {} is disabled", m_impl->mod->getID());
         addChild(modDisabled);
     };
 
@@ -287,28 +287,28 @@ bool ModItem::init(
 };
 
 void ModItem::onViewMod(CCObject*) {
-    if (m_impl->m_mod) openInfoPopup(m_impl->m_mod);
+    if (m_impl->mod) openInfoPopup(m_impl->mod);
 };
 
 void ModItem::onModDesc(CCObject*) {
-    if (!m_impl->m_mod) return;
+    if (!m_impl->mod) return;
 
     if (auto alert = FLAlertLayer::create(
-        m_impl->m_mod->getName().c_str(),
-        m_impl->m_mod->getDescription().value_or("<cr>No description available.</c>"),
+        m_impl->mod->getName().c_str(),
+        m_impl->mod->getDescription().value_or("<cr>No description available.</c>"),
         "OK"
     )) alert->show();
 };
 
 void ModItem::onFavorite(CCObject*) {
-    if (!m_impl->m_mod) return;
+    if (!m_impl->mod) return;
 
     // Toggle favorite status
-    m_impl->m_favorite = !m_impl->m_favorite;
+    m_impl->favorite = !m_impl->favorite;
 
     // Save the favorite status
-    favMod->setSavedValue(m_impl->m_mod->getID(), m_impl->m_favorite);
-    log::debug("Setting {} to {}", m_impl->m_mod->getID(), favMod->getSavedValue<bool>(m_impl->m_mod->getID(), m_impl->m_favorite) ? "favorite" : "non-favorite");
+    favMod->setSavedValue(m_impl->mod->getID(), m_impl->favorite);
+    log::debug("Setting {} to {}", m_impl->mod->getID(), favMod->getSavedValue<bool>(m_impl->mod->getID(), m_impl->favorite) ? "favorite" : "non-favorite");
 
     // Update the icon
     updateFavoriteIcon();
@@ -318,33 +318,33 @@ void ModItem::onFavorite(CCObject*) {
 };
 
 void ModItem::updateFavoriteIcon() {
-    if (!m_impl->m_mod) return;
+    if (!m_impl->mod) return;
 
-    auto const modID = m_impl->m_mod->getID();
+    auto const modID = m_impl->mod->getID();
 
-    if (m_impl->m_favButton) { // Make sure the favorite button has already been created
-        auto const fOn = m_impl->m_heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto const fOff = m_impl->m_heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+    if (m_impl->favButton) { // Make sure the favorite button has already been created
+        auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+        auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
-        auto newSprite = CCSprite::createWithSpriteFrameName(m_impl->m_favorite ? fOn : fOff);
-        newSprite->setScale(m_impl->m_heartIcons ? 0.625f : 0.875f);
+        auto newSprite = CCSprite::createWithSpriteFrameName(m_impl->favorite ? fOn : fOff);
+        newSprite->setScale(m_impl->heartIcons ? 0.625f : 0.875f);
 
-        m_impl->m_favButton->setNormalImage(newSprite);
-        log::info("Updated state for {} to {}", modID, m_impl->m_favorite ? "favorite" : "non-favorite");
+        m_impl->favButton->setNormalImage(newSprite);
+        log::info("Updated state for {} to {}", modID, m_impl->favorite ? "favorite" : "non-favorite");
     } else {
         log::error("Favorite button not found for {}", modID);
     };
 };
 
 CCLabelBMFont* ModItem::firstTimeText() {
-    if (!m_impl->m_mod) return nullptr;
+    if (!m_impl->mod) return nullptr;
 
     // check if mod loaded before
     if (favMod->getSavedValue<bool>("already-loaded", false)
         || favMod->getSavedValue<bool>(GEODE_MOD_ID)
         || !favMod->getSettingValue<bool>("minimal")) {
         return nullptr;
-    } else if (m_impl->m_mod->getID() == GEODE_MOD_ID) { // create the help text if loaded for the first time
+    } else if (m_impl->mod->getID() == GEODE_MOD_ID) { // create the help text if loaded for the first time
         log::info("Mod loaded for the first time!");
 
         // Help text for first-time users

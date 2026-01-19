@@ -64,7 +64,7 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
             favBtn->setID("favorites-button"_spr);
 
             actionsMenu->addChild(favBtn);
-            actionsMenu->updateLayout(true);
+            actionsMenu->updateLayout();
 
             log::info("Favorites button added to actions menu successfully");
         } else {
@@ -183,7 +183,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                             favMenu->addChild(favLabel);
                         };
 
-                        favMenu->updateLayout(true);
+                        favMenu->updateLayout();
 
                         // try to get the actual popup layer
                         auto popup = reinterpret_cast<FLAlertLayer*>(this);
@@ -204,7 +204,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
 
     void onToggleFavorite(CCObject*) {
         auto f = m_fields.self();
-        
+
         if (f->m_favButton) {
             auto toFavorite = f->m_favButton->isToggled();
             log::debug("({}) {} favorites", f->m_modID, toFavorite ? "Adding to" : "Removing from");
