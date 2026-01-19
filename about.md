@@ -25,4 +25,5 @@ You can also quickly add favorites through Geode's mod pop-ups! Just look for th
 - **[ArcticWoof](user:7689052)**: Helped significantly in designing UI
 
 ---
+
 ![🗨️](frame:gj_discordIcon_001.png?scale=0.375) **If you need help, join my [support Discord server](https://www.dsc.gg/cheeseworks) and ask! :)**
