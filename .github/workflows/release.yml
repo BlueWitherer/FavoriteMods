@@ -58,7 +58,7 @@ jobs:
               uses: prevter/discord-webhook@main
               with:
                   webhook-url: ${{ steps.check-discord.outputs.webhook-url }}
-                  embed-title: "[${{ github.repository }}] Release `${{ github.ref_name }}`"
+                  embed-title: "[${{ github.event.repository.name }}] Release `${{ github.ref_name }}`"
                   embed-description: |
                       ${{ steps.publish-release.outputs.changelog }}
 
