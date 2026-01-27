@@ -213,7 +213,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
             favMod->setSavedValue(f->m_modID, toFavorite);
             log::info("{} now {} favorites", f->m_modID, favMod->getSavedValue<bool>(f->m_modID) ? "on" : "off");
 
-            OnFavoriteEvent().post();
+            FavoriteEvent().post();
         } else {
             log::error("Couldn't get favorite button");
         };

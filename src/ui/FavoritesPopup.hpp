@@ -7,29 +7,23 @@
 using namespace geode::prelude;
 
 // Favorites menu
-class FavoritesPopup : public Popup<>, public TextInputDelegate {
+class FavoritesPopup : public Popup, public TextInputDelegate {
 private:
     class Impl;
     std::unique_ptr<Impl> m_impl;
 
 protected:
-    EventListener<OnFavoriteEventFilter> m_listener = {
-        [this]() { return OnFavoritesChanged(); },
-        OnFavoriteEventFilter()
-    };
-
     FavoritesPopup();
     virtual ~FavoritesPopup();
 
-    bool setup() override;
-    bool init(float width, float height, bool geodeTheme, bool heartIcons);
+    bool init(bool geodeTheme, bool heartIcons);
 
     void textChanged(CCTextInputNode* input) override;
 
-    ListenerResult OnFavoritesChanged();
+    ListenerResult FavoritesChanged();
     void refreshModList(bool clearSearch = false);
 
-    void loadModList(std::vector<Mod*> const& allMods);
+    void loadModList(std::span<Mod*> allMods);
 
     void onPageNext(CCObject*);
     void onPagePrevious(CCObject*);

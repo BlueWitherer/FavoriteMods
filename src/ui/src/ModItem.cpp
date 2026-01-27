@@ -232,7 +232,7 @@ bool ModItem::init(
     auto const loadProblem = m_impl->mod->targetsOutdatedVersion();
     if (loadProblem.has_value()) {
         if (loadProblem->isOutdated() && favMod->getSettingValue<bool>("indicate-outdated")) {
-            auto const gdVer = m_impl->mod->getMetadataRef().getGameVersion();
+            auto const gdVer = m_impl->mod->getMetadata().getGameVersion();
             auto const reason = fmt::format("Outdated ({})", gdVer.value_or("Unknown"));
 
             auto modOutdated = CCLabelBMFont::create(reason.c_str(), "bigFont.fnt");
@@ -314,7 +314,7 @@ void ModItem::onFavorite(CCObject*) {
     updateFavoriteIcon();
 
     // Send event to refresh list
-    OnFavoriteEvent().post();
+    FavoriteEvent().post();
 };
 
 void ModItem::updateFavoriteIcon() {
@@ -373,6 +373,6 @@ ModItem* ModItem::create(
         return ret;
     };
 
-    CC_SAFE_DELETE(ret);
+    delete ret;
     return nullptr;
 };

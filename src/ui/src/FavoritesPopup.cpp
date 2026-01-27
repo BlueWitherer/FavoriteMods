@@ -53,12 +53,7 @@ FavoritesPopup::FavoritesPopup() {
 
 FavoritesPopup::~FavoritesPopup() {};
 
-bool FavoritesPopup::init(
-    float width,
-    float height,
-    bool geodeTheme,
-    bool heartIcons
-) {
+bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     m_impl->geodeTheme = geodeTheme;
     m_impl->heartIcons = heartIcons;
 
@@ -68,7 +63,7 @@ bool FavoritesPopup::init(
 
     m_impl->itemsPerPage = static_cast<int>(favMod->getSettingValue<int64_t>("pages-count"));
 
-    if (!Popup<>::initAnchored(width, height, m_impl->geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) return false;
+    if (!Popup::init(400.f, 280.f, m_impl->geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) return false;
 
     setCloseButtonSpr(
         CircleButtonSprite::createWithSpriteFrameName(
@@ -78,12 +73,12 @@ bool FavoritesPopup::init(
         )
     );
 
-    return true;
-};
-
-bool FavoritesPopup::setup() {
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
+
+    this->template addEventListener<FavoriteEventFilter>(
+        [this](auto) { return FavoritesChanged(); }
+    );
 
     // Create main content area
     auto const [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
@@ -252,9 +247,8 @@ bool FavoritesPopup::setup() {
     );
     clearAllBtn->setID("clear-favorites-btn");
     clearAllBtn->setPosition({ widthCS / 2.f, 1.25f });
-    clearAllBtn->setZOrder(3);
 
-    m_buttonMenu->addChild(clearAllBtn);
+    m_buttonMenu->addChild(clearAllBtn, 3);
 
     // favorites stats button sprite
     auto statsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
@@ -273,9 +267,8 @@ bool FavoritesPopup::setup() {
     );
     statsBtn->setID("statistics-btn");
     statsBtn->setPosition({ widthCS - 1.25f, 1.25f });
-    statsBtn->setZOrder(3);
 
-    m_buttonMenu->addChild(statsBtn);
+    m_buttonMenu->addChild(statsBtn, 3);
 
     if (m_impl->usePages) { // if the player has pages enabled
         constexpr auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
@@ -346,14 +339,14 @@ bool FavoritesPopup::setup() {
     return true;
 };
 
-void FavoritesPopup::loadModList(std::vector<Mod*> const& allMods) {
+void FavoritesPopup::loadModList(std::span<Mod*> allMods) {
     for (auto const& mod : allMods) { // Add all mod items to scrolllayer
         m_impl->scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_impl->scrollLayer->getScaledContentWidth(), 37.5f }, m_impl->geodeTheme, m_impl->heartIcons));
         log::debug("Processed list item for mod {}", mod->getID());
     };
 };
 
-ListenerResult FavoritesPopup::OnFavoritesChanged() {
+ListenerResult FavoritesPopup::FavoritesChanged() {
     refreshModList(false);
     return ListenerResult::Propagate;
 };
@@ -441,7 +434,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
         int endIndex = std::min(startIndex + m_impl->itemsPerPage, m_impl->totalItems); // show this mod last
 
         if (startIndex >= 0 && startIndex < m_impl->totalItems) { // make sure the mods exist
-            loadModList(std::vector<Mod*>(filteredMods.begin() + startIndex, filteredMods.begin() + endIndex));
+            loadModList({ filteredMods.begin() + startIndex, filteredMods.begin() + endIndex });
 
             if (m_impl->pagesLabel) { // make sure the page label exists
                 auto pageText = fmt::format("Page {}/{}, Total {} Mods", m_impl->page, m_impl->totalPages, m_impl->totalItems);
@@ -601,11 +594,11 @@ FavoritesPopup* FavoritesPopup::create(
     bool heartIcons
 ) {
     auto ret = new FavoritesPopup();
-    if (ret->init(400.f, 280.f, geodeTheme, heartIcons)) {
+    if (ret->init(geodeTheme, heartIcons)) {
         ret->autorelease();
         return ret;
     };
 
-    CC_SAFE_DELETE(ret);
+    delete ret;
     return nullptr;
 };

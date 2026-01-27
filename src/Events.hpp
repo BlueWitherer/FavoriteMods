@@ -4,16 +4,19 @@
 
 using namespace geode::prelude;
 
-class OnFavoriteEvent : public Event {
+class FavoriteEvent : public Event {
 public:
-    OnFavoriteEvent() = default;
+    FavoriteEvent() = default;
 };
 
-class OnFavoriteEventFilter : public EventFilter<OnFavoriteEvent> {
+class FavoriteEventFilter : public EventFilter<FavoriteEvent> {
 public:
-    using Callback = ListenerResult();
+    using Callback = ListenerResult(FavoriteEvent*);
 
-    ListenerResult handle(std::function<Callback> fn, OnFavoriteEvent* event) {
-        return fn();
+    ListenerResult handle(Function<Callback>& fn, FavoriteEvent* ev) {
+        return fn(ev);
     };
+
+    FavoriteEventFilter() = default;
+    FavoriteEventFilter(CCNode*) {};
 };
