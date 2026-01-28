@@ -76,9 +76,9 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
 
-    this->template addEventListener<FavoriteEventFilter>(
-        [this](auto) { return FavoritesChanged(); }
-    );
+    // this->template addEventListener<FavoriteEventFilter>(
+    //     [this](auto) { return FavoritesChanged(); }
+    // );
 
     // Create main content area
     auto const [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
