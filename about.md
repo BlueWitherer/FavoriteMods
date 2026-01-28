@@ -1,4 +1,4 @@
-# ![⭐](frame:GJ_bigStar_noShadow_001.png?scale=0.435) Favorite Mods
+# ![⭐](frame:GJ_bigStar_001.png?scale=0.45) Favorite Mods
 **A shortcut to your favorite Geode mods!**
 
 *by [Cheeseworks](user:6408873)!*
