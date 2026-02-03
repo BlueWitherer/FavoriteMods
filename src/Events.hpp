@@ -4,19 +4,7 @@
 
 using namespace geode::prelude;
 
-class FavoriteEvent : public Event {
+class FavoriteEvent : public SimpleEvent<FavoriteEvent> {
 public:
     FavoriteEvent() = default;
-};
-
-class FavoriteEventFilter : public EventFilter<FavoriteEvent> {
-public:
-    using Callback = ListenerResult(FavoriteEvent*);
-
-    ListenerResult handle(Function<Callback>& fn, FavoriteEvent* ev) {
-        return fn(ev);
-    };
-
-    FavoriteEventFilter() = default;
-    FavoriteEventFilter(CCNode*) {};
 };

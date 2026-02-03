@@ -25,7 +25,7 @@
     "dependencies": {
         "alphalaneous.alphas_geode_utils": {
             "importance": "required",
-            "version": ">=1.1.0"
+            "version": ">=1.2.0"
         }
     },
     "settings": {
@@ -120,12 +120,6 @@
             "type": "bool",
             "name": "Mod Disabled",
             "description": "Show an indicator for a mod that is disabled.",
-            "default": true
-        },
-        "indicate-update": {
-            "type": "bool",
-            "name": "Update Pending",
-            "description": "Show an indicator for a pending update for a mod. <cr>Only works if the mod is enabled.</c>",
             "default": true
         },
         "indicate-outdated": {

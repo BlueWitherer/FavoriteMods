@@ -1,6 +1,7 @@
 # v1.2.5 
 - Ported to Geometry Dash version `2.2081`
   - Bumped Geode loader support to `v5.0.0`
+- Removed toggle setting *`Update Pending`*
 
 # v1.2.4 
 - Internal optimizations

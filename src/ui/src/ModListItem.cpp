@@ -1,8 +1,6 @@
-#include "../ModItem.hpp"
+#include "../ModListItem.hpp"
 
 #include "../../Events.hpp"
-
-#include "../FavoritesPopup.hpp"
 
 #include <Geode/Geode.hpp>
 
@@ -14,7 +12,7 @@ using namespace geode::prelude;
 
 static auto favMod = Mod::get(); // Get this mod
 
-class ModItem::Impl final {
+class ModListItem::Impl final {
 public:
     Mod* mod = nullptr; // Fetched mod
 
@@ -28,13 +26,13 @@ public:
     CCScale9Sprite* backgroundSprite = nullptr; // Background theme
 };
 
-ModItem::ModItem() {
+ModListItem::ModListItem() {
     m_impl = std::make_unique<Impl>();
 };
 
-ModItem::~ModItem() {};
+ModListItem::~ModListItem() {};
 
-bool ModItem::init(
+bool ModListItem::init(
     Mod* mod,
     CCSize const& size,
     bool geodeTheme,
@@ -45,11 +43,11 @@ bool ModItem::init(
     m_impl->heartIcons = heartIcons;
 
     if (!mod) {
-        log::error("ModItem init function called with null mod");
+        log::error("ModListItem init function called with null mod");
         return false;
     };
 
-    auto const modID = mod->getID();
+    auto modID = mod->getID();
 
     m_impl->favorite = favMod->getSavedValue<bool>(modID);
 
@@ -110,7 +108,7 @@ bool ModItem::init(
     auto viewBtn = CCMenuItemSpriteExtra::create(
         viewBtnSprite,
         this,
-        menu_selector(ModItem::onViewMod)
+        menu_selector(ModListItem::onViewMod)
     );
     viewBtn->setID("view-btn");
 
@@ -124,7 +122,7 @@ bool ModItem::init(
     m_impl->favButton = CCMenuItemSpriteExtra::create(
         favBtnSprite,
         this,
-        menu_selector(ModItem::onFavorite)
+        menu_selector(ModListItem::onFavorite)
     );
     m_impl->favButton->setID("favorite-btn");
 
@@ -199,7 +197,7 @@ bool ModItem::init(
         auto descBtn = CCMenuItemSpriteExtra::create(
             descBtnSprite,
             this,
-            menu_selector(ModItem::onModDesc)
+            menu_selector(ModListItem::onModDesc)
         );
         descBtn->setID("short-description-btn");
 
@@ -249,24 +247,6 @@ bool ModItem::init(
             log::info("Mod {} is outdated, uses game version {}", m_impl->mod->getID(), gdVer);
             addChild(modOutdated);
         };
-    } else if (m_impl->mod->isEnabled() && favMod->getSettingValue<bool>("indicate-update")) {
-        if (auto update = m_impl->mod->checkUpdates().getFinishedValue()) {
-            log::debug("Checked for updates for mod of ID {}", m_impl->mod->getID());
-
-            if (update->unwrapOrDefault().has_value()) {
-                auto pendingUpdate = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
-                pendingUpdate->setID("pending-update-indicator");
-                pendingUpdate->setScale(0.375f);
-                pendingUpdate->setPosition({ btnMenu->getPositionX(), btnMenu->getPositionY() + (btnMenu->getScaledContentHeight() / 2.f) });
-
-                log::info("Mod {} has new update of version {} available", m_impl->mod->getID(), update->unwrapOrDefault().value().toVString());
-                addChild(pendingUpdate);
-            } else {
-                log::debug("Mod {} up-to-date", m_impl->mod->getID());
-            };
-        } else {
-            log::error("Unknown error when fetching update for {}", m_impl->mod->getID());
-        };
     } else if (!m_impl->mod->isEnabled() && favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
         auto modDisabled = CCLabelBMFont::create("Disabled", "bigFont.fnt");
         modDisabled->setID("disabled-indicator");
@@ -286,11 +266,11 @@ bool ModItem::init(
     return true;
 };
 
-void ModItem::onViewMod(CCObject*) {
+void ModListItem::onViewMod(CCObject*) {
     if (m_impl->mod) openInfoPopup(m_impl->mod);
 };
 
-void ModItem::onModDesc(CCObject*) {
+void ModListItem::onModDesc(CCObject*) {
     if (!m_impl->mod) return;
 
     if (auto alert = FLAlertLayer::create(
@@ -300,7 +280,7 @@ void ModItem::onModDesc(CCObject*) {
     )) alert->show();
 };
 
-void ModItem::onFavorite(CCObject*) {
+void ModListItem::onFavorite(CCObject*) {
     if (!m_impl->mod) return;
 
     // Toggle favorite status
@@ -314,29 +294,29 @@ void ModItem::onFavorite(CCObject*) {
     updateFavoriteIcon();
 
     // Send event to refresh list
-    FavoriteEvent().post();
+    FavoriteEvent().send();
 };
 
-void ModItem::updateFavoriteIcon() {
+void ModListItem::updateFavoriteIcon() {
     if (!m_impl->mod) return;
-
-    auto const modID = m_impl->mod->getID();
 
     if (m_impl->favButton) { // Make sure the favorite button has already been created
         auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
         auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
         auto newSprite = CCSprite::createWithSpriteFrameName(m_impl->favorite ? fOn : fOff);
-        newSprite->setScale(m_impl->heartIcons ? 0.625f : 0.875f);
+        newSprite->setScale(m_impl->heartIcons ? 0.75f : 1.f);
 
         m_impl->favButton->setNormalImage(newSprite);
-        log::info("Updated state for {} to {}", modID, m_impl->favorite ? "favorite" : "non-favorite");
+        m_impl->favButton->updateSprite();
+
+        log::info("Updated state for {} to {}", m_impl->mod->getID(), m_impl->favorite ? "favorite" : "non-favorite");
     } else {
-        log::error("Favorite button not found for {}", modID);
+        log::error("Favorite button not found for {}", m_impl->mod->getID());
     };
 };
 
-CCLabelBMFont* ModItem::firstTimeText() {
+CCLabelBMFont* ModListItem::firstTimeText() {
     if (!m_impl->mod) return nullptr;
 
     // check if mod loaded before
@@ -361,13 +341,13 @@ CCLabelBMFont* ModItem::firstTimeText() {
     return nullptr;
 };
 
-ModItem* ModItem::create(
+ModListItem* ModListItem::create(
     Mod* mod,
     CCSize const& size,
     bool geodeTheme,
     bool heartIcons
 ) {
-    auto ret = new ModItem();
+    auto ret = new ModListItem();
     if (ret->init(mod, size, geodeTheme, heartIcons)) {
         ret->autorelease();
         return ret;

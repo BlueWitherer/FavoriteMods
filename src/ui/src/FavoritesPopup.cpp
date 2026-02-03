@@ -1,8 +1,8 @@
 #include "../FavoritesPopup.hpp"
 
-#include "../../Events.hpp"
+#include "../ModListItem.hpp"
 
-#include "../ModItem.hpp"
+#include "../../Events.hpp"
 
 #include <Geode/Geode.hpp>
 
@@ -19,13 +19,13 @@ class FavoritesPopup::Impl final {
 public:
     bool geodeTheme = false; // Make sure visuals go with geode theme
     bool heartIcons = false; // Heart UI mode
-    bool usePages = false; // Use the list page system
+    bool usePages = favMod->getSettingValue<bool>("pages"); // Use the list page system
 
     ScrollLayer* scrollLayer = nullptr;
 
     int page = 1;
 
-    int itemsPerPage = 10;
+    int itemsPerPage = static_cast<int>(favMod->getSettingValue<int64_t>("pages-count"));
 
     int totalItems = 0;
     int totalPages = 0;
@@ -57,12 +57,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     m_impl->geodeTheme = geodeTheme;
     m_impl->heartIcons = heartIcons;
 
-    m_impl->usePages = favMod->getSettingValue<bool>("pages");
-
-    m_impl->page = 1;
-
-    m_impl->itemsPerPage = static_cast<int>(favMod->getSettingValue<int64_t>("pages-count"));
-
     if (!Popup::init(400.f, 280.f, m_impl->geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) return false;
 
     setCloseButtonSpr(
@@ -76,9 +70,9 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
 
-    // this->template addEventListener<FavoriteEventFilter>(
-    //     [this](auto) { return FavoritesChanged(); }
-    // );
+    addEventListener(FavoriteEvent(), [this]() {
+        return FavoritesChanged();
+                     });
 
     // Create main content area
     auto const [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
@@ -341,7 +335,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
 void FavoritesPopup::loadModList(std::span<Mod*> allMods) {
     for (auto const& mod : allMods) { // Add all mod items to scrolllayer
-        m_impl->scrollLayer->m_contentLayer->addChild(ModItem::create(mod, { m_impl->scrollLayer->getScaledContentWidth(), 37.5f }, m_impl->geodeTheme, m_impl->heartIcons));
+        m_impl->scrollLayer->m_contentLayer->addChild(ModListItem::create(mod, { m_impl->scrollLayer->getScaledContentWidth(), 37.5f }, m_impl->geodeTheme, m_impl->heartIcons));
         log::debug("Processed list item for mod {}", mod->getID());
     };
 };
@@ -364,7 +358,7 @@ void FavoritesPopup::refreshModList(bool clearSearch) {
     auto enabledOnly = favMod->getSettingValue<bool>("enabled-only");
 
     for (auto const& mod : loader->getAllMods()) {
-        auto const modID = mod->getID();
+        auto modID = mod->getID();
         bool isFavorited = favMod->getSavedValue<bool>(modID);
 
         // if the player only wants to show enabled mods or just everything
@@ -554,7 +548,7 @@ void FavoritesPopup::onPromptClearAll(CCObject*) {
 void FavoritesPopup::onClearAll() {
     // Turn off favorite from every mod
     for (auto const& mod : loader->getAllMods()) {
-        auto const modID = mod->getID(); // get the mod id
+        auto modID = mod->getID(); // get the mod id
         if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false); // prevent creating more saves
     };
 
