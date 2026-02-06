@@ -1,4 +1,4 @@
-#include "../ModListItem.hpp"
+#include "../FavoritesItem.hpp"
 
 #include "../../Events.hpp"
 
@@ -12,7 +12,7 @@ using namespace geode::prelude;
 
 static auto favMod = Mod::get(); // Get this mod
 
-class ModListItem::Impl final {
+class FavoritesItem::Impl final {
 public:
     Mod* mod = nullptr; // Fetched mod
 
@@ -26,13 +26,13 @@ public:
     CCScale9Sprite* backgroundSprite = nullptr; // Background theme
 };
 
-ModListItem::ModListItem() {
+FavoritesItem::FavoritesItem() {
     m_impl = std::make_unique<Impl>();
 };
 
-ModListItem::~ModListItem() {};
+FavoritesItem::~FavoritesItem() {};
 
-bool ModListItem::init(
+bool FavoritesItem::init(
     Mod* mod,
     CCSize const& size,
     bool geodeTheme,
@@ -43,7 +43,7 @@ bool ModListItem::init(
     m_impl->heartIcons = heartIcons;
 
     if (!mod) {
-        log::error("ModListItem init function called with null mod");
+        log::error("FavoritesItem init function called with null mod");
         return false;
     };
 
@@ -105,7 +105,7 @@ bool ModListItem::init(
     auto viewBtn = CCMenuItemSpriteExtra::create(
         viewBtnSprite,
         this,
-        menu_selector(ModListItem::onViewMod)
+        menu_selector(FavoritesItem::onViewMod)
     );
     viewBtn->setID("view-btn");
 
@@ -119,7 +119,7 @@ bool ModListItem::init(
     m_impl->favButton = CCMenuItemSpriteExtra::create(
         favBtnSprite,
         this,
-        menu_selector(ModListItem::onFavorite)
+        menu_selector(FavoritesItem::onFavorite)
     );
     m_impl->favButton->setID("favorite-btn");
 
@@ -194,7 +194,7 @@ bool ModListItem::init(
         auto descBtn = CCMenuItemSpriteExtra::create(
             descBtnSprite,
             this,
-            menu_selector(ModListItem::onModDesc)
+            menu_selector(FavoritesItem::onModDesc)
         );
         descBtn->setID("short-description-btn");
 
@@ -263,11 +263,11 @@ bool ModListItem::init(
     return true;
 };
 
-void ModListItem::onViewMod(CCObject*) {
+void FavoritesItem::onViewMod(CCObject*) {
     if (m_impl->mod) openInfoPopup(m_impl->mod);
 };
 
-void ModListItem::onModDesc(CCObject*) {
+void FavoritesItem::onModDesc(CCObject*) {
     if (!m_impl->mod) return;
 
     if (auto alert = FLAlertLayer::create(
@@ -277,7 +277,7 @@ void ModListItem::onModDesc(CCObject*) {
     )) alert->show();
 };
 
-void ModListItem::onFavorite(CCObject*) {
+void FavoritesItem::onFavorite(CCObject*) {
     if (!m_impl->mod) return;
 
     // Toggle favorite status
@@ -294,7 +294,7 @@ void ModListItem::onFavorite(CCObject*) {
     FavoriteEvent().send();
 };
 
-void ModListItem::updateFavoriteIcon() {
+void FavoritesItem::updateFavoriteIcon() {
     if (!m_impl->mod) return;
 
     if (m_impl->favButton) { // Make sure the favorite button has already been created
@@ -313,7 +313,7 @@ void ModListItem::updateFavoriteIcon() {
     };
 };
 
-CCLabelBMFont* ModListItem::firstTimeText() {
+CCLabelBMFont* FavoritesItem::firstTimeText() {
     if (!m_impl->mod) return nullptr;
 
     // check if mod loaded before
@@ -338,13 +338,13 @@ CCLabelBMFont* ModListItem::firstTimeText() {
     return nullptr;
 };
 
-ModListItem* ModListItem::create(
+FavoritesItem* FavoritesItem::create(
     Mod* mod,
     CCSize const& size,
     bool geodeTheme,
     bool heartIcons
 ) {
-    auto ret = new ModListItem();
+    auto ret = new FavoritesItem();
     if (ret->init(mod, size, geodeTheme, heartIcons)) {
         ret->autorelease();
         return ret;

@@ -1,6 +1,6 @@
 #include "../FavoritesPopup.hpp"
 
-#include "../ModListItem.hpp"
+#include "../FavoritesItem.hpp"
 
 #include "../../Events.hpp"
 
@@ -336,7 +336,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
 void FavoritesPopup::loadModList(std::span<Mod*> allMods) {
     for (auto const& mod : allMods) { // Add all mod items to scrolllayer
-        m_impl->scrollLayer->m_contentLayer->addChild(ModListItem::create(mod, { m_impl->scrollLayer->getScaledContentWidth(), 37.5f }, m_impl->geodeTheme, m_impl->heartIcons));
+        m_impl->scrollLayer->m_contentLayer->addChild(FavoritesItem::create(mod, { m_impl->scrollLayer->getScaledContentWidth(), 37.5f }, m_impl->geodeTheme, m_impl->heartIcons));
         log::debug("Processed list item for mod {}", mod->getID());
     };
 };

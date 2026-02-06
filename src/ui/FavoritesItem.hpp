@@ -5,14 +5,14 @@
 using namespace geode::prelude;
 
 // Mod list item
-class ModListItem : public CCNode {
+class FavoritesItem : public CCNode {
 private:
     class Impl;
     std::unique_ptr<Impl> m_impl;
 
 protected:
-    ModListItem();
-    virtual ~ModListItem();
+    FavoritesItem();
+    virtual ~FavoritesItem();
 
     void onViewMod(CCObject*);
     void onModDesc(CCObject*);
@@ -25,5 +25,5 @@ protected:
     bool init(Mod* mod, CCSize const& size, bool geodeTheme, bool heartIcons);
 
 public:
-    static ModListItem* create(Mod* mod, CCSize const& size, bool geodeTheme = false, bool heartIcons = false);
+    static FavoritesItem* create(Mod* mod, CCSize const& size, bool geodeTheme = false, bool heartIcons = false);
 };
