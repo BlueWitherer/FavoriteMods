@@ -8,16 +8,16 @@
 ---
 
 ## About
-This mod focuses on creating a dedicated UI with a list of installed mods, which prioritizes the mods you chose to be your favorites! Save time when looking for mods you enjoy or need the most.
+This mod creates an easier-to-access UI with your list of installed mods, which prioritizes the mods you chose to be your favorites! Save time when looking for mods you enjoy or need the most.
 
 ---
 
 ### Favorites
-A <cg>button</c> will appear on the left-hand side of the Geode mods page that creates a pop-up listing all installed mods, prioritizing the mods you have included in your favorites.
+A **<cg>new button</c>** will appear on <cg>the left-hand side of the Geode mods page</c> that creates a <cg>pop-up listing all installed mods</c>, prioritizing the mods you have included in your favorites.
 
-To <cy>add a mod to your favorites</c>, simply look for it by scrolling or <cy>typing its name, description, or ID</c> in the search box. Then, <cl>press the star icon</c> to the right, and it should add it as a favorite mod! You can also <cl>press the star again</c> to <cy>un-favorite the mod</c>. Favorite mods will always be listed at the top-most part in the first-most page of the list.
+To <cy>add a mod to your favorites</c>, simply look for it by scrolling or <cy>typing its name, description, or ID</c> in the <cg>search box</c>. Then, <cl>press the star icon</c> to the right, and it should add it as a favorite mod! You can also <cl>press the star again</c> to <cy>un-favorite the mod</c>. Favorite mods will always be listed at the top-most part in the first-most page of the list.
 
-You can also quickly add favorites through <cg>Geode's mod information pop-ups</c>! Just look for the <cg>favorite button at the bottom left of the pop-up</c> and <cl>press it</c>! <cr>You will be required to already have the mod installed to see this button.</c>
+You can also quickly add favorites through <cg>Geode's mod information pop-ups</c>! Just look for the <cg>favorite button below the bottom left corner of the pop-up</c> and <cl>press it</c>! <cr>You will be required to already have the mod installed to see this button.</c>
 
 ---
 

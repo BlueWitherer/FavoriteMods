@@ -1,4 +1,5 @@
 #include "ui/FavoritesPopup.hpp"
+
 #include "Events.hpp"
 
 #include <Geode/Geode.hpp>
@@ -42,9 +43,7 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
         f->m_isHeartIcons = favMod->getSettingValue<bool>("hearts");
 
         // get the actions menu
-        if (auto actionsMenu = typeinfo_cast<CCMenu*>(getChildByID("actions-menu"))) {
-            log::debug("Actions menu found successfully!");
-
+        if (auto menu = getChildByID("actions-menu")) {
             // favorites button sprite
             auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
                 f->m_isHeartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
@@ -54,27 +53,19 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
             favBtnSprite->setScale(0.8f);
 
             // create favorites button
-            auto favBtn = CCMenuItemSpriteExtra::create(
+            auto favBtn = CCMenuItemExt::createSpriteExtra(
                 favBtnSprite,
-                this,
-                menu_selector(FavoritesModsLayer::onFavoritesBtn)
+                [f](auto) {
+                    if (auto popup = FavoritesPopup::create(f->m_isGeodeTheme, f->m_isHeartIcons)) popup->show();
+                }
             );
-            favBtn->setID("favorites-button"_spr);
+            favBtn->setID("favorites-btn"_spr);
 
-            actionsMenu->addChild(favBtn);
-            actionsMenu->updateLayout();
-
-            log::info("Favorites button added to actions menu successfully");
+            menu->addChild(favBtn);
+            menu->updateLayout();
         } else {
-            log::error("Failed to find actions menu in Geode mods layer with ID 'actions-menu'");
+            log::error("Couldn't find actions menu in Geode mods layer");
         };
-    };
-
-    void onFavoritesBtn(CCObject*) {
-        auto f = m_fields.self();
-
-        // create and show the favorites pop-up
-        if (auto popup = FavoritesPopup::create(f->m_isGeodeTheme, f->m_isHeartIcons)) popup->show();
     };
 };
 
@@ -90,7 +81,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
             log::info("Creating favorite button on Geode mod popup");
 
             // check for the mod url button
-            if (auto modPageBtn = getChildByIDRecursive("mod-online-page-button")) {
+            if (auto modPageBtn = getChildByIDRecursive("mod-online-page-btn")) {
                 log::debug("Mod page button found");
 
                 // get the url from the user object

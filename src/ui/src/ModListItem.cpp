@@ -53,10 +53,7 @@ bool ModListItem::init(
 
     if (!CCNode::init()) return false;
 
-    auto colProvider = ColorProvider::get();
-
-    // node background theme color
-    auto const bgColor = colProvider->color("geode.loader/mod-developer-item-bg");
+    auto const bgColor = m_impl->geodeTheme ? ColorProvider::get()->color("geode.loader/mod-developer-item-bg") : ccColor4B{ 0, 0, 0, 75 };
 
     setID(modID);
     setAnchorPoint({ 0, 1 });
@@ -240,7 +237,7 @@ bool ModListItem::init(
             modOutdated->setAnchorPoint({ 0, 0.5 });
             modOutdated->setAlignment(kCCTextAlignmentLeft);
             modOutdated->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
-            modOutdated->setColor(colProvider->color3b("geode.loader/mod-list-outdated-label"));
+            modOutdated->setColor(ColorProvider::get()->color3b("geode.loader/mod-list-outdated-label"));
 
             nameLabel->setOpacity(200);
 

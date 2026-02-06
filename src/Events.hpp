@@ -2,9 +2,6 @@
 
 #include <Geode/loader/Event.hpp>
 
-using namespace geode::prelude;
-
-class FavoriteEvent : public SimpleEvent<FavoriteEvent> {
-public:
+struct FavoriteEvent : geode::SimpleEvent<FavoriteEvent> {
     using SimpleEvent::SimpleEvent;
 };

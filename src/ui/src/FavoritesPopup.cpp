@@ -64,7 +64,8 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
             "geode.loader/close.png",
             0.875f,
             m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
-        )
+        ),
+        0.875f
     );
 
     setID("favorite-mods-popup"_spr);
