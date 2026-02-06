@@ -47,13 +47,13 @@ bool FavoritesItem::init(
         return false;
     };
 
-    auto modID = mod->getID();
+    auto const modID = mod->getID();
 
     m_impl->favorite = favMod->getSavedValue<bool>(modID);
 
     if (!CCNode::init()) return false;
 
-    auto const bgColor = m_impl->geodeTheme ? ColorProvider::get()->color("geode.loader/mod-developer-item-bg") : ccColor4B{ 0, 0, 0, 75 };
+    auto const bgColor = ColorProvider::get()->color("geode.loader/mod-developer-item-bg");
 
     setID(modID);
     setAnchorPoint({ 0, 1 });
