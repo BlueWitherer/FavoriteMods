@@ -24,8 +24,8 @@
     ],
     "dependencies": {
         "alphalaneous.alphas_geode_utils": {
-            "importance": "required",
-            "version": ">=1.2.0-beta.1"
+            "version": ">=1.2.0-beta.1",
+            "required": true
         }
     },
     "settings": {

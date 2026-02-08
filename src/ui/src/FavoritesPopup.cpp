@@ -568,7 +568,7 @@ void FavoritesPopup::onGetStats(CCObject*) {
         total++;
 
         if (favMod->getSavedValue<bool>(mod->getID())) favorite++;
-        if (mod->isEnabled()) enabled++;
+        if (mod->isLoaded()) enabled++;
     };
 
     auto const faveCount = fmt::format("<cy>{}</c> Favorites", favorite);

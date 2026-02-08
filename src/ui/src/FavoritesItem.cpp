@@ -226,7 +226,7 @@ bool FavoritesItem::init(
 
     auto const loadProblem = m_impl->mod->targetsOutdatedVersion();
     if (loadProblem.has_value()) {
-        if (loadProblem->isOutdated() && favMod->getSettingValue<bool>("indicate-outdated")) {
+        if (loadProblem->type == LoadProblem::Type::Outdated && favMod->getSettingValue<bool>("indicate-outdated")) {
             auto const gdVer = m_impl->mod->getMetadata().getGameVersion();
             auto const reason = fmt::format("Outdated ({})", gdVer.value_or("Unknown"));
 
@@ -244,7 +244,7 @@ bool FavoritesItem::init(
             log::info("Mod {} is outdated, uses game version {}", m_impl->mod->getID(), gdVer);
             addChild(modOutdated);
         };
-    } else if (!m_impl->mod->isEnabled() && favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
+    } else if (!m_impl->mod->isLoaded() && favMod->getSettingValue<bool>("indicate-disabled")) { // check if the user wants to show the mod is disabled
         auto modDisabled = CCLabelBMFont::create("Disabled", "bigFont.fnt");
         modDisabled->setID("disabled-indicator");
         modDisabled->setScale(0.2f);

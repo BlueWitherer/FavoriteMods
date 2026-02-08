@@ -2,6 +2,6 @@
 
 #include <Geode/loader/Event.hpp>
 
-struct FavoriteEvent : geode::SimpleEvent<FavoriteEvent> {
-    using SimpleEvent::SimpleEvent;
+struct FavoriteEvent : geode::Event<FavoriteEvent, bool()> {
+    using Event::Event;
 };
