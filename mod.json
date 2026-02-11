@@ -23,10 +23,7 @@
         "enhancement"
     ],
     "dependencies": {
-        "alphalaneous.alphas_geode_utils": {
-            "version": ">=1.2.0-beta.1",
-            "required": true
-        }
+        "alphalaneous.alphas_geode_utils": ">=1.2.0-beta.2"
     },
     "settings": {
         "enabled-only": {

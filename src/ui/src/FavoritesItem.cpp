@@ -23,7 +23,7 @@ public:
 
     CCMenuItemSpriteExtra* favButton = nullptr; // Favorite button
 
-    CCScale9Sprite* backgroundSprite = nullptr; // Background theme
+    NineSlice* backgroundSprite = nullptr; // Background theme
 };
 
 FavoritesItem::FavoritesItem() {
@@ -60,7 +60,7 @@ bool FavoritesItem::init(
     setContentSize(size);
 
     // Background for mod item
-    m_impl->backgroundSprite = CCScale9Sprite::create("square02b_001.png");
+    m_impl->backgroundSprite = NineSlice::create("square02b_001.png");
     m_impl->backgroundSprite->setID("background");
     m_impl->backgroundSprite->setScale(0.5f);
     m_impl->backgroundSprite->setContentSize({ size.width * 2.f, size.height * 2.f });

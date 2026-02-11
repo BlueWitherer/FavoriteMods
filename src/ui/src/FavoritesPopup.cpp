@@ -172,7 +172,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     auto const scrollSize = CCSize{ widthCS - 17.5f, heightCS - 80.f };
 
     // bg for scroll layer
-    auto scrollBG = CCScale9Sprite::create("square02b_001.png");
+    auto scrollBG = NineSlice::create("square02b_001.png");
     scrollBG->setContentSize(scrollSize);
     scrollBG->setAnchorPoint({ 0.5, 0.5 });
     scrollBG->setPosition({ widthCS / 2.f, (heightCS / 2.f) - 30.f });

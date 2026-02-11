@@ -67,7 +67,7 @@ jobs:
                   embed-url: ${{ steps.publish-release.outputs.url }}
                   embed-author: ${{ github.actor }}
                   embed-author-icon: "https://avatars.githubusercontent.com/u/${{ github.actor_id }}?v=4"
-                  embed-thumbnail: "https://raw.githubusercontent.com/${{ github.repository }}/refs/heads/${{ github.event.repository.default_branch }}/logo.png"
+                  embed-thumbnail: "https://raw.githubusercontent.com/${{ github.repository }}/refs/tags/${{ github.ref_name }}/logo.png"
                   embed-timestamp: "now"
 
     publish:
