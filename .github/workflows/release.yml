@@ -51,7 +51,7 @@ jobs:
               uses: BlueWitherer/release-geode-mod@main
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  workflow: multi-platform.yml
+                  workflow: build.yml
 
             - name: Send Discord webhook
               if: ${{ steps.check-discord.outputs.has-webhook == 'true' }}

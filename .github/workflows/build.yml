@@ -101,7 +101,8 @@ jobs:
               uses: prevter/discord-webhook@main
               with:
                   webhook-url: ${{ secrets.NIGHTLY_WEBHOOK }}
-                  files: ./artifacts/Build Output/*.geode
+                  files: |
+                      ./artifacts/Build Output/*.geode
                   embed-title: "[${{ github.event.repository.name }}] Nightly Release"
                   embed-description: |
                       **Development build for commit [`${{ github.sha }}`](${{ github.event.repository.html_url}}/commit/${{ github.sha }})**.
