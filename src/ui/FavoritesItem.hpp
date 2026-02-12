@@ -12,7 +12,7 @@ private:
 
 protected:
     FavoritesItem();
-    virtual ~FavoritesItem();
+    ~FavoritesItem();
 
     void onViewMod(CCObject*);
     void onModDesc(CCObject*);

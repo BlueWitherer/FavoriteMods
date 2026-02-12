@@ -14,7 +14,7 @@ private:
 
 protected:
     FavoritesPopup();
-    virtual ~FavoritesPopup();
+    ~FavoritesPopup();
 
     bool init(bool geodeTheme, bool heartIcons);
 
