@@ -42,10 +42,7 @@ bool FavoritesItem::init(
     m_impl->geodeTheme = geodeTheme;
     m_impl->heartIcons = heartIcons;
 
-    if (!mod) {
-        log::error("FavoritesItem init function called with null mod");
-        return false;
-    };
+    if (!mod) return false;
 
     auto const modID = mod->getID();
 
@@ -62,10 +59,9 @@ bool FavoritesItem::init(
     // Background for mod item
     m_impl->backgroundSprite = NineSlice::create("square02b_001.png");
     m_impl->backgroundSprite->setID("background");
-    m_impl->backgroundSprite->setScale(0.5f);
-    m_impl->backgroundSprite->setContentSize({ size.width * 2.f, size.height * 2.f });
-    m_impl->backgroundSprite->setAnchorPoint({ 0.5, 0.5 });
-    m_impl->backgroundSprite->setPosition({ getScaledContentWidth() / 2.f, getScaledContentHeight() / 2.f });
+    m_impl->backgroundSprite->setContentSize(size);
+    m_impl->backgroundSprite->setScaleMultiplier(0.5f);
+    m_impl->backgroundSprite->setPosition(getScaledContentSize() / 2.f);
     m_impl->backgroundSprite->setColor(to3B(bgColor));
     m_impl->backgroundSprite->setOpacity(bgColor.a);
 
@@ -139,7 +135,7 @@ bool FavoritesItem::init(
     btnMenu->setID("button-menu");
     btnMenu->setAnchorPoint({ 1, 0.5 });
     btnMenu->setPosition({ widthCS - 10.f, heightCS / 2.f });
-    btnMenu->setScaledContentSize({ widthCS * 0.375f, heightCS - 10.f });
+    btnMenu->setContentSize({ widthCS * 0.375f, heightCS - 10.f });
     btnMenu->setLayout(btnMenuLayout);
 
     // add the previous buttons
