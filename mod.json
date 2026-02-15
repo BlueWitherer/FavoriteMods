@@ -1,5 +1,5 @@
 {
-    "geode": "5.0.0-alpha.2",
+    "geode": "5.0.0-beta.1",
     "gd": {
         "win": "2.2081",
         "android": "2.2081",
@@ -23,7 +23,7 @@
         "enhancement"
     ],
     "dependencies": {
-        "alphalaneous.alphas_geode_utils": ">=1.2.0-beta.2"
+        "alphalaneous.alphas_geode_utils": ">=1.2.0"
     },
     "settings": {
         "enabled-only": {
