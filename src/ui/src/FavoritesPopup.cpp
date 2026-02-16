@@ -327,7 +327,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
             m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
             CircleBaseSize::Medium
         );
-        modSettingsBtnSprite->setScale(0.625f);
+        modSettingsBtnSprite->setScale(0.5f);
 
         auto modSettingsBtn = CCMenuItemSpriteExtra::create(
             modSettingsBtnSprite,

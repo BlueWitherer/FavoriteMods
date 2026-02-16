@@ -8,7 +8,7 @@
     },
     "id": "cheeseworks.favoritemods",
     "name": "Favorite Mods",
-    "version": "1.2.5-beta.1",
+    "version": "1.2.5-beta.2",
     "developers": [
         "Cheeseworks"
     ],
@@ -94,7 +94,7 @@
             "type": "bool",
             "name": "Mod Settings Button",
             "description": "Create a quickly accessible mod settings button in the favorites pop-up.",
-            "default": false
+            "default": true
         },
         "refresh-clear-search": {
             "type": "bool",
