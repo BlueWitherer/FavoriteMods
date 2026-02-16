@@ -26,9 +26,7 @@ public:
     NineSlice* backgroundSprite = nullptr; // Background theme
 };
 
-FavoritesItem::FavoritesItem() {
-    m_impl = std::make_unique<Impl>();
-};
+FavoritesItem::FavoritesItem() : m_impl(std::make_unique<Impl>()) {};
 
 FavoritesItem::~FavoritesItem() {};
 

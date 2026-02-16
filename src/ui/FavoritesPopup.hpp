@@ -20,11 +20,6 @@ protected:
 
     void textChanged(CCTextInputNode* input) override;
 
-    ListenerResult FavoritesChanged();
-    void refreshModList(bool clearSearch = false);
-
-    void loadModList(std::span<Mod*> allMods);
-
     void onPageNext(CCObject*);
     void onPagePrevious(CCObject*);
 

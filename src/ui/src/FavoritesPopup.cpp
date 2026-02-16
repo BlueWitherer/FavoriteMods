@@ -45,11 +45,128 @@ public:
 
     bool showFavoritesOnly = false;
     bool hideFavorites = false;
+
+    void refreshModList(bool clearSearch = false) {
+        // Clear and recreate scroll content
+        scrollLayer->m_contentLayer->removeAllChildrenWithCleanup(true);
+
+        if (clearSearch && favMod->getSettingValue<bool>("refresh-clear-search")) searchText = "";
+
+        searchInput->setString(searchText, false);
+
+        // Filtered mods based on search text and toggle settings
+        std::vector<Mod*> filteredMods;
+        auto enabledOnly = favMod->getSettingValue<bool>("enabled-only");
+
+        for (auto const& mod : loader->getAllMods()) {
+            auto modID = mod->getID();
+            bool isFavorited = favMod->getSavedValue<bool>(modID);
+
+            // if the player only wants to show enabled mods or just everything
+            bool list = enabledOnly ? mod->isOrWillBeEnabled() : true;
+            if (searchText.empty()) list = isFavorited || (modID != "geode.loader"); // if search text is empty, don't show geode loader mod unless its favorited
+
+            if (list) {
+                auto empty = std::string::npos; // dry code xd
+
+                log::debug("{} {} a favorite", modID, isFavorited ? "is" : "is not");
+
+                // evil bool >:3
+                bool matchesSearch = searchText.empty() // show all mods if search text is empty
+                    || str::toLower(mod->getName()).find(string::toLower(searchText)) != empty // search via name
+                    || str::toLower(mod->getDescription().value_or(mod->getName())).find(string::toLower(searchText)) != empty // search via description
+                    || str::toLower(mod->getID()).find(string::toLower(searchText)) != empty; // search via id
+
+                // If favorites-only is enabled, only show favorited mods
+                if (showFavoritesOnly) {
+                    if (isFavorited && matchesSearch) filteredMods.push_back(mod);
+                } else if (hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
+                    if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
+                } else { // show all matching mods, with favorites prioritized
+                    if (matchesSearch) filteredMods.push_back(mod);
+                };
+            } else { // if geode or disabled skip it
+                log::warn("Skipping listing mod {}", modID);
+            };
+        };
+
+        // Sort if favorited or otherwise in alphabetical order
+        std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
+            auto aFav = favMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
+            auto bFav = favMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
+
+            if (aFav != bFav) return aFav > bFav; // Favorited mods first
+
+            return str::toLower(a->getName()) < str::toLower(b->getName()); // Alphabetical order
+                  });
+
+        if (usePages) { // load every set amount of mods in separate pages
+            totalItems = static_cast<int>(filteredMods.size());
+            totalPages = static_cast<int>(std::ceil(static_cast<float>(totalItems) / static_cast<float>(itemsPerPage)));
+
+            log::info("Loading page {} of {}", page, totalPages);
+
+            if (page >= totalPages) { // if at the last page
+                log::debug("Reached last page");
+
+                page = totalPages;
+
+                if (pageNextBtn) pageNextBtn->setVisible(false);
+                if (pagePreviousBtn) pagePreviousBtn->setVisible(totalPages > 1); // if there's more than 1 page, show this button
+            } else if (page <= 1) { // if at the first page
+                log::debug("Reached first page");
+
+                page = 1;
+
+                if (pageNextBtn) pageNextBtn->setVisible(totalPages > 1); // if there's more than 1 page, show this button
+                if (pagePreviousBtn) pagePreviousBtn->setVisible(false);
+            } else { // if somewhere in the middle
+                if (pageNextBtn) pageNextBtn->setVisible(true);
+                if (pagePreviousBtn) pagePreviousBtn->setVisible(true);
+            };
+
+            int startIndex = (page - 1) * itemsPerPage; // show this mod first
+            int endIndex = std::min(startIndex + itemsPerPage, totalItems); // show this mod last
+
+            if (startIndex >= 0 && startIndex < totalItems) { // make sure the mods exist
+                loadModList({ filteredMods.begin() + startIndex, filteredMods.begin() + endIndex });
+
+                if (pagesLabel) { // make sure the page label exists
+                    auto pageText = fmt::format("Page {}/{}, Total {} Mods", page, totalPages, totalItems);
+                    pagesLabel->setCString(pageText.c_str());
+                } else {
+                    log::error("Couldn't find page count label");
+                };
+            } else {
+                log::error("Invalid start index for filtered mods vector: {}", startIndex);
+            };
+        } else { // or screw it just load 'em all!
+            log::debug("Loading all mods");
+            loadModList(filteredMods);
+        };
+
+        scrollLayer->m_contentLayer->updateLayout();
+        if (favMod->getSettingValue<bool>("auto-scroll")) scrollLayer->scrollToTop();
+
+        // Toggle "No mods found" message
+        if (filteredMods.empty()) {
+            noModsLabel->setVisible(true);
+            scrollLayer->setVisible(false);
+        } else {
+            noModsLabel->setVisible(false);
+            scrollLayer->setVisible(true);
+        };
+    };
+
+    void loadModList(std::span<Mod*> allMods) {
+        for (auto const& mod : allMods) { // Add all mod items
+            scrollLayer->m_contentLayer->addChild(FavoritesItem::create(mod, { scrollLayer->getScaledContentWidth(), 37.5f }, geodeTheme, heartIcons));
+            log::debug("Processed list item for mod {}", mod->getID());
+        };
+    };
 };
 
-FavoritesPopup::FavoritesPopup() {
-    m_impl = std::make_unique<Impl>();
-};
+FavoritesPopup::FavoritesPopup() : m_impl(std::make_unique<Impl>()) {};
 
 FavoritesPopup::~FavoritesPopup() {};
 
@@ -72,7 +189,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     setTitle("Favorite Mods");
 
     addEventListener(FavoriteEvent(), [this]() {
-        return FavoritesChanged();
+        m_impl->refreshModList(false);
                      });
 
     // Create main content area
@@ -327,140 +444,16 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     m_buttonMenu->addChild(infoBtn);
 
-    refreshModList(true);
+    m_impl->refreshModList(true);
 
     favMod->setSavedValue("already-loaded", true);
 
     return true;
 };
 
-void FavoritesPopup::loadModList(std::span<Mod*> allMods) {
-    for (auto const& mod : allMods) { // Add all mod items to scrolllayer
-        m_impl->scrollLayer->m_contentLayer->addChild(FavoritesItem::create(mod, { m_impl->scrollLayer->getScaledContentWidth(), 37.5f }, m_impl->geodeTheme, m_impl->heartIcons));
-        log::debug("Processed list item for mod {}", mod->getID());
-    };
-};
-
-ListenerResult FavoritesPopup::FavoritesChanged() {
-    refreshModList(false);
-    return ListenerResult::Propagate;
-};
-
-void FavoritesPopup::refreshModList(bool clearSearch) {
-    // Clear and recreate scroll content
-    m_impl->scrollLayer->m_contentLayer->removeAllChildrenWithCleanup(true);
-
-    if (clearSearch && favMod->getSettingValue<bool>("refresh-clear-search")) m_impl->searchText = "";
-
-    m_impl->searchInput->setString(m_impl->searchText, false);
-
-    // Filtered mods based on search text and toggle settings
-    std::vector<Mod*> filteredMods;
-    auto enabledOnly = favMod->getSettingValue<bool>("enabled-only");
-
-    for (auto const& mod : loader->getAllMods()) {
-        auto modID = mod->getID();
-        bool isFavorited = favMod->getSavedValue<bool>(modID);
-
-        // if the player only wants to show enabled mods or just everything
-        bool list = enabledOnly ? mod->isOrWillBeEnabled() : true;
-        if (m_impl->searchText.empty()) list = isFavorited || (modID != "geode.loader"); // if search text is empty, don't show geode loader mod unless its favorited
-
-        if (list) {
-            auto empty = std::string::npos; // dry code xd
-
-            log::debug("{} {} a favorite", modID, isFavorited ? "is" : "is not");
-
-            // evil bool >:3
-            bool matchesSearch = m_impl->searchText.empty() // show all mods if search text is empty
-                || str::toLower(mod->getName()).find(string::toLower(m_impl->searchText)) != empty // search via name
-                || str::toLower(mod->getDescription().value_or(mod->getName())).find(string::toLower(m_impl->searchText)) != empty // search via description
-                || str::toLower(mod->getID()).find(string::toLower(m_impl->searchText)) != empty; // search via id
-
-            // If favorites-only is enabled, only show favorited mods
-            if (m_impl->showFavoritesOnly) {
-                if (isFavorited && matchesSearch) filteredMods.push_back(mod);
-            } else if (m_impl->hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
-                if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
-            } else { // show all matching mods, with favorites prioritized
-                if (matchesSearch) filteredMods.push_back(mod);
-            };
-        } else { // if geode or disabled skip it
-            log::warn("Skipping listing mod {}", modID);
-        };
-    };
-
-    // Sort if favorited or otherwise in alphabetical order
-    std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
-        auto aFav = favMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
-        auto bFav = favMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
-
-        if (aFav != bFav) return aFav > bFav; // Favorited mods first
-
-        return str::toLower(a->getName()) < str::toLower(b->getName()); // Alphabetical order
-              });
-
-    if (m_impl->usePages) { // load every set amount of mods in separate pages
-        m_impl->totalItems = static_cast<int>(filteredMods.size());
-        m_impl->totalPages = static_cast<int>(std::ceil(static_cast<float>(m_impl->totalItems) / static_cast<float>(m_impl->itemsPerPage)));
-
-        log::info("Loading page {} of {}", m_impl->page, m_impl->totalPages);
-
-        if (m_impl->page >= m_impl->totalPages) { // if at the last page
-            log::debug("Reached last page");
-
-            m_impl->page = m_impl->totalPages;
-
-            if (m_impl->pageNextBtn) m_impl->pageNextBtn->setVisible(false);
-            if (m_impl->pagePreviousBtn) m_impl->pagePreviousBtn->setVisible(m_impl->totalPages > 1); // if there's more than 1 page, show this button
-        } else if (m_impl->page <= 1) { // if at the first page
-            log::debug("Reached first page");
-
-            m_impl->page = 1;
-
-            if (m_impl->pageNextBtn) m_impl->pageNextBtn->setVisible(m_impl->totalPages > 1); // if there's more than 1 page, show this button
-            if (m_impl->pagePreviousBtn) m_impl->pagePreviousBtn->setVisible(false);
-        } else { // if somewhere in the middle
-            if (m_impl->pageNextBtn) m_impl->pageNextBtn->setVisible(true);
-            if (m_impl->pagePreviousBtn) m_impl->pagePreviousBtn->setVisible(true);
-        };
-
-        int startIndex = (m_impl->page - 1) * m_impl->itemsPerPage; // show this mod first
-        int endIndex = std::min(startIndex + m_impl->itemsPerPage, m_impl->totalItems); // show this mod last
-
-        if (startIndex >= 0 && startIndex < m_impl->totalItems) { // make sure the mods exist
-            loadModList({ filteredMods.begin() + startIndex, filteredMods.begin() + endIndex });
-
-            if (m_impl->pagesLabel) { // make sure the page label exists
-                auto pageText = fmt::format("Page {}/{}, Total {} Mods", m_impl->page, m_impl->totalPages, m_impl->totalItems);
-                m_impl->pagesLabel->setCString(pageText.c_str());
-            } else {
-                log::error("Couldn't find page count label");
-            };
-        } else {
-            log::error("Invalid start index for filtered mods vector: {}", startIndex);
-        };
-    } else { // or screw it just load 'em all!
-        log::debug("Loading all mods");
-        loadModList(filteredMods);
-    };
-
-    m_impl->scrollLayer->m_contentLayer->updateLayout();
-    if (favMod->getSettingValue<bool>("auto-scroll")) m_impl->scrollLayer->scrollToTop();
-
-    // Toggle "No mods found" message
-    if (filteredMods.empty()) {
-        m_impl->noModsLabel->setVisible(true);
-        m_impl->scrollLayer->setVisible(false);
-    } else {
-        m_impl->noModsLabel->setVisible(false);
-        m_impl->scrollLayer->setVisible(true);
-    };
-};
-
 void FavoritesPopup::textChanged(CCTextInputNode* input) {
     m_impl->searchText = input->getString();
-    refreshModList(false);
+    m_impl->refreshModList(false);
 };
 
 void FavoritesPopup::onClearSearch(CCObject*) {
@@ -486,7 +479,7 @@ void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
         log::debug("Hide favorites mode already off");
     };
 
-    refreshModList(true);
+    m_impl->refreshModList(true);
 };
 
 void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
@@ -500,21 +493,21 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
         log::debug("Favorites only mode already off");
     };
 
-    refreshModList(true);
+    m_impl->refreshModList(true);
 };
 
 void FavoritesPopup::onPageNext(CCObject*) {
     if (m_impl->page < m_impl->totalPages) m_impl->page++; // turn the page next
     if (m_impl->page >= m_impl->totalPages) m_impl->page = m_impl->totalPages; // if max pages just stay at 1
 
-    refreshModList(true);
+    m_impl->refreshModList(true);
 };
 
 void FavoritesPopup::onPagePrevious(CCObject*) {
     if (m_impl->page > 1) m_impl->page--; // turn the page previous
     if (m_impl->page <= 1) m_impl->page = 1; // if max pages just stay at 1
 
-    refreshModList(true);
+    m_impl->refreshModList(true);
 };
 
 void FavoritesPopup::onInfoButton(CCObject*) {
@@ -553,7 +546,7 @@ void FavoritesPopup::onClearAll() {
         if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false); // prevent creating more saves
     };
 
-    refreshModList(true);
+    m_impl->refreshModList(true);
 
     Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
     log::info("Cleared all favorite mods");

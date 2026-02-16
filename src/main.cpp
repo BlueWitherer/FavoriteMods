@@ -166,8 +166,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                         favMenu->updateLayout();
 
                         // try to get the actual popup layer
-                        auto popup = reinterpret_cast<FLAlertLayer*>(this);
-                        if (popup->m_mainLayer) popup->m_mainLayer->addChild(favMenu);
+                        if (auto layer = getChildByType<CCLayer*>(0)) layer->addChild(favMenu);
                     } else {
                         log::error("Couldn't find Geode mod URL");
                     };
@@ -194,8 +193,6 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
             log::info("{} now {} favorites", f->m_modID, favMod->getSavedValue<bool>(f->m_modID) ? "on" : "off");
 
             FavoriteEvent().send();
-        } else {
-            log::error("Couldn't get favorite button");
         };
     };
 };
