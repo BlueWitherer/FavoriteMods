@@ -7,7 +7,7 @@
 using namespace geode::prelude;
 
 // Favorites menu
-class FavoritesPopup : public Popup, public TextInputDelegate {
+class FavoritesPopup final : public Popup, public TextInputDelegate {
 private:
     class Impl;
     std::unique_ptr<Impl> m_impl;
@@ -15,8 +15,6 @@ private:
 protected:
     FavoritesPopup();
     ~FavoritesPopup();
-
-    bool init(bool geodeTheme, bool heartIcons);
 
     void textChanged(CCTextInputNode* input) override;
 
@@ -35,9 +33,8 @@ protected:
 
     void onModSettings(CCObject*);
 
+    bool init(bool geodeTheme, bool heartIcons);
+
 public:
-    static FavoritesPopup* create(
-        bool geodeTheme = false,
-        bool heartIcons = false
-    );
+    static FavoritesPopup* create(bool geodeTheme = false, bool heartIcons = false);
 };

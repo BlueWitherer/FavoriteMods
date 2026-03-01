@@ -5,7 +5,7 @@
 using namespace geode::prelude;
 
 // Mod list item
-class FavoritesItem : public CCNode {
+class FavoritesItem final : public CCNode {
 private:
     class Impl;
     std::unique_ptr<Impl> m_impl;

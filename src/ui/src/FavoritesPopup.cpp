@@ -6,6 +6,7 @@
 
 #include <Geode/Geode.hpp>
 
+#include <Geode/ui/Button.hpp>
 #include <Geode/ui/GeodeUI.hpp>
 
 using namespace geode::prelude;
@@ -30,8 +31,8 @@ public:
     int totalItems = 0;
     int totalPages = 0;
 
-    CCMenuItemSpriteExtra* pageNextBtn = nullptr;
-    CCMenuItemSpriteExtra* pagePreviousBtn = nullptr;
+    Button* pageNextBtn = nullptr;
+    Button* pagePreviousBtn = nullptr;
 
     CCLabelBMFont* pagesLabel = nullptr;
 
@@ -69,7 +70,7 @@ public:
             if (list) {
                 auto empty = std::string::npos; // dry code xd
 
-                log::debug("{} {} a favorite", modID, isFavorited ? "is" : "is not");
+                log::trace("{} {} a favorite", modID, isFavorited ? "is" : "is not");
 
                 // evil bool >:3
                 bool matchesSearch = searchText.empty() // show all mods if search text is empty
@@ -86,7 +87,7 @@ public:
                     if (matchesSearch) filteredMods.push_back(mod);
                 };
             } else { // if geode or disabled skip it
-                log::warn("Skipping listing mod {}", modID);
+                log::debug("Skipping listing mod {}", modID);
             };
         };
 
@@ -98,7 +99,7 @@ public:
             if (aFav != bFav) return aFav > bFav; // Favorited mods first
 
             return str::toLower(a->getName()) < str::toLower(b->getName()); // Alphabetical order
-                  });
+            });
 
         if (usePages) { // load every set amount of mods in separate pages
             totalItems = static_cast<int>(filteredMods.size());
@@ -161,7 +162,7 @@ public:
     void loadModList(std::span<Mod*> allMods) {
         for (auto const& mod : allMods) { // Add all mod items
             scrollLayer->m_contentLayer->addChild(FavoritesItem::create(mod, { scrollLayer->getScaledContentWidth(), 37.5f }, geodeTheme, heartIcons));
-            log::debug("Processed list item for mod {}", mod->getID());
+            log::trace("Processed list item for mod {}", mod->getID());
         };
     };
 };
@@ -174,10 +175,12 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     m_impl->geodeTheme = geodeTheme;
     m_impl->heartIcons = heartIcons;
 
+    // @geode-ignore(unknown-resource)
     if (!Popup::init(400.f, 280.f, m_impl->geodeTheme ? "geode.loader/GE_square01.png" : "GJ_square01.png")) return false;
 
     setCloseButtonSpr(
         CircleButtonSprite::createWithSpriteFrameName(
+            // @geode-ignore(unknown-resource)
             "geode.loader/close.png",
             0.875f,
             m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
@@ -189,16 +192,16 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     setTitle("Favorite Mods");
 
     addEventListener(FavoriteEvent(), [this]() {
-        m_impl->refreshModList(false);
-                     });
+        m_impl->refreshModList();
+        });
 
     // Create main content area
-    auto const [widthCS, heightCS] = m_mainLayer->getScaledContentSize();
+    auto const size = m_mainLayer->getScaledContentSize();
 
     // Create search input
-    m_impl->searchInput = TextInput::create(widthCS - 125.f, "Search Mods", "bigFont.fnt");
+    m_impl->searchInput = TextInput::create(size.width - 125.f, "Search Mods", "bigFont.fnt");
     m_impl->searchInput->setID("search-box");
-    m_impl->searchInput->setPosition({ widthCS / 2.f - 15.f, heightCS - 50.f });
+    m_impl->searchInput->setPosition({ size.width / 2.f - 15.f, size.height - 50.f });
     m_impl->searchInput->setDelegate(this);
     m_impl->searchInput->setMaxCharCount(50);
 
@@ -234,7 +237,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
     );
     m_impl->favoritesOnlyToggle->setID("show-favorites-btn");
-    m_impl->favoritesOnlyToggle->setPosition({ widthCS - 60.f, heightCS - 50.f });
+    m_impl->favoritesOnlyToggle->setPosition({ size.width - 60.f, size.height - 50.f });
 
     m_buttonMenu->addChild(m_impl->favoritesOnlyToggle);
 
@@ -252,7 +255,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         menu_selector(FavoritesPopup::onHideFavoritesToggle)
     );
     m_impl->hideFavoritesToggle->setID("hide-favorites-btn");
-    m_impl->hideFavoritesToggle->setPosition({ widthCS - 25.f, heightCS - 50.f });
+    m_impl->hideFavoritesToggle->setPosition({ size.width - 25.f, size.height - 50.f });
 
     m_buttonMenu->addChild(m_impl->hideFavoritesToggle);
 
@@ -278,7 +281,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     m_impl->noModsLabel = CCLabelBMFont::create("No mods found! :(", "bigFont.fnt");
     m_impl->noModsLabel->setID("no-mods-label");
-    m_impl->noModsLabel->setPosition({ widthCS / 2.f, heightCS / 2.f - 30.f });
+    m_impl->noModsLabel->setPosition({ size.width / 2.f, size.height / 2.f - 30.f });
     m_impl->noModsLabel->setScale(0.5f);
     m_impl->noModsLabel->setColor({ 125, 125, 125 });
     m_impl->noModsLabel->setVisible(false);
@@ -286,13 +289,13 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     m_mainLayer->addChild(m_impl->noModsLabel);
 
     // Create scroll size
-    auto const scrollSize = CCSize{ widthCS - 17.5f, heightCS - 80.f };
+    auto const scrollSize = CCSize{ size.width - 17.5f, size.height - 80.f };
 
     // bg for scroll layer
     auto scrollBG = NineSlice::create("square02b_001.png");
     scrollBG->setContentSize(scrollSize);
     scrollBG->setAnchorPoint({ 0.5, 0.5 });
-    scrollBG->setPosition({ widthCS / 2.f, (heightCS / 2.f) - 30.f });
+    scrollBG->setPosition({ size.width / 2.f, (size.height / 2.f) - 30.f });
     scrollBG->setColor({ 0, 0, 0 });
     scrollBG->setOpacity(100);
 
@@ -322,6 +325,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     if (favMod->getSettingValue<bool>("settings-btn")) {
         // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+            // @geode-ignore(unknown-resource)
             "geode.loader/settings.png",
             1.f,
             m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
@@ -346,6 +350,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     auto clearAllBtnSprite = ButtonSprite::create(
         "Clear",
         "bigFont.fnt",
+        // @geode-ignore(unknown-resource)
         m_impl->geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
         0.875f
     );
@@ -358,12 +363,13 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         menu_selector(FavoritesPopup::onPromptClearAll)
     );
     clearAllBtn->setID("clear-favorites-btn");
-    clearAllBtn->setPosition({ widthCS / 2.f, 1.25f });
+    clearAllBtn->setPosition({ size.width / 2.f, 1.25f });
 
     m_buttonMenu->addChild(clearAllBtn, 3);
 
     // favorites stats button sprite
     auto statsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+        // @geode-ignore(unknown-resource)
         "geode.loader/changelog.png",
         0.75f,
         m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
@@ -378,7 +384,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         menu_selector(FavoritesPopup::onGetStats)
     );
     statsBtn->setID("statistics-btn");
-    statsBtn->setPosition({ widthCS - 1.25f, 1.25f });
+    statsBtn->setPosition({ size.width - 1.25f, 1.25f });
 
     m_buttonMenu->addChild(statsBtn, 3);
 
@@ -390,13 +396,17 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         pageNextBtnSprite->setFlipX(true);
 
         // create go next page button
-        m_impl->pageNextBtn = CCMenuItemSpriteExtra::create(
+        m_impl->pageNextBtn = Button::createWithNode(
             pageNextBtnSprite,
-            this,
-            menu_selector(FavoritesPopup::onPageNext)
+            [this](auto) {
+                if (m_impl->page < m_impl->totalPages) m_impl->page++; // turn the page next
+                if (m_impl->page >= m_impl->totalPages) m_impl->page = m_impl->totalPages; // if max pages just stay at 1
+
+                m_impl->refreshModList(true);
+            }
         );
         m_impl->pageNextBtn->setID("page-next-btn");
-        m_impl->pageNextBtn->setPosition({ widthCS + 17.5f , scrollBG->getPositionY() });
+        m_impl->pageNextBtn->setPosition({ size.width + 17.5f , scrollBG->getPositionY() });
         m_impl->pageNextBtn->setVisible(true);
 
         auto pagePreviousBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
@@ -404,10 +414,14 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         pagePreviousBtnSprite->setFlipX(false);
 
         // create go previous page button
-        m_impl->pagePreviousBtn = CCMenuItemSpriteExtra::create(
+        m_impl->pagePreviousBtn = Button::createWithNode(
             pagePreviousBtnSprite,
-            this,
-            menu_selector(FavoritesPopup::onPagePrevious)
+            [this](auto) {
+                if (m_impl->page > 1) m_impl->page--; // turn the page previous
+                if (m_impl->page <= 1) m_impl->page = 1; // if max pages just stay at 1
+
+                m_impl->refreshModList(true);
+            }
         );
         m_impl->pagePreviousBtn->setID("page-previous-btn");
         m_impl->pagePreviousBtn->setPosition({ -17.5f , scrollBG->getPositionY() });
@@ -440,7 +454,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         menu_selector(FavoritesPopup::onInfoButton)
     );
     infoBtn->setID("info-btn");
-    infoBtn->setPosition({ widthCS - 15.f, heightCS - 15.f });
+    infoBtn->setPosition({ size.width - 15.f, size.height - 15.f });
 
     m_buttonMenu->addChild(infoBtn);
 
@@ -453,7 +467,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
 void FavoritesPopup::textChanged(CCTextInputNode* input) {
     m_impl->searchText = input->getString();
-    m_impl->refreshModList(false);
+    m_impl->refreshModList();
 };
 
 void FavoritesPopup::onClearSearch(CCObject*) {

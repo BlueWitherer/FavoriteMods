@@ -78,20 +78,20 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
 
     void modify() {
         if (favMod->getSettingValue<bool>("geode-popup")) {
-            log::info("Creating favorite button on Geode mod popup");
+            log::debug("Creating favorite button on Geode mod popup");
 
             // check for the mod url button
             if (auto modPageBtn = getChildByIDRecursive("mod-online-page-btn")) {
-                log::debug("Mod page button found");
+                log::trace("Mod page button found");
 
                 // get the url from the user object
                 if (auto url = typeinfo_cast<CCString*>(modPageBtn->getUserObject("url"))) {
-                    log::debug("URL string object found in mod page button");
+                    log::trace("URL string object found in mod page button");
 
                     std::string urlStr = url->getCString();
 
                     if (utils::string::startsWith(urlStr, urlGeode)) {
-                        log::debug("URL found, creating favorites UI");
+                        log::trace("URL found, creating favorites UI");
 
                         // extract mod id from url
                         auto const thisModID = urlStr.erase(0, urlGeode.size());
@@ -186,11 +186,11 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
 
         if (f->m_favButton) {
             auto toFavorite = f->m_favButton->isToggled();
-            log::debug("({}) {} favorites", f->m_modID, toFavorite ? "Adding to" : "Removing from");
+            log::trace("({}) {} favorites", f->m_modID, toFavorite ? "Adding to" : "Removing from");
 
             // Save the favorite status
             favMod->setSavedValue(f->m_modID, toFavorite);
-            log::info("{} now {} favorites", f->m_modID, favMod->getSavedValue<bool>(f->m_modID) ? "on" : "off");
+            log::debug("{} now {} favorites", f->m_modID, favMod->getSavedValue<bool>(f->m_modID) ? "on" : "off");
 
             FavoriteEvent().send();
         };

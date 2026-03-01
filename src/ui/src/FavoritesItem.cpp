@@ -22,8 +22,6 @@ public:
     bool heartIcons = false; // Hearts UI mode
 
     CCMenuItemSpriteExtra* favButton = nullptr; // Favorite button
-
-    NineSlice* backgroundSprite = nullptr; // Background theme
 };
 
 FavoritesItem::FavoritesItem() : m_impl(std::make_unique<Impl>()) {};
@@ -54,43 +52,37 @@ bool FavoritesItem::init(
     setAnchorPoint({ 0, 1 });
     setContentSize(size);
 
-    // Background for mod item
-    m_impl->backgroundSprite = NineSlice::create("square02b_001.png");
-    m_impl->backgroundSprite->setID("background");
-    m_impl->backgroundSprite->setContentSize(size);
-    m_impl->backgroundSprite->setScaleMultiplier(0.5f);
-    m_impl->backgroundSprite->setPosition(getScaledContentSize() / 2.f);
-    m_impl->backgroundSprite->setColor(to3B(bgColor));
-    m_impl->backgroundSprite->setOpacity(bgColor.a);
+    auto backgroundSprite = NineSlice::create("square02b_001.png");
+    backgroundSprite->setID("background");
+    backgroundSprite->setContentSize(size);
+    backgroundSprite->setScaleMultiplier(0.5f);
+    backgroundSprite->setPosition(getScaledContentSize() / 2.f);
+    backgroundSprite->setColor(to3B(bgColor));
+    backgroundSprite->setOpacity(bgColor.a);
 
-    // Create main content area
-    auto const [widthCS, heightCS] = getScaledContentSize();
+    addChild(backgroundSprite);
 
-    addChild(m_impl->backgroundSprite);
-
-    // Mod icon sprite
     auto modIcon = createModLogo(m_impl->mod);
     modIcon->setID("mod-icon");
     modIcon->setScale(0.5f);
-    modIcon->setPosition({ 20.f, heightCS / 2.f });
+    modIcon->setPosition({ 20.f, size.height / 2.f });
     modIcon->setAnchorPoint({ 0.5, 0.5 });
 
     addChild(modIcon);
 
-    // Mod name label
     auto nameLabel = CCLabelBMFont::create(m_impl->mod->getName().c_str(), "bigFont.fnt");
     nameLabel->setID("mod-name");
     nameLabel->setScale(0.4f);
-    nameLabel->setPosition({ 37.5f, (heightCS / 2.f) + 5.f });
+    nameLabel->setPosition({ 37.5f, (size.height / 2.f) + 5.f });
     nameLabel->setAlignment(kCCTextAlignmentLeft);
     nameLabel->setAnchorPoint({ 0, 0.5 });
 
     addChild(nameLabel);
 
-    // View button
     auto viewBtnSprite = ButtonSprite::create(
         "View",
         "bigFont.fnt",
+        // @geode-ignore(unknown-resource)
         m_impl->geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
         0.75f
     );
@@ -117,7 +109,6 @@ bool FavoritesItem::init(
     );
     m_impl->favButton->setID("favorite-btn");
 
-    // Layout to automatically position buttons on right-side button menu
     auto btnMenuLayout = RowLayout::create()
         ->setDefaultScaleLimits(0.625f, 0.875f)
         ->setAxisAlignment(AxisAlignment::End)
@@ -128,15 +119,13 @@ bool FavoritesItem::init(
         ->setAxisReverse(true)
         ->setGap(5.f);
 
-    // Create menu for buttons
     auto btnMenu = CCMenu::create();
     btnMenu->setID("button-menu");
     btnMenu->setAnchorPoint({ 1, 0.5 });
-    btnMenu->setPosition({ widthCS - 10.f, heightCS / 2.f });
-    btnMenu->setContentSize({ widthCS * 0.375f, heightCS - 10.f });
+    btnMenu->setPosition({ size.width - 10.f, size.height / 2.f });
+    btnMenu->setContentSize({ size.width * 0.375f, size.height - 10.f });
     btnMenu->setLayout(btnMenuLayout);
 
-    // add the previous buttons
     btnMenu->addChild(viewBtn);
     btnMenu->addChild(m_impl->favButton);
 
@@ -153,7 +142,6 @@ bool FavoritesItem::init(
         auto devLabelText = devs[0];
         if (andMore > 0) devLabelText = fmt::format("{} & {} more", devLabelText, andMore);
 
-        // Developers label
         auto devLabel = CCLabelBMFont::create(devLabelText.c_str(), "goldFont.fnt");
         devLabel->setID("mod-developers");
         devLabel->setPosition({ nameLabel->getScaledContentWidth() + 40.f, nameLabel->getPositionY() });
@@ -163,10 +151,9 @@ bool FavoritesItem::init(
 
         addChild(devLabel);
 
-        // Version label
         auto versionLabel = CCLabelBMFont::create(m_impl->mod->getVersion().toVString().c_str(), "goldFont.fnt");
         versionLabel->setID("mod-version");
-        versionLabel->setPosition({ 37.5f, (heightCS / 2.f) - 5.f });
+        versionLabel->setPosition({ 37.5f, (size.height / 2.f) - 5.f });
         versionLabel->setScale(0.3f);
         versionLabel->setAnchorPoint({ 0, 0.5 });
         versionLabel->setAlignment(kCCTextAlignmentLeft);
@@ -175,8 +162,8 @@ bool FavoritesItem::init(
 
         addChild(versionLabel);
 
-        // sprite for description button
         auto descBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
+            // @geode-ignore(unknown-resource)
             "geode.loader/message.png",
             0.875f,
             m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
@@ -198,7 +185,7 @@ bool FavoritesItem::init(
     // ID label
     auto idLabel = CCLabelBMFont::create(modID.c_str(), "bigFont.fnt");
     idLabel->setID("mod-id");
-    idLabel->setPosition({ 37.5f + idLabelOffset, (heightCS / 2.f) - 5.f });
+    idLabel->setPosition({ 37.5f + idLabelOffset, (size.height / 2.f) - 5.f });
     idLabel->setScale(0.25f);
     idLabel->setAnchorPoint({ 0, 0.5 });
     idLabel->setOpacity(125);
@@ -210,12 +197,10 @@ bool FavoritesItem::init(
 
     // for first time users of favorites
     if (auto helpTxt = firstTimeText()) {
-        helpTxt->setPosition({ widthCS - (btnMenu->getScaledContentWidth() + 2.5f), heightCS / 2.f });
+        helpTxt->setPosition({ size.width - (btnMenu->getScaledContentWidth() + 2.5f), size.height / 2.f });
         addChild(helpTxt);
 
         log::debug("Help text added for first time users");
-    } else {
-        btnMenu->updateLayout();
     };
 
     auto const loadProblem = m_impl->mod->targetsOutdatedVersion();
@@ -230,7 +215,7 @@ bool FavoritesItem::init(
             modOutdated->setOpacity(200);
             modOutdated->setAnchorPoint({ 0, 0.5 });
             modOutdated->setAlignment(kCCTextAlignmentLeft);
-            modOutdated->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
+            modOutdated->setPosition({ 37.5f, (size.height / 2.f) - 12.5f });
             modOutdated->setColor(ColorProvider::get()->color3b("geode.loader/mod-list-outdated-label"));
 
             nameLabel->setOpacity(200);
@@ -245,7 +230,7 @@ bool FavoritesItem::init(
         modDisabled->setOpacity(200);
         modDisabled->setAnchorPoint({ 0, 0.5 });
         modDisabled->setAlignment(kCCTextAlignmentLeft);
-        modDisabled->setPosition({ 37.5f, (heightCS / 2.f) - 12.5f });
+        modDisabled->setPosition({ 37.5f, (size.height / 2.f) - 12.5f });
         modDisabled->setColor({ 255, 65, 65 });
 
         nameLabel->setOpacity(200);
@@ -262,8 +247,6 @@ void FavoritesItem::onViewMod(CCObject*) {
 };
 
 void FavoritesItem::onModDesc(CCObject*) {
-    if (!m_impl->mod) return;
-
     if (auto alert = FLAlertLayer::create(
         m_impl->mod->getName().c_str(),
         m_impl->mod->getDescription().value_or("<cr>No description available.</c>"),
@@ -272,8 +255,6 @@ void FavoritesItem::onModDesc(CCObject*) {
 };
 
 void FavoritesItem::onFavorite(CCObject*) {
-    if (!m_impl->mod) return;
-
     // Toggle favorite status
     m_impl->favorite = !m_impl->favorite;
 
@@ -289,9 +270,7 @@ void FavoritesItem::onFavorite(CCObject*) {
 };
 
 void FavoritesItem::updateFavoriteIcon() {
-    if (!m_impl->mod) return;
-
-    if (m_impl->favButton) { // Make sure the favorite button has already been created
+    if (m_impl->favButton) {
         auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
         auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
 
@@ -308,8 +287,6 @@ void FavoritesItem::updateFavoriteIcon() {
 };
 
 CCLabelBMFont* FavoritesItem::firstTimeText() {
-    if (!m_impl->mod) return nullptr;
-
     // check if mod loaded before
     if (favMod->getSavedValue<bool>("already-loaded", false)
         || favMod->getSavedValue<bool>(GEODE_MOD_ID)
