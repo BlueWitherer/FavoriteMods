@@ -14,13 +14,7 @@ protected:
     FavoritesItem();
     ~FavoritesItem();
 
-    void onViewMod(CCObject*);
-    void onModDesc(CCObject*);
-
-    void onFavorite(CCObject*);
-
     CCLabelBMFont* firstTimeText();
-    void updateFavoriteIcon();
 
     bool init(Mod* mod, CCSize const& size, bool geodeTheme, bool heartIcons);
 

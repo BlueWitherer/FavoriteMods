@@ -198,7 +198,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     // Create main content area
     auto const size = m_mainLayer->getScaledContentSize();
 
-    // Create search input
     m_impl->searchInput = TextInput::create(size.width - 125.f, "Search Mods", "bigFont.fnt");
     m_impl->searchInput->setID("search-box");
     m_impl->searchInput->setPosition({ size.width / 2.f - 15.f, size.height - 50.f });
@@ -207,21 +206,23 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     m_mainLayer->addChild(m_impl->searchInput);
 
-    // Clear search box button sprite
     auto searchClearBtnSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn07_001.png");
     searchClearBtnSprite->setScale(0.875f);
 
-    // Create clear search box button
-    auto searchClearBtn = CCMenuItemSpriteExtra::create(
+    auto searchClearBtn = Button::createWithNode(
         searchClearBtnSprite,
-        this,
-        menu_selector(FavoritesPopup::onClearSearch)
+        [this](auto) {
+            m_impl->searchText = "";
+            m_impl->searchInput->setString(m_impl->searchText, true);
+
+            log::debug("Cleared search box");
+        }
     );
     searchClearBtn->setID("clear-search-btn");
     searchClearBtn->setAnchorPoint({ 0.5, 0.5 });
     searchClearBtn->setPosition({ 26.5f, m_impl->searchInput->getPositionY() });
 
-    m_buttonMenu->addChild(searchClearBtn);
+    m_mainLayer->addChild(searchClearBtn);
 
     auto favOnlyOffSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
     auto favOnlyOnSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
@@ -229,7 +230,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     favOnlyOffSprite->setScale(0.8f);
     favOnlyOnSprite->setScale(0.8f);
 
-    // Create favorites only checkbox
     m_impl->favoritesOnlyToggle = CCMenuItemToggler::create(
         favOnlyOffSprite,
         favOnlyOnSprite,
@@ -247,7 +247,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     hideFavOffSprite->setScale(0.8f);
     hideFavOnSprite->setScale(0.8f);
 
-    // Create hide favorites checkbox
     m_impl->hideFavoritesToggle = CCMenuItemToggler::create(
         hideFavOffSprite,
         hideFavOnSprite,
@@ -264,13 +263,11 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     auto fScale = m_impl->heartIcons ? 0.375f : 0.625f;
 
-    // Create icon above favorites only toggle
     auto starOnIcon = CCSprite::createWithSpriteFrameName(fOn);
     starOnIcon->setID("show-favorites-icon");
     starOnIcon->setPosition({ m_impl->favoritesOnlyToggle->getPositionX(), m_impl->favoritesOnlyToggle->getPositionY() + 20.f });
     starOnIcon->setScale(fScale);
 
-    // Create icon above hide favorites toggle
     auto starOffIcon = CCSprite::createWithSpriteFrameName(fOff);
     starOffIcon->setID("hide-favorites-icon");
     starOffIcon->setPosition({ m_impl->hideFavoritesToggle->getPositionX(), m_impl->hideFavoritesToggle->getPositionY() + 20.f });
@@ -288,10 +285,8 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     m_mainLayer->addChild(m_impl->noModsLabel);
 
-    // Create scroll size
     auto const scrollSize = CCSize{ size.width - 17.5f, size.height - 80.f };
 
-    // bg for scroll layer
     auto scrollBG = NineSlice::create("square02b_001.png");
     scrollBG->setContentSize(scrollSize);
     scrollBG->setAnchorPoint({ 0.5, 0.5 });
@@ -323,7 +318,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     m_impl->scrollLayer->scrollToTop();
 
     if (favMod->getSettingValue<bool>("settings-btn")) {
-        // geode mod settings popup button
         auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
             // @geode-ignore(unknown-resource)
             "geode.loader/settings.png",
@@ -333,15 +327,17 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         );
         modSettingsBtnSprite->setScale(0.5f);
 
-        auto modSettingsBtn = CCMenuItemSpriteExtra::create(
+        auto modSettingsBtn = Button::createWithNode(
             modSettingsBtnSprite,
-            this,
-            menu_selector(FavoritesPopup::onModSettings)
+            [this](auto) {
+                log::debug("Opening mod settings popup");
+                openSettingsPopup(favMod);
+            }
         );
         modSettingsBtn->setID("settings-btn");
         modSettingsBtn->setPosition({ 2.5f, 2.5f });
 
-        m_buttonMenu->addChild(modSettingsBtn);
+        m_mainLayer->addChild(modSettingsBtn);
     } else {
         log::debug("Mod settings button disabled");
     };
@@ -356,18 +352,24 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     );
     clearAllBtnSprite->setScale(0.75f);
 
-    // button to clear favorites
-    auto clearAllBtn = CCMenuItemSpriteExtra::create(
+    auto clearAllBtn = Button::createWithNode(
         clearAllBtnSprite,
-        this,
-        menu_selector(FavoritesPopup::onPromptClearAll)
+        [this](auto) {
+            createQuickPopup(
+                "Clear Favorites",
+                "Are you sure you want to <cr>clear your favorites</c>?",
+                "Cancel", "Yes",
+                [this](auto, bool btn2) {
+                    if (btn2) clearAllFavorites();
+                }, true
+            );
+        }
     );
     clearAllBtn->setID("clear-favorites-btn");
     clearAllBtn->setPosition({ size.width / 2.f, 1.25f });
 
-    m_buttonMenu->addChild(clearAllBtn, 3);
+    m_mainLayer->addChild(clearAllBtn, 3);
 
-    // favorites stats button sprite
     auto statsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
         // @geode-ignore(unknown-resource)
         "geode.loader/changelog.png",
@@ -377,25 +379,45 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     );
     statsBtnSprite->setScale(0.5f);
 
-    // button to view funny favorites stats
-    auto statsBtn = CCMenuItemSpriteExtra::create(
+    auto statsBtn = Button::createWithNode(
         statsBtnSprite,
-        this,
-        menu_selector(FavoritesPopup::onGetStats)
+        [this](auto) {
+            int favorite = 0; // favorited mods
+            int enabled = 0; // all enabled mods
+            int total = 0; // all installed mods
+
+            for (auto const& mod : loader->getAllMods()) { // gotta count 'em all!
+                total++;
+
+                if (favMod->getSavedValue<bool>(mod->getID())) favorite++;
+                if (mod->isLoaded()) enabled++;
+            };
+
+            auto const faveCount = fmt::format("<cy>{}</c> Favorites", favorite);
+            auto const enableCount = fmt::format("<cg>{}</c> Enabled, <cr>{}</c> Disabled", enabled, total - enabled);
+            auto const totalCount = fmt::format("<cj>{}</c> Installed", total);
+
+            auto const body = fmt::format("{}\n\nYour Mods\n{}\n{}", faveCount, enableCount, totalCount);
+
+            if (auto alert = FLAlertLayer::create(
+                "Statistics",
+                body.c_str(),
+                "OK"
+            )) alert->show();
+        }
     );
     statsBtn->setID("statistics-btn");
     statsBtn->setPosition({ size.width - 1.25f, 1.25f });
 
-    m_buttonMenu->addChild(statsBtn, 3);
+    m_mainLayer->addChild(statsBtn, 3);
 
-    if (m_impl->usePages) { // if the player has pages enabled
+    if (m_impl->usePages) {
         constexpr auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
 
         auto pageNextBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
         pageNextBtnSprite->setScale(0.875f);
         pageNextBtnSprite->setFlipX(true);
 
-        // create go next page button
         m_impl->pageNextBtn = Button::createWithNode(
             pageNextBtnSprite,
             [this](auto) {
@@ -413,7 +435,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         pagePreviousBtnSprite->setScale(0.875f);
         pagePreviousBtnSprite->setFlipX(false);
 
-        // create go previous page button
         m_impl->pagePreviousBtn = Button::createWithNode(
             pagePreviousBtnSprite,
             [this](auto) {
@@ -427,10 +448,9 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         m_impl->pagePreviousBtn->setPosition({ -17.5f , scrollBG->getPositionY() });
         m_impl->pagePreviousBtn->setVisible(false);
 
-        m_buttonMenu->addChild(m_impl->pageNextBtn);
-        m_buttonMenu->addChild(m_impl->pagePreviousBtn);
+        m_mainLayer->addChild(m_impl->pageNextBtn);
+        m_mainLayer->addChild(m_impl->pagePreviousBtn);
 
-        // create pages label
         m_impl->pagesLabel = CCLabelBMFont::create("Loading pages...", "goldFont.fnt");
         m_impl->pagesLabel->setID("pages-label");
         m_impl->pagesLabel->setAnchorPoint({ 0, 1 });
@@ -444,19 +464,30 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         log::warn("Skipping page buttons");
     };
 
-    // Create info button
     auto infoBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
     infoBtnSprite->setScale(0.75f);
 
-    auto infoBtn = CCMenuItemSpriteExtra::create(
+    auto infoBtn = Button::createWithNode(
         infoBtnSprite,
-        this,
-        menu_selector(FavoritesPopup::onInfoButton)
+        [this](auto) {
+            if (auto alert = FLAlertLayer::create(
+                "Help",
+                fmt::format(
+                    "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.{}",
+                    m_impl->heartIcons ? "heart" : "star",
+                    m_impl->usePages ? fmt::format(
+                        "\n\nYou can also use the <cc>page buttons</c> to navigate through your mods if you have more than {} favorites.",
+                        m_impl->itemsPerPage
+                    ) : ""
+                ).c_str(),
+                "OK"
+            )) alert->show();
+        }
     );
     infoBtn->setID("info-btn");
     infoBtn->setPosition({ size.width - 15.f, size.height - 15.f });
 
-    m_buttonMenu->addChild(infoBtn);
+    m_mainLayer->addChild(infoBtn);
 
     m_impl->refreshModList(true);
 
@@ -468,18 +499,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 void FavoritesPopup::textChanged(CCTextInputNode* input) {
     m_impl->searchText = input->getString();
     m_impl->refreshModList();
-};
-
-void FavoritesPopup::onClearSearch(CCObject*) {
-    m_impl->searchText = "";
-    m_impl->searchInput->setString(m_impl->searchText, true);
-
-    log::debug("Cleared search box");
-};
-
-void FavoritesPopup::onModSettings(CCObject*) {
-    log::debug("Opening mod settings popup");
-    openSettingsPopup(favMod);
 };
 
 void FavoritesPopup::onFavoritesOnlyToggle(CCObject*) {
@@ -510,50 +529,7 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
     m_impl->refreshModList(true);
 };
 
-void FavoritesPopup::onPageNext(CCObject*) {
-    if (m_impl->page < m_impl->totalPages) m_impl->page++; // turn the page next
-    if (m_impl->page >= m_impl->totalPages) m_impl->page = m_impl->totalPages; // if max pages just stay at 1
-
-    m_impl->refreshModList(true);
-};
-
-void FavoritesPopup::onPagePrevious(CCObject*) {
-    if (m_impl->page > 1) m_impl->page--; // turn the page previous
-    if (m_impl->page <= 1) m_impl->page = 1; // if max pages just stay at 1
-
-    m_impl->refreshModList(true);
-};
-
-void FavoritesPopup::onInfoButton(CCObject*) {
-    // lol
-    auto body = fmt::format(
-        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.{}",
-        m_impl->heartIcons ? "heart" : "star",
-        m_impl->usePages ? fmt::format(
-            "\n\nYou can also use the <cc>page buttons</c> to navigate through your mods if you have more than {} favorites.",
-            m_impl->itemsPerPage
-        ) : ""
-    );
-
-    if (auto alert = FLAlertLayer::create(
-        "Help",
-        body.c_str(),
-        "OK"
-    )) alert->show();
-};
-
-void FavoritesPopup::onPromptClearAll(CCObject*) {
-    createQuickPopup(
-        "Clear Favorites",
-        "Are you sure you want to <cr>clear your favorites</c>?",
-        "Cancel", "Yes",
-        [this](auto, bool btn2) {
-            if (btn2) onClearAll();
-        }, true
-    );
-};
-
-void FavoritesPopup::onClearAll() {
+void FavoritesPopup::clearAllFavorites() {
     // Turn off favorite from every mod
     for (auto const& mod : loader->getAllMods()) {
         auto modID = mod->getID(); // get the mod id
@@ -564,31 +540,6 @@ void FavoritesPopup::onClearAll() {
 
     Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
     log::info("Cleared all favorite mods");
-};
-
-void FavoritesPopup::onGetStats(CCObject*) {
-    int favorite = 0; // favorited mods
-    int enabled = 0; // all enabled mods
-    int total = 0; // all installed mods
-
-    for (auto const& mod : loader->getAllMods()) { // gotta count 'em all!
-        total++;
-
-        if (favMod->getSavedValue<bool>(mod->getID())) favorite++;
-        if (mod->isLoaded()) enabled++;
-    };
-
-    auto const faveCount = fmt::format("<cy>{}</c> Favorites", favorite);
-    auto const enableCount = fmt::format("<cg>{}</c> Enabled, <cr>{}</c> Disabled", enabled, total - enabled);
-    auto const totalCount = fmt::format("<cj>{}</c> Installed", total);
-
-    auto const body = fmt::format("{}\n\nYour Mods\n{}\n{}", faveCount, enableCount, totalCount);
-
-    if (auto alert = FLAlertLayer::create(
-        "Statistics",
-        body.c_str(),
-        "OK"
-    )) alert->show();
 };
 
 FavoritesPopup* FavoritesPopup::create(

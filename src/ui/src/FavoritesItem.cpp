@@ -88,10 +88,11 @@ bool FavoritesItem::init(
     );
     viewBtnSprite->setScale(0.75f);
 
-    auto viewBtn = CCMenuItemSpriteExtra::create(
+    auto viewBtn = CCMenuItemExt::createSpriteExtra(
         viewBtnSprite,
-        this,
-        menu_selector(FavoritesItem::onViewMod)
+        [this](auto) {
+            if (m_impl->mod) openInfoPopup(m_impl->mod);
+        }
     );
     viewBtn->setID("view-btn");
 
@@ -101,13 +102,35 @@ bool FavoritesItem::init(
     auto favBtnSprite = CCSprite::createWithSpriteFrameName(m_impl->favorite ? fOn : fOff);
     favBtnSprite->setScale(m_impl->heartIcons ? 0.75f : 1.f);
 
-    // Favorite button here :)
-    m_impl->favButton = CCMenuItemSpriteExtra::create(
+    // fav button here :)
+    auto favBtn = CCMenuItemExt::createSpriteExtra(
         favBtnSprite,
-        this,
-        menu_selector(FavoritesItem::onFavorite)
+        [this](CCMenuItem* sender) {
+            m_impl->favorite = !m_impl->favorite;
+
+            favMod->setSavedValue(m_impl->mod->getID(), m_impl->favorite);
+            log::trace("Setting {} to {}", m_impl->mod->getID(), favMod->getSavedValue<bool>(m_impl->mod->getID(), m_impl->favorite) ? "favorite" : "non-favorite");
+
+            // toggle icon manually cuz cctogglerwhatever sucks balls
+            if (auto btn = typeinfo_cast<CCMenuItemSpriteExtra*>(sender)) {
+                auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
+                auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
+
+                auto newSprite = CCSprite::createWithSpriteFrameName(m_impl->favorite ? fOn : fOff);
+                newSprite->setScale(m_impl->heartIcons ? 0.75f : 1.f);
+
+                btn->setNormalImage(newSprite);
+                btn->updateSprite();
+
+                log::debug("Updated state for {} to {}", m_impl->mod->getID(), m_impl->favorite ? "favorite" : "non-favorite");
+            } else {
+                log::error("Favorite button not found for {}", m_impl->mod->getID());
+            };
+
+            FavoriteEvent().send();
+        }
     );
-    m_impl->favButton->setID("favorite-btn");
+    favBtn->setID("favorite-btn");
 
     auto btnMenuLayout = RowLayout::create()
         ->setDefaultScaleLimits(0.625f, 0.875f)
@@ -127,7 +150,7 @@ bool FavoritesItem::init(
     btnMenu->setLayout(btnMenuLayout);
 
     btnMenu->addChild(viewBtn);
-    btnMenu->addChild(m_impl->favButton);
+    btnMenu->addChild(favBtn);
 
     addChild(btnMenu);
 
@@ -172,10 +195,15 @@ bool FavoritesItem::init(
         descBtnSprite->setScale(0.375f);
 
         // Mod description button
-        auto descBtn = CCMenuItemSpriteExtra::create(
+        auto descBtn = CCMenuItemExt::createSpriteExtra(
             descBtnSprite,
-            this,
-            menu_selector(FavoritesItem::onModDesc)
+            [this](auto) {
+                if (auto alert = FLAlertLayer::create(
+                    m_impl->mod->getName().c_str(),
+                    m_impl->mod->getDescription().value_or("<cr>No description available.</c>"),
+                    "OK"
+                )) alert->show();
+            }
         );
         descBtn->setID("short-description-btn");
 
@@ -240,50 +268,6 @@ bool FavoritesItem::init(
     };
 
     return true;
-};
-
-void FavoritesItem::onViewMod(CCObject*) {
-    if (m_impl->mod) openInfoPopup(m_impl->mod);
-};
-
-void FavoritesItem::onModDesc(CCObject*) {
-    if (auto alert = FLAlertLayer::create(
-        m_impl->mod->getName().c_str(),
-        m_impl->mod->getDescription().value_or("<cr>No description available.</c>"),
-        "OK"
-    )) alert->show();
-};
-
-void FavoritesItem::onFavorite(CCObject*) {
-    // Toggle favorite status
-    m_impl->favorite = !m_impl->favorite;
-
-    // Save the favorite status
-    favMod->setSavedValue(m_impl->mod->getID(), m_impl->favorite);
-    log::debug("Setting {} to {}", m_impl->mod->getID(), favMod->getSavedValue<bool>(m_impl->mod->getID(), m_impl->favorite) ? "favorite" : "non-favorite");
-
-    // Update the icon
-    updateFavoriteIcon();
-
-    // Send event to refresh list
-    FavoriteEvent().send();
-};
-
-void FavoritesItem::updateFavoriteIcon() {
-    if (m_impl->favButton) {
-        auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";
-        auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";
-
-        auto newSprite = CCSprite::createWithSpriteFrameName(m_impl->favorite ? fOn : fOff);
-        newSprite->setScale(m_impl->heartIcons ? 0.75f : 1.f);
-
-        m_impl->favButton->setNormalImage(newSprite);
-        m_impl->favButton->updateSprite();
-
-        log::info("Updated state for {} to {}", m_impl->mod->getID(), m_impl->favorite ? "favorite" : "non-favorite");
-    } else {
-        log::error("Favorite button not found for {}", m_impl->mod->getID());
-    };
 };
 
 CCLabelBMFont* FavoritesItem::firstTimeText() {

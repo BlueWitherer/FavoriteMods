@@ -12,26 +12,16 @@ private:
     class Impl;
     std::unique_ptr<Impl> m_impl;
 
+    void clearAllFavorites();
+
 protected:
     FavoritesPopup();
     ~FavoritesPopup();
 
     void textChanged(CCTextInputNode* input) override;
 
-    void onPageNext(CCObject*);
-    void onPagePrevious(CCObject*);
-
-    void onClearAll();
-    void onClearSearch(CCObject*);
-    void onPromptClearAll(CCObject*);
-
     void onFavoritesOnlyToggle(CCObject*);
     void onHideFavoritesToggle(CCObject*);
-
-    void onInfoButton(CCObject*);
-    void onGetStats(CCObject*);
-
-    void onModSettings(CCObject*);
 
     bool init(bool geodeTheme, bool heartIcons);
 

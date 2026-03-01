@@ -33,18 +33,14 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
     void modify() {
         auto f = m_fields.self();
 
-        // get geode's mod
         if (auto geodeMod = loader->getLoadedMod("geode.loader")) {
             f->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
             log::debug("Geode theme enabled: {}", f->m_isGeodeTheme);
         };
 
-        // check if the player wants hearts instead
         f->m_isHeartIcons = favMod->getSettingValue<bool>("hearts");
 
-        // get the actions menu
         if (auto menu = getChildByID("actions-menu")) {
-            // favorites button sprite
             auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
                 f->m_isHeartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
                 f->m_isHeartIcons ? 1.f : 0.875f,
@@ -52,7 +48,6 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
             );
             favBtnSprite->setScale(0.8f);
 
-            // create favorites button
             auto favBtn = CCMenuItemExt::createSpriteExtra(
                 favBtnSprite,
                 [f](auto) {
