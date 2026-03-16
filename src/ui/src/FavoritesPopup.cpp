@@ -13,14 +13,15 @@ using namespace geode::prelude;
 
 namespace str = utils::string;
 
-static auto favMod = Mod::get(); // Get this mod
-static auto loader = Loader::get();
+static auto favMod = Mod::get();  // Get this mod
 
 class FavoritesPopup::Impl final {
 public:
-    bool geodeTheme = false; // Make sure visuals go with geode theme
-    bool heartIcons = false; // Heart UI mode
-    bool usePages = favMod->getSettingValue<bool>("pages"); // Use the list page system
+    std::vector<Mod*> mods = Loader::get()->getAllMods();
+
+    bool geodeTheme = false;                                 // Make sure visuals go with geode theme
+    bool heartIcons = false;                                 // Heart UI mode
+    bool usePages = favMod->getSettingValue<bool>("pages");  // Use the list page system
 
     ScrollLayer* scrollLayer = nullptr;
 
@@ -59,80 +60,80 @@ public:
         std::vector<Mod*> filteredMods;
         auto enabledOnly = favMod->getSettingValue<bool>("enabled-only");
 
-        for (auto const& mod : loader->getAllMods()) {
+        for (auto const& mod : mods) {
             auto modID = mod->getID();
             bool isFavorited = favMod->getSavedValue<bool>(modID);
 
             // if the player only wants to show enabled mods or just everything
             bool list = enabledOnly ? mod->isOrWillBeEnabled() : true;
-            if (searchText.empty()) list = isFavorited || (modID != "geode.loader"); // if search text is empty, don't show geode loader mod unless its favorited
+            if (searchText.empty()) list = isFavorited || (modID != "geode.loader");  // if search text is empty, don't show geode loader mod unless its favorited
 
             if (list) {
-                auto empty = std::string::npos; // dry code xd
+                auto empty = std::string::npos;  // dry code xd
 
                 log::trace("{} {} a favorite", modID, isFavorited ? "is" : "is not");
 
                 // evil bool >:3
-                bool matchesSearch = searchText.empty() // show all mods if search text is empty
-                    || str::toLower(mod->getName()).find(string::toLower(searchText)) != empty // search via name
-                    || str::toLower(mod->getDescription().value_or(mod->getName())).find(string::toLower(searchText)) != empty // search via description
-                    || str::toLower(mod->getID()).find(string::toLower(searchText)) != empty; // search via id
+                bool matchesSearch = searchText.empty()                                                                                          // show all mods if search text is empty
+                                     || str::toLower(mod->getName()).find(string::toLower(searchText)) != empty                                  // search via name
+                                     || str::toLower(mod->getDescription().value_or(mod->getName())).find(string::toLower(searchText)) != empty  // search via description
+                                     || str::toLower(mod->getID()).find(string::toLower(searchText)) != empty;                                   // search via id
 
                 // If favorites-only is enabled, only show favorited mods
                 if (showFavoritesOnly) {
                     if (isFavorited && matchesSearch) filteredMods.push_back(mod);
-                } else if (hideFavorites) { // If hide favorites is enabled, only show non-favorited mods
+                } else if (hideFavorites) {  // If hide favorites is enabled, only show non-favorited mods
                     if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
-                } else { // show all matching mods, with favorites prioritized
+                } else {  // show all matching mods, with favorites prioritized
                     if (matchesSearch) filteredMods.push_back(mod);
                 };
-            } else { // if geode or disabled skip it
+            } else {  // if geode or disabled skip it
                 log::debug("Skipping listing mod {}", modID);
             };
         };
 
         // Sort if favorited or otherwise in alphabetical order
         std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
-            auto aFav = favMod->getSavedValue<bool>(a->getID()); // Check if mod A is favorited
-            auto bFav = favMod->getSavedValue<bool>(b->getID()); // Check if mod B is favorited
+            auto aFav = favMod->getSavedValue<bool>(a->getID());  // Check if mod A is favorited
+            auto bFav = favMod->getSavedValue<bool>(b->getID());  // Check if mod B is favorited
 
-            if (aFav != bFav) return aFav > bFav; // Favorited mods first
+            if (aFav != bFav) return aFav > bFav;  // Favorited mods first
 
-            return str::toLower(a->getName()) < str::toLower(b->getName()); // Alphabetical order
-            });
+            return str::toLower(a->getName()) < str::toLower(b->getName());  // Alphabetical order
+        });
 
-        if (usePages) { // load every set amount of mods in separate pages
+        if (usePages) {  // load every set amount of mods in separate pages
             totalItems = static_cast<int>(filteredMods.size());
             totalPages = static_cast<int>(std::ceil(static_cast<float>(totalItems) / static_cast<float>(itemsPerPage)));
 
             log::info("Loading page {} of {}", page, totalPages);
 
-            if (page >= totalPages) { // if at the last page
+            if (page >= totalPages) {  // if at the last page
                 log::debug("Reached last page");
 
                 page = totalPages;
 
                 if (pageNextBtn) pageNextBtn->setVisible(false);
-                if (pagePreviousBtn) pagePreviousBtn->setVisible(totalPages > 1); // if there's more than 1 page, show this button
-            } else if (page <= 1) { // if at the first page
+                if (pagePreviousBtn) pagePreviousBtn->setVisible(totalPages > 1);  // if there's more than 1 page, show this button
+            } else if (page <= 1) {                                                // if at the first page
                 log::debug("Reached first page");
 
                 page = 1;
 
-                if (pageNextBtn) pageNextBtn->setVisible(totalPages > 1); // if there's more than 1 page, show this button
+                if (pageNextBtn) pageNextBtn->setVisible(totalPages > 1);  // if there's more than 1 page, show this button
                 if (pagePreviousBtn) pagePreviousBtn->setVisible(false);
-            } else { // if somewhere in the middle
+            } else {  // if somewhere in the middle
                 if (pageNextBtn) pageNextBtn->setVisible(true);
                 if (pagePreviousBtn) pagePreviousBtn->setVisible(true);
             };
 
-            int startIndex = (page - 1) * itemsPerPage; // show this mod first
-            int endIndex = std::min(startIndex + itemsPerPage, totalItems); // show this mod last
+            int startIndex = (page - 1) * itemsPerPage;                      // show this mod first
+            int endIndex = std::min(startIndex + itemsPerPage, totalItems);  // show this mod last
 
-            if (startIndex >= 0 && startIndex < totalItems) { // make sure the mods exist
-                loadModList({ filteredMods.begin() + startIndex, filteredMods.begin() + endIndex });
+            if (startIndex >= 0 && startIndex < totalItems) {  // make sure the mods exist
+                loadModList({filteredMods.begin() + startIndex, filteredMods.begin() + endIndex});
 
-                if (pagesLabel) { // make sure the page label exists
+                if (pagesLabel) {  // make sure the page label exists
                     auto pageText = fmt::format("Page {}/{}, Total {} Mods", page, totalPages, totalItems);
                     pagesLabel->setCString(pageText.c_str());
                 } else {
@@ -141,7 +142,7 @@ public:
             } else {
                 log::error("Invalid start index for filtered mods vector: {}", startIndex);
             };
-        } else { // or screw it just load 'em all!
+        } else {  // or screw it just load 'em all!
             log::debug("Loading all mods");
             loadModList(filteredMods);
         };
@@ -159,16 +160,28 @@ public:
         };
     };
 
+    void clearAllFavorites() {
+        // Turn off favorite from every mod
+        for (auto const& mod : mods) {
+            auto modID = mod->getID();                                              // get the mod id
+            if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false);  // prevent creating more saves
+        };
+
+        refreshModList(true);
+
+        Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
+        log::info("Cleared all favorite mods");
+    };
+
     void loadModList(std::span<Mod*> allMods) {
-        for (auto const& mod : allMods) { // Add all mod items
-            scrollLayer->m_contentLayer->addChild(FavoritesItem::create(mod, { scrollLayer->getScaledContentWidth(), 37.5f }, geodeTheme, heartIcons));
+        for (auto const& mod : allMods) {  // Add all mod items
+            scrollLayer->m_contentLayer->addChild(FavoritesItem::create(mod, {scrollLayer->getScaledContentWidth(), 37.5f}, geodeTheme, heartIcons));
             log::trace("Processed list item for mod {}", mod->getID());
         };
     };
 };
 
 FavoritesPopup::FavoritesPopup() : m_impl(std::make_unique<Impl>()) {};
-
 FavoritesPopup::~FavoritesPopup() {};
 
 bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
@@ -183,44 +196,38 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
             // @geode-ignore(unknown-resource)
             "geode.loader/close.png",
             0.875f,
-            m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
-        ),
-        0.875f
-    );
+            m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green),
+        0.875f);
 
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
 
     addEventListener(FavoriteEvent(), [this]() {
         m_impl->refreshModList();
-        });
+    });
 
     // Create main content area
     auto const size = m_mainLayer->getScaledContentSize();
 
     m_impl->searchInput = TextInput::create(size.width - 125.f, "Search Mods", "bigFont.fnt");
     m_impl->searchInput->setID("search-box");
-    m_impl->searchInput->setPosition({ size.width / 2.f - 15.f, size.height - 50.f });
+    m_impl->searchInput->setPosition({size.width / 2.f - 15.f, size.height - 50.f});
     m_impl->searchInput->setDelegate(this);
     m_impl->searchInput->setMaxCharCount(50);
 
     m_mainLayer->addChild(m_impl->searchInput);
 
-    auto searchClearBtnSprite = CCSprite::createWithSpriteFrameName("GJ_longBtn07_001.png");
-    searchClearBtnSprite->setScale(0.875f);
-
-    auto searchClearBtn = Button::createWithNode(
-        searchClearBtnSprite,
+    auto searchClearBtn = Button::createWithSpriteFrameName(
+        "GJ_longBtn07_001.png",
         [this](auto) {
             m_impl->searchText = "";
             m_impl->searchInput->setString(m_impl->searchText, true);
 
             log::debug("Cleared search box");
-        }
-    );
+        });
     searchClearBtn->setID("clear-search-btn");
-    searchClearBtn->setAnchorPoint({ 0.5, 0.5 });
-    searchClearBtn->setPosition({ 26.5f, m_impl->searchInput->getPositionY() });
+    searchClearBtn->setScale(0.875f);
+    searchClearBtn->setPosition({26.5f, m_impl->searchInput->getPositionY()});
 
     m_mainLayer->addChild(searchClearBtn);
 
@@ -234,10 +241,9 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         favOnlyOffSprite,
         favOnlyOnSprite,
         this,
-        menu_selector(FavoritesPopup::onFavoritesOnlyToggle)
-    );
+        menu_selector(FavoritesPopup::onFavoritesOnlyToggle));
     m_impl->favoritesOnlyToggle->setID("show-favorites-btn");
-    m_impl->favoritesOnlyToggle->setPosition({ size.width - 60.f, size.height - 50.f });
+    m_impl->favoritesOnlyToggle->setPosition({size.width - 60.f, size.height - 50.f});
 
     m_buttonMenu->addChild(m_impl->favoritesOnlyToggle);
 
@@ -251,26 +257,25 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         hideFavOffSprite,
         hideFavOnSprite,
         this,
-        menu_selector(FavoritesPopup::onHideFavoritesToggle)
-    );
+        menu_selector(FavoritesPopup::onHideFavoritesToggle));
     m_impl->hideFavoritesToggle->setID("hide-favorites-btn");
-    m_impl->hideFavoritesToggle->setPosition({ size.width - 25.f, size.height - 50.f });
+    m_impl->hideFavoritesToggle->setPosition({size.width - 25.f, size.height - 50.f});
 
     m_buttonMenu->addChild(m_impl->hideFavoritesToggle);
 
-    auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png"; // enabled favorite icon
-    auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png"; // disabled favorite icon
+    auto const fOn = m_impl->heartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png";         // enabled favorite icon
+    auto const fOff = m_impl->heartIcons ? "gj_heartOff_001.png" : "GJ_starsIcon_gray_001.png";  // disabled favorite icon
 
     auto fScale = m_impl->heartIcons ? 0.375f : 0.625f;
 
     auto starOnIcon = CCSprite::createWithSpriteFrameName(fOn);
     starOnIcon->setID("show-favorites-icon");
-    starOnIcon->setPosition({ m_impl->favoritesOnlyToggle->getPositionX(), m_impl->favoritesOnlyToggle->getPositionY() + 20.f });
+    starOnIcon->setPosition({m_impl->favoritesOnlyToggle->getPositionX(), m_impl->favoritesOnlyToggle->getPositionY() + 20.f});
     starOnIcon->setScale(fScale);
 
     auto starOffIcon = CCSprite::createWithSpriteFrameName(fOff);
     starOffIcon->setID("hide-favorites-icon");
-    starOffIcon->setPosition({ m_impl->hideFavoritesToggle->getPositionX(), m_impl->hideFavoritesToggle->getPositionY() + 20.f });
+    starOffIcon->setPosition({m_impl->hideFavoritesToggle->getPositionX(), m_impl->hideFavoritesToggle->getPositionY() + 20.f});
     starOffIcon->setScale(fScale);
 
     m_mainLayer->addChild(starOnIcon);
@@ -278,37 +283,37 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     m_impl->noModsLabel = CCLabelBMFont::create("No mods found! :(", "bigFont.fnt");
     m_impl->noModsLabel->setID("no-mods-label");
-    m_impl->noModsLabel->setPosition({ size.width / 2.f, size.height / 2.f - 30.f });
+    m_impl->noModsLabel->setPosition({size.width / 2.f, size.height / 2.f - 30.f});
     m_impl->noModsLabel->setScale(0.5f);
-    m_impl->noModsLabel->setColor({ 125, 125, 125 });
+    m_impl->noModsLabel->setColor({125, 125, 125});
     m_impl->noModsLabel->setVisible(false);
 
     m_mainLayer->addChild(m_impl->noModsLabel);
 
-    auto const scrollSize = CCSize{ size.width - 17.5f, size.height - 80.f };
+    auto const scrollSize = CCSize{size.width - 17.5f, size.height - 80.f};
 
     auto scrollBG = NineSlice::create("square02b_001.png");
     scrollBG->setContentSize(scrollSize);
-    scrollBG->setAnchorPoint({ 0.5, 0.5 });
-    scrollBG->setPosition({ size.width / 2.f, (size.height / 2.f) - 30.f });
-    scrollBG->setColor({ 0, 0, 0 });
+    scrollBG->setAnchorPoint({0.5, 0.5});
+    scrollBG->setPosition({size.width / 2.f, (size.height / 2.f) - 30.f});
+    scrollBG->setColor({0, 0, 0});
     scrollBG->setOpacity(100);
 
     m_mainLayer->addChild(scrollBG);
 
     // Create layout for scroll layer
     auto scrollLayerLayout = ColumnLayout::create()
-        ->setAxisAlignment(AxisAlignment::End) // seriously why is this end at top but start at bottom?
-        ->setAxisReverse(true) // haha wtf is top reverse but bottom isnt LMAO
-        ->setAutoGrowAxis(scrollSize.height - 12.5f)
-        ->setGrowCrossAxis(false)
-        ->setGap(5.f);
+                                 ->setAxisAlignment(AxisAlignment::End)  // seriously why is this end at top but start at bottom?
+                                 ->setAxisReverse(true)                  // haha wtf is top reverse but bottom isnt LMAO
+                                 ->setAutoGrowAxis(scrollSize.height - 12.5f)
+                                 ->setGrowCrossAxis(false)
+                                 ->setGap(5.f);
 
     // Create scroll layer
-    m_impl->scrollLayer = ScrollLayer::create({ scrollSize.width - 10.f, scrollSize.height - 10.f });
+    m_impl->scrollLayer = ScrollLayer::create({scrollSize.width - 10.f, scrollSize.height - 10.f});
     m_impl->scrollLayer->setID("mod-list");
-    m_impl->scrollLayer->setAnchorPoint({ 0.5, 0.5 });
-    m_impl->scrollLayer->setPosition({ 13.5f, 15.f }); // ???
+    m_impl->scrollLayer->setAnchorPoint({0.5, 0.5});
+    m_impl->scrollLayer->setPosition({13.5f, 15.f});  // ???
 
     m_impl->scrollLayer->m_contentLayer->setLayout(scrollLayerLayout);
 
@@ -318,24 +323,20 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     m_impl->scrollLayer->scrollToTop();
 
     if (favMod->getSettingValue<bool>("settings-btn")) {
-        auto modSettingsBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
-            // @geode-ignore(unknown-resource)
-            "geode.loader/settings.png",
-            1.f,
-            m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
-            CircleBaseSize::Medium
-        );
-        modSettingsBtnSprite->setScale(0.5f);
-
         auto modSettingsBtn = Button::createWithNode(
-            modSettingsBtnSprite,
+            CircleButtonSprite::createWithSpriteFrameName(
+                // @geode-ignore(unknown-resource)
+                "geode.loader/settings.png",
+                1.f,
+                m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
+                CircleBaseSize::Medium),
             [this](auto) {
                 log::debug("Opening mod settings popup");
                 openSettingsPopup(favMod);
-            }
-        );
+            });
         modSettingsBtn->setID("settings-btn");
-        modSettingsBtn->setPosition({ 2.5f, 2.5f });
+        modSettingsBtn->setScale(0.5f);
+        modSettingsBtn->setPosition({2.5f, 2.5f});
 
         m_mainLayer->addChild(modSettingsBtn);
     } else {
@@ -348,8 +349,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         "bigFont.fnt",
         // @geode-ignore(unknown-resource)
         m_impl->geodeTheme ? "geode.loader/GE_button_05.png" : "GJ_button_01.png",
-        0.875f
-    );
+        0.875f);
     clearAllBtnSprite->setScale(0.75f);
 
     auto clearAllBtn = Button::createWithNode(
@@ -358,15 +358,15 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
             createQuickPopup(
                 "Clear Favorites",
                 "Are you sure you want to <cr>clear your favorites</c>?",
-                "Cancel", "Yes",
+                "Cancel",
+                "Yes",
                 [this](auto, bool btn2) {
-                    if (btn2) clearAllFavorites();
-                }, true
-            );
-        }
-    );
+                    if (btn2) m_impl->clearAllFavorites();
+                },
+                true);
+        });
     clearAllBtn->setID("clear-favorites-btn");
-    clearAllBtn->setPosition({ size.width / 2.f, 1.25f });
+    clearAllBtn->setPosition({size.width / 2.f, 1.25f});
 
     m_mainLayer->addChild(clearAllBtn, 3);
 
@@ -375,18 +375,17 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         "geode.loader/changelog.png",
         0.75f,
         m_impl->geodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green,
-        CircleBaseSize::Small
-    );
+        CircleBaseSize::Small);
     statsBtnSprite->setScale(0.5f);
 
     auto statsBtn = Button::createWithNode(
         statsBtnSprite,
         [this](auto) {
-            int favorite = 0; // favorited mods
-            int enabled = 0; // all enabled mods
-            int total = 0; // all installed mods
+            int favorite = 0;  // favorited mods
+            int enabled = 0;   // all enabled mods
+            int total = 0;     // all installed mods
 
-            for (auto const& mod : loader->getAllMods()) { // gotta count 'em all!
+            for (auto const& mod : m_impl->mods) {  // gotta count 'em all!
                 total++;
 
                 if (favMod->getSavedValue<bool>(mod->getID())) favorite++;
@@ -400,52 +399,44 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
             auto const body = fmt::format("{}\n\nYour Mods\n{}\n{}", faveCount, enableCount, totalCount);
 
             if (auto alert = FLAlertLayer::create(
-                "Statistics",
-                body.c_str(),
-                "OK"
-            )) alert->show();
-        }
-    );
+                    "Statistics",
+                    body.c_str(),
+                    "OK")) alert->show();
+        });
     statsBtn->setID("statistics-btn");
-    statsBtn->setPosition({ size.width - 1.25f, 1.25f });
+    statsBtn->setPosition({size.width - 1.25f, 1.25f});
 
     m_mainLayer->addChild(statsBtn, 3);
 
     if (m_impl->usePages) {
-        constexpr auto pageBtnSpriteName = "GJ_arrow_02_001.png"; // same for both buttons
+        constexpr auto pageBtnSpriteName = "GJ_arrow_02_001.png";  // same for both buttons
 
-        auto pageNextBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
-        pageNextBtnSprite->setScale(0.875f);
-        pageNextBtnSprite->setFlipX(true);
-
-        m_impl->pageNextBtn = Button::createWithNode(
-            pageNextBtnSprite,
+        m_impl->pageNextBtn = Button::createWithSpriteFrameName(
+            pageBtnSpriteName,
             [this](auto) {
-                if (m_impl->page < m_impl->totalPages) m_impl->page++; // turn the page next
-                if (m_impl->page >= m_impl->totalPages) m_impl->page = m_impl->totalPages; // if max pages just stay at 1
+                if (m_impl->page < m_impl->totalPages) m_impl->page++;                      // turn the page next
+                if (m_impl->page >= m_impl->totalPages) m_impl->page = m_impl->totalPages;  // if max pages just stay at 1
 
                 m_impl->refreshModList(true);
-            }
-        );
+            });
         m_impl->pageNextBtn->setID("page-next-btn");
-        m_impl->pageNextBtn->setPosition({ size.width + 17.5f , scrollBG->getPositionY() });
+        m_impl->pageNextBtn->setScale(0.875f);
+        m_impl->pageNextBtn->setPosition({size.width + 17.5f, scrollBG->getPositionY()});
         m_impl->pageNextBtn->setVisible(true);
 
-        auto pagePreviousBtnSprite = CCSprite::createWithSpriteFrameName(pageBtnSpriteName);
-        pagePreviousBtnSprite->setScale(0.875f);
-        pagePreviousBtnSprite->setFlipX(false);
+        if (auto spr = typeinfo_cast<CCSprite*>(m_impl->pageNextBtn->getDisplayNode())) spr->setFlipX(true);
 
-        m_impl->pagePreviousBtn = Button::createWithNode(
-            pagePreviousBtnSprite,
+        m_impl->pagePreviousBtn = Button::createWithSpriteFrameName(
+            pageBtnSpriteName,
             [this](auto) {
-                if (m_impl->page > 1) m_impl->page--; // turn the page previous
-                if (m_impl->page <= 1) m_impl->page = 1; // if max pages just stay at 1
+                if (m_impl->page > 1) m_impl->page--;     // turn the page previous
+                if (m_impl->page <= 1) m_impl->page = 1;  // if max pages just stay at 1
 
                 m_impl->refreshModList(true);
-            }
-        );
+            });
         m_impl->pagePreviousBtn->setID("page-previous-btn");
-        m_impl->pagePreviousBtn->setPosition({ -17.5f , scrollBG->getPositionY() });
+        m_impl->pagePreviousBtn->setScale(0.875f);
+        m_impl->pagePreviousBtn->setPosition({-17.5f, scrollBG->getPositionY()});
         m_impl->pagePreviousBtn->setVisible(false);
 
         m_mainLayer->addChild(m_impl->pageNextBtn);
@@ -453,8 +444,8 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
         m_impl->pagesLabel = CCLabelBMFont::create("Loading pages...", "goldFont.fnt");
         m_impl->pagesLabel->setID("pages-label");
-        m_impl->pagesLabel->setAnchorPoint({ 0, 1 });
-        m_impl->pagesLabel->setPosition({ favMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f });
+        m_impl->pagesLabel->setAnchorPoint({0, 1});
+        m_impl->pagesLabel->setPosition({favMod->getSettingValue<bool>("settings-btn") ? 20.f : 0.f, -1.25f});
         m_impl->pagesLabel->setScale(0.375f);
 
         m_mainLayer->addChild(m_impl->pagesLabel);
@@ -464,28 +455,24 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
         log::warn("Skipping page buttons");
     };
 
-    auto infoBtnSprite = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    infoBtnSprite->setScale(0.75f);
-
-    auto infoBtn = Button::createWithNode(
-        infoBtnSprite,
+    auto infoBtn = Button::createWithSpriteFrameName(
+        "GJ_infoIcon_001.png",
         [this](auto) {
             if (auto alert = FLAlertLayer::create(
-                "Help",
-                fmt::format(
-                    "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.{}",
-                    m_impl->heartIcons ? "heart" : "star",
-                    m_impl->usePages ? fmt::format(
-                        "\n\nYou can also use the <cc>page buttons</c> to navigate through your mods if you have more than {} favorites.",
-                        m_impl->itemsPerPage
-                    ) : ""
-                ).c_str(),
-                "OK"
-            )) alert->show();
-        }
-    );
+                    "Help",
+                    fmt::format(
+                        "To <cg>add a mod to your favorites</c>, search for it in the scrolling area and press the <cy>{} button</c> located to the right-hand side of the listed mod. You can also press it again to <cr>remove it</c> from your favorites.{}",
+                        m_impl->heartIcons ? "heart" : "star",
+                        m_impl->usePages ? fmt::format(
+                                               "\n\nYou can also use the <cc>page buttons</c> to navigate through your mods if you have more than {} favorites.",
+                                               m_impl->itemsPerPage)
+                                         : "")
+                        .c_str(),
+                    "OK")) alert->show();
+        });
     infoBtn->setID("info-btn");
-    infoBtn->setPosition({ size.width - 15.f, size.height - 15.f });
+    infoBtn->setScale(0.75f);
+    infoBtn->setPosition({size.width - 15.f, size.height - 15.f});
 
     m_mainLayer->addChild(infoBtn);
 
@@ -529,23 +516,9 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
     m_impl->refreshModList(true);
 };
 
-void FavoritesPopup::clearAllFavorites() {
-    // Turn off favorite from every mod
-    for (auto const& mod : loader->getAllMods()) {
-        auto modID = mod->getID(); // get the mod id
-        if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false); // prevent creating more saves
-    };
-
-    m_impl->refreshModList(true);
-
-    Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
-    log::info("Cleared all favorite mods");
-};
-
 FavoritesPopup* FavoritesPopup::create(
     bool geodeTheme,
-    bool heartIcons
-) {
+    bool heartIcons) {
     auto ret = new FavoritesPopup();
     if (ret->init(geodeTheme, heartIcons)) {
         ret->autorelease();

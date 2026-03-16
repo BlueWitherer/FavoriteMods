@@ -10,9 +10,8 @@ using namespace geode::prelude;
 
 // it's modding time :3
 static auto favMod = Mod::get();
-static auto loader = Loader::get();
 
-static const ZStringView urlGeode = "https://geode-sdk.org/mods/";
+static constexpr std::string_view urlGeode = "https://geode-sdk.org/mods/";
 
 $on_game(Loaded) {
     // showcase itself when the player loads for the first time
@@ -26,14 +25,14 @@ $on_game(Loaded) {
 
 class $nodeModify(FavoritesModsLayer, ModsLayer) {
     struct Fields {
-        bool m_isGeodeTheme = false; // setting for geode theme
-        bool m_isHeartIcons = false; // if the player wants heart buttons
+        bool m_isGeodeTheme = false;  // setting for geode theme
+        bool m_isHeartIcons = false;  // if the player wants heart buttons
     };
 
     void modify() {
         auto f = m_fields.self();
 
-        if (auto geodeMod = loader->getLoadedMod("geode.loader")) {
+        if (auto geodeMod = Loader::get()->getLoadedMod("geode.loader")) {
             f->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
             log::debug("Geode theme enabled: {}", f->m_isGeodeTheme);
         };
@@ -44,16 +43,14 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
             auto favBtnSprite = CircleButtonSprite::createWithSpriteFrameName(
                 f->m_isHeartIcons ? "gj_heartOn_001.png" : "GJ_starsIcon_001.png",
                 f->m_isHeartIcons ? 1.f : 0.875f,
-                f->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green
-            );
+                f->m_isGeodeTheme ? CircleBaseColor::DarkPurple : CircleBaseColor::Green);
             favBtnSprite->setScale(0.8f);
 
             auto favBtn = CCMenuItemExt::createSpriteExtra(
                 favBtnSprite,
                 [f](auto) {
                     if (auto popup = FavoritesPopup::create(f->m_isGeodeTheme, f->m_isHeartIcons)) popup->show();
-                }
-            );
+                });
             favBtn->setID("favorites-btn"_spr);
 
             menu->addChild(favBtn);
@@ -92,20 +89,20 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                         auto const thisModID = urlStr.erase(0, urlGeode.size());
 
                         auto favMenuLayout = RowLayout::create()
-                            ->setAxisAlignment(AxisAlignment::Start)
-                            ->setAutoScale(false)
-                            ->setAutoGrowAxis(0.f)
-                            ->setGap(2.5f);
+                                                 ->setAxisAlignment(AxisAlignment::Start)
+                                                 ->setAutoScale(false)
+                                                 ->setAutoGrowAxis(0.f)
+                                                 ->setGap(2.5f);
 
                         auto favMenu = CCMenu::create();
                         favMenu->setID("menu"_spr);
-                        favMenu->setPosition({ 0, -1.f });
-                        favMenu->setAnchorPoint({ 0, 1 });
+                        favMenu->setPosition({0, -1.f});
+                        favMenu->setAnchorPoint({0, 1});
 
                         favMenu->setLayout(favMenuLayout);
 
                         // find this mod if it's installed
-                        if (auto mod = loader->getInstalledMod(thisModID)) {
+                        if (auto mod = Loader::get()->getInstalledMod(thisModID)) {
                             auto f = m_fields.self();
 
                             f->m_modID = mod->getID();
@@ -129,18 +126,17 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                                 favButtonOnSpr,
                                 favButtonOffSpr,
                                 this,
-                                menu_selector(FavoritesModPopup::onToggleFavorite)
-                            );
+                                menu_selector(FavoritesModPopup::onToggleFavorite));
                             f->m_favButton->setID("favorite-btn");
 
-                            f->m_favButton->toggle(!isFavorite); // works like this for some reason
+                            f->m_favButton->toggle(!isFavorite);  // works like this for some reason
 
                             favMenu->addChild(f->m_favButton);
 
                             auto favLabel = CCLabelBMFont::create("Favorite", "bigFont.fnt");
                             favLabel->setID("favorite-label");
                             favLabel->setAlignment(kCCTextAlignmentLeft);
-                            favLabel->setAnchorPoint({ 0, 0.5 });
+                            favLabel->setAnchorPoint({0, 0.5});
                             favLabel->setScale(0.375f);
 
                             favMenu->addChild(favLabel);
@@ -150,9 +146,9 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                             auto favLabel = CCLabelBMFont::create("Install this mod to add it to your favorites!", "bigFont.fnt");
                             favLabel->setID("favorite-label");
                             favLabel->setOpacity(200);
-                            favLabel->setColor({ 200, 200, 200 });
+                            favLabel->setColor({200, 200, 200});
                             favLabel->setAlignment(kCCTextAlignmentLeft);
-                            favLabel->setAnchorPoint({ 0, 0.5 });
+                            favLabel->setAnchorPoint({0, 0.5});
                             favLabel->setScale(0.25f);
 
                             favMenu->addChild(favLabel);

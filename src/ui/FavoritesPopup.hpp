@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../Events.hpp"
-
 #include <Geode/Geode.hpp>
 
 using namespace geode::prelude;
@@ -11,8 +9,6 @@ class FavoritesPopup final : public Popup, public TextInputDelegate {
 private:
     class Impl;
     std::unique_ptr<Impl> m_impl;
-
-    void clearAllFavorites();
 
 protected:
     FavoritesPopup();
