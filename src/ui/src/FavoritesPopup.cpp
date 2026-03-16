@@ -17,7 +17,7 @@ static auto favMod = Mod::get();  // Get this mod
 
 class FavoritesPopup::Impl final {
 public:
-    std::vector<Mod*> mods = Loader::get()->getAllMods();
+    std::vector<Mod*> const mods = Loader::get()->getAllMods();
 
     bool geodeTheme = false;                                 // Make sure visuals go with geode theme
     bool heartIcons = false;                                 // Heart UI mode
