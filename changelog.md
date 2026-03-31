@@ -1,3 +1,6 @@
+# v1.2.7-prerelease 
+- Happy April Fool's day!
+
 # v1.2.6 
 - Internal tweaks
 

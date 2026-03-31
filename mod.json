@@ -7,12 +7,12 @@
         "ios": "2.2081"
     },
     "id": "cheeseworks.favoritemods",
-    "name": "Favorite Mods",
-    "version": "1.2.6",
+    "name": "Texture Workshop",
+    "version": "1.2.7-prerelease",
     "developers": [
         "Cheeseworks"
     ],
-    "description": "A shortcut to your favorite Geode mods!",
+    "description": "A shortcut to your favorite Geode Texture Packs!",
     "links": {
         "source": "https://github.com/BlueWitherer/FavoriteMods",
         "homepage": "https://www.cheeseworks.gay/",
