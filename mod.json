@@ -7,7 +7,7 @@
         "ios": "2.2081"
     },
     "id": "cheeseworks.favoritemods",
-    "name": "Texture Workshop",
+    "name": "Favorite Mods",
     "version": "1.2.7",
     "developers": [
         "Cheeseworks"
@@ -20,7 +20,8 @@
     },
     "tags": [
         "offline",
-        "enhancement"
+        "enhancement",
+        "utility"
     ],
     "dependencies": {
         "alphalaneous.alphas_geode_utils": ">=1.2.0"
