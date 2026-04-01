@@ -1,6 +1,4 @@
-#include "../FavoritesItem.hpp"
-
-#include "../../Events.hpp"
+#include "../FavoritesItem.h"
 
 #include <Geode/Geode.hpp>
 
@@ -22,6 +20,8 @@ public:
     bool heartIcons = false;  // Hearts UI mode
 
     CCMenuItemSpriteExtra* favButton = nullptr;  // Favorite button
+
+    Callback favoriteCallback = nullptr;  // Callback for when the favorite button is toggled
 };
 
 FavoritesItem::FavoritesItem() : m_impl(std::make_unique<Impl>()) {};
@@ -123,7 +123,7 @@ bool FavoritesItem::init(
                 log::error("Favorite button not found for {}", m_impl->mod->getID());
             };
 
-            FavoriteEvent().send();
+            if (m_impl->favoriteCallback) m_impl->favoriteCallback();
         });
     favBtn->setID("favorite-btn");
 
@@ -281,6 +281,10 @@ CCLabelBMFont* FavoritesItem::firstTimeText() {
     };
 
     return nullptr;
+};
+
+void FavoritesItem::setFavoriteCallback(Callback&& cb) {
+    m_impl->favoriteCallback = std::move(cb);
 };
 
 FavoritesItem* FavoritesItem::create(

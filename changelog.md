@@ -1,5 +1,6 @@
-# v1.2.7-prerelease 
-- Happy April Fool's day!
+# v1.2.7 
+- ~~Happy April Fool's day!~~ ok playtime's over
+- Optimized UI functionality
 
 # v1.2.6 
 - Internal tweaks

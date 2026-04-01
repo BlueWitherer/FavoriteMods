@@ -1,6 +1,4 @@
-#include "ui/FavoritesPopup.hpp"
-
-#include "Events.hpp"
+#include "ui/FavoritesPopup.h"
 
 #include <Geode/Geode.hpp>
 
@@ -157,7 +155,9 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
                         favMenu->updateLayout();
 
                         // try to get the actual popup layer
-                        if (auto layer = getChildByType<CCLayer*>(0)) layer->addChild(favMenu);
+                        if (auto alert = reinterpret_cast<FLAlertLayer*>(this)) {
+                            if (auto mainLayer = alert->m_mainLayer) mainLayer->addChild(favMenu);
+                        };
                     } else {
                         log::error("Couldn't find Geode mod URL");
                     };
@@ -183,7 +183,7 @@ class $nodeModify(FavoritesModPopup, ModPopup) {
             favMod->setSavedValue(f->m_modID, toFavorite);
             log::debug("{} now {} favorites", f->m_modID, favMod->getSavedValue<bool>(f->m_modID) ? "on" : "off");
 
-            FavoriteEvent().send();
+            if (auto popup = FavoritesPopup::get()) popup->refreshList();
         };
     };
 };

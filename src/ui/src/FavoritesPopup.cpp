@@ -1,8 +1,6 @@
-#include "../FavoritesPopup.hpp"
+#include "../FavoritesPopup.h"
 
-#include "../FavoritesItem.hpp"
-
-#include "../../Events.hpp"
+#include "../FavoritesItem.h"
 
 #include <Geode/Geode.hpp>
 
@@ -14,6 +12,8 @@ using namespace geode::prelude;
 namespace str = utils::string;
 
 static auto favMod = Mod::get();  // Get this mod
+
+FavoritesPopup* FavoritesPopup::s_inst = nullptr;
 
 class FavoritesPopup::Impl final {
 public:
@@ -175,7 +175,14 @@ public:
 
     void loadModList(std::span<Mod*> allMods) {
         for (auto const& mod : allMods) {  // Add all mod items
-            scrollLayer->m_contentLayer->addChild(FavoritesItem::create(mod, {scrollLayer->getScaledContentWidth(), 37.5f}, geodeTheme, heartIcons));
+            if (auto item = FavoritesItem::create(mod, {scrollLayer->getScaledContentWidth(), 37.5f}, geodeTheme, heartIcons)) {
+                item->setFavoriteCallback([this]() {
+                    refreshModList();  // refresh the mod list to update the favorite icons and order
+                });
+
+                scrollLayer->m_contentLayer->addChild(item);
+            };
+
             log::trace("Processed list item for mod {}", mod->getID());
         };
     };
@@ -201,10 +208,6 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     setID("favorite-mods-popup"_spr);
     setTitle("Favorite Mods");
-
-    addEventListener(FavoriteEvent(), [this]() {
-        m_impl->refreshModList();
-    });
 
     // Create main content area
     auto const size = m_mainLayer->getScaledContentSize();
@@ -516,12 +519,36 @@ void FavoritesPopup::onHideFavoritesToggle(CCObject*) {
     m_impl->refreshModList(true);
 };
 
+void FavoritesPopup::refreshList() {
+    m_impl->refreshModList();
+};
+
+void FavoritesPopup::onClose(CCObject* sender) {
+    s_inst = nullptr;
+    Popup::onClose(sender);
+};
+
+void FavoritesPopup::onExit() {
+    s_inst = nullptr;
+    Popup::onExit();
+};
+
+void FavoritesPopup::cleanup() {
+    s_inst = nullptr;
+    Popup::cleanup();
+};
+
+FavoritesPopup* FavoritesPopup::get() noexcept {
+    return s_inst;
+};
+
 FavoritesPopup* FavoritesPopup::create(
     bool geodeTheme,
     bool heartIcons) {
     auto ret = new FavoritesPopup();
     if (ret->init(geodeTheme, heartIcons)) {
         ret->autorelease();
+        s_inst = ret;
         return ret;
     };
 
