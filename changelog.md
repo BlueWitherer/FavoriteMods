@@ -1,3 +1,7 @@
+# v1.2.8 
+- Added support for themes introduced in Geode `v5.6.0`
+- Internal optimizations
+
 # v1.2.7 
 - ~~Happy April Fool's day!~~ ok playtime's over
 - Optimized UI functionality

@@ -31,8 +31,13 @@ class $nodeModify(FavoritesModsLayer, ModsLayer) {
         auto f = m_fields.self();
 
         if (auto geodeMod = Loader::get()->getLoadedMod("geode.loader")) {
-            f->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
-            log::debug("Geode theme enabled: {}", f->m_isGeodeTheme);
+            if (geodeMod->getVersion().getMinor() >= 6) {
+                f->m_isGeodeTheme = ("Geometry Dash" != geodeMod->getSettingValue<std::string>("used-theme"));
+            } else {
+                f->m_isGeodeTheme = geodeMod->getSettingValue<bool>("enable-geode-theme");
+            };
+
+            log::trace("Geode theme {}", f->m_isGeodeTheme ? "enabled" : "disabled");
         };
 
         f->m_isHeartIcons = favMod->getSettingValue<bool>("hearts");

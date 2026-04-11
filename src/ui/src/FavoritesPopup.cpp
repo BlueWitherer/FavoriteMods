@@ -2,6 +2,8 @@
 
 #include "../FavoritesItem.h"
 
+#include <asp/iter.hpp>
+
 #include <Geode/Geode.hpp>
 
 #include <Geode/ui/Button.hpp>
@@ -56,44 +58,45 @@ public:
 
         searchInput->setString(searchText, false);
 
-        // Filtered mods based on search text and toggle settings
-        std::vector<Mod*> filteredMods;
         auto enabledOnly = favMod->getSettingValue<bool>("enabled-only");
 
-        for (auto const& mod : mods) {
-            auto modID = mod->getID();
-            bool isFavorited = favMod->getSavedValue<bool>(modID);
+        auto filteredMods = asp::iter::from(mods)
+                                .filter([this, enabledOnly](Mod* mod) {
+                                    auto modID = mod->getID();
+                                    bool isFavorited = favMod->getSavedValue<bool>(modID);
 
-            // if the player only wants to show enabled mods or just everything
-            bool list = enabledOnly ? mod->isOrWillBeEnabled() : true;
-            if (searchText.empty()) list = isFavorited || (modID != "geode.loader");  // if search text is empty, don't show geode loader mod unless its favorited
+                                    // if the player only wants to show enabled mods or just everything
+                                    bool list = enabledOnly ? mod->isOrWillBeEnabled() : true;
+                                    if (searchText.empty()) list = isFavorited || (modID != "geode.loader");  // if search text is empty, don't show geode loader mod unless its favorited
 
-            if (list) {
-                auto empty = std::string::npos;  // dry code xd
+                                    if (list) {
+                                        auto empty = std::string::npos;  // dry code i guess xd
 
-                log::trace("{} {} a favorite", modID, isFavorited ? "is" : "is not");
+                                        log::trace("{} {} a favorite", modID, isFavorited ? "is" : "is not");
 
-                // evil bool >:3
-                bool matchesSearch = searchText.empty()                                                                                          // show all mods if search text is empty
-                                     || str::toLower(mod->getName()).find(string::toLower(searchText)) != empty                                  // search via name
-                                     || str::toLower(mod->getDescription().value_or(mod->getName())).find(string::toLower(searchText)) != empty  // search via description
-                                     || str::toLower(mod->getID()).find(string::toLower(searchText)) != empty;                                   // search via id
+                                        // evil bool >:3
+                                        bool matchesSearch = searchText.empty()                                                                                          // show all mods if search text is empty
+                                                             || str::toLower(mod->getName()).find(string::toLower(searchText)) != empty                                  // search via name
+                                                             || str::toLower(mod->getDescription().value_or(mod->getName())).find(string::toLower(searchText)) != empty  // search via description
+                                                             || str::toLower(mod->getID()).find(string::toLower(searchText)) != empty;                                   // search via id
 
-                // If favorites-only is enabled, only show favorited mods
-                if (showFavoritesOnly) {
-                    if (isFavorited && matchesSearch) filteredMods.push_back(mod);
-                } else if (hideFavorites) {  // If hide favorites is enabled, only show non-favorited mods
-                    if (!isFavorited && matchesSearch) filteredMods.push_back(mod);
-                } else {  // show all matching mods, with favorites prioritized
-                    if (matchesSearch) filteredMods.push_back(mod);
-                };
-            } else {  // if geode or disabled skip it
-                log::debug("Skipping listing mod {}", modID);
-            };
-        };
+                                        // If favorites-only is enabled, only show favorited mods
+                                        if (showFavoritesOnly) {
+                                            return isFavorited && matchesSearch;
+                                        } else if (hideFavorites) {  // If hide favorites is enabled, only show non-favorited mods
+                                            return !isFavorited && matchesSearch;
+                                        } else {  // show all matching mods, with favorites prioritized
+                                            return matchesSearch;
+                                        };
+                                    } else {  // if mod is geode loader or disabled skip it
+                                        log::debug("Skipping listing mod {}", modID);
+                                    };
 
-        // Sort if favorited or otherwise in alphabetical order
-        std::sort(filteredMods.begin(), filteredMods.end(), [this](const Mod* a, const Mod* b) -> bool {
+                                    return false;
+                                })
+                                .collect();
+
+        std::sort(filteredMods.begin(), filteredMods.end(), [this](Mod* a, Mod* b) -> bool {
             auto aFav = favMod->getSavedValue<bool>(a->getID());  // Check if mod A is favorited
             auto bFav = favMod->getSavedValue<bool>(b->getID());  // Check if mod B is favorited
 
@@ -160,19 +163,6 @@ public:
         };
     };
 
-    void clearAllFavorites() {
-        // Turn off favorite from every mod
-        for (auto const& mod : mods) {
-            auto modID = mod->getID();                                              // get the mod id
-            if (favMod->hasSavedValue(modID)) favMod->setSavedValue(modID, false);  // prevent creating more saves
-        };
-
-        refreshModList(true);
-
-        Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
-        log::info("Cleared all favorite mods");
-    };
-
     void loadModList(std::span<Mod*> allMods) {
         for (auto const& mod : allMods) {  // Add all mod items
             if (auto item = FavoritesItem::create(mod, {scrollLayer->getScaledContentWidth(), 37.5f}, geodeTheme, heartIcons)) {
@@ -185,6 +175,16 @@ public:
 
             log::trace("Processed list item for mod {}", mod->getID());
         };
+    };
+
+    void clearAllFavorites() {
+        // Turn off favorite from every mod
+        for (auto const& mod : mods) favMod->setSavedValue(mod->getID(), false);
+
+        refreshModList(true);
+
+        Notification::create("Cleared all favorites", NotificationIcon::Success, 2.5f)->show();
+        log::info("Cleared all favorite mods");
     };
 };
 
@@ -295,22 +295,13 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
 
     auto const scrollSize = CCSize{size.width - 17.5f, size.height - 80.f};
 
-    auto scrollBG = NineSlice::create("square02b_001.png");
-    scrollBG->setContentSize(scrollSize);
-    scrollBG->setAnchorPoint({0.5, 0.5});
-    scrollBG->setPosition({size.width / 2.f, (size.height / 2.f) - 30.f});
-    scrollBG->setColor({0, 0, 0});
-    scrollBG->setOpacity(100);
+    auto scrollLayerBg = NineSlice::create("square02_001.png");
+    scrollLayerBg->setContentSize(scrollSize);
+    scrollLayerBg->setAnchorPoint({0.5, 0.5});
+    scrollLayerBg->setPosition({size.width / 2.f, (size.height / 2.f) - 30.f});
+    scrollLayerBg->setOpacity(50);
 
-    m_mainLayer->addChild(scrollBG);
-
-    // Create layout for scroll layer
-    auto scrollLayerLayout = ColumnLayout::create()
-                                 ->setAxisAlignment(AxisAlignment::End)  // seriously why is this end at top but start at bottom?
-                                 ->setAxisReverse(true)                  // haha wtf is top reverse but bottom isnt LMAO
-                                 ->setAutoGrowAxis(scrollSize.height - 12.5f)
-                                 ->setGrowCrossAxis(false)
-                                 ->setGap(5.f);
+    m_mainLayer->addChild(scrollLayerBg);
 
     // Create scroll layer
     m_impl->scrollLayer = ScrollLayer::create({scrollSize.width - 10.f, scrollSize.height - 10.f});
@@ -318,7 +309,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
     m_impl->scrollLayer->setAnchorPoint({0.5, 0.5});
     m_impl->scrollLayer->setPosition({13.5f, 15.f});  // ???
 
-    m_impl->scrollLayer->m_contentLayer->setLayout(scrollLayerLayout);
+    m_impl->scrollLayer->m_contentLayer->setLayout(ScrollLayer::createDefaultListLayout(5.f));
 
     m_mainLayer->addChild(m_impl->scrollLayer);
 
@@ -424,7 +415,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
             });
         m_impl->pageNextBtn->setID("page-next-btn");
         m_impl->pageNextBtn->setScale(0.875f);
-        m_impl->pageNextBtn->setPosition({size.width + 17.5f, scrollBG->getPositionY()});
+        m_impl->pageNextBtn->setPosition({size.width + 17.5f, scrollLayerBg->getPositionY()});
         m_impl->pageNextBtn->setVisible(true);
 
         if (auto spr = typeinfo_cast<CCSprite*>(m_impl->pageNextBtn->getDisplayNode())) spr->setFlipX(true);
@@ -439,7 +430,7 @@ bool FavoritesPopup::init(bool geodeTheme, bool heartIcons) {
             });
         m_impl->pagePreviousBtn->setID("page-previous-btn");
         m_impl->pagePreviousBtn->setScale(0.875f);
-        m_impl->pagePreviousBtn->setPosition({-17.5f, scrollBG->getPositionY()});
+        m_impl->pagePreviousBtn->setPosition({-17.5f, scrollLayerBg->getPositionY()});
         m_impl->pagePreviousBtn->setVisible(false);
 
         m_mainLayer->addChild(m_impl->pageNextBtn);

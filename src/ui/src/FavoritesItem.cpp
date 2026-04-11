@@ -130,8 +130,6 @@ bool FavoritesItem::init(
     auto btnMenuLayout = RowLayout::create()
                              ->setDefaultScaleLimits(0.625f, 0.875f)
                              ->setAxisAlignment(AxisAlignment::End)
-                             ->setCrossAxisAlignment(AxisAlignment::Center)
-                             ->setCrossAxisLineAlignment(AxisAlignment::Center)
                              ->setGrowCrossAxis(false)
                              ->setAutoGrowAxis(0.f)
                              ->setAxisReverse(true)
